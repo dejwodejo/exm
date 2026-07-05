@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porównanie metod i narzędzi</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/notes.css">
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Big Data i systemy rozproszone</p>
+    <h1>Porównanie metod i narzędzi</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+    <h2 id="1-definicje-fundamentalne">1. Definicje fundamentalne</h2>
+<ul>
+<li><strong>Przetwarzanie wsadowe (batch)</strong> — funkcja <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><msup><mi>D</mi><mo>∗</mo></msup><mo>→</mo><mi>Y</mi></mrow><annotation encoding="application/x-tex">f: D^* \to Y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6887em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6887em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span></span></span></span>, gdzie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span> to dziedzina pojedynczego rekordu, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>D</mi><mo>∗</mo></msup></mrow><annotation encoding="application/x-tex">D^*</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6887em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6887em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span></span></span></span> (gwiazdka Kleene&#39;ego) to zbiór wszystkich skończonych kolekcji rekordów, a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi></mrow><annotation encoding="application/x-tex">Y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span></span></span></span> to przestrzeń wyników; całe wejście jest znane na starcie (rozmiar dowolny, ale skończony).</li>
+<li><strong>Przetwarzanie strumieniowe (stream)</strong> — funkcja <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mo stretchy="false">(</mo><mi>D</mi><mo>×</mo><mi>T</mi><msup><mo stretchy="false">)</mo><mi>ω</mi></msup><mo>→</mo><msup><mi>Y</mi><mi>ω</mi></msup></mrow><annotation encoding="application/x-tex">f: (D\times T)^\omega \to Y^\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">ω</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.22222em;">Y</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">ω</span></span></span></span></span></span></span></span></span></span></span> na nieskończonej (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ω</mi></mrow><annotation encoding="application/x-tex">\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">ω</span></span></span></span> = ciąg nieskończony) sekwencji par (zdarzenie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>∈</mo><mi>D</mi></mrow><annotation encoding="application/x-tex">d\in D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span>, znacznik czasu <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>∈</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">t\in T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6542em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span></span></span></span>). Kluczowa własność: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi></mrow><annotation encoding="application/x-tex">f</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span> jest <strong>przyczynowa</strong> — <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi></mrow><annotation encoding="application/x-tex">i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>-ty element wyjścia zależy tylko od prefiksu wejścia <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>d</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>t</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><msub><mi>d</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>i</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(d_1,t_1),\dots,(d_i,t_i)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, nie od przyszłych zdarzeń; wynik powstaje przyrostowo (on-line), a nie z całego ciągu naraz.</li>
+<li><strong>Czas zdarzenia (event time)</strong> vs <strong>czas przetwarzania (processing time)</strong> — pierwszy to moment, w którym zdarzenie zaszło; drugi to moment, w którym dotarło do systemu.</li>
+<li><strong>Watermark</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> — niemalejąca funkcja czasu przetwarzania; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">W(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> to systemowa estymata lub deklarowana dolna granica event-time: system zakłada, że wszystkie zdarzenia o event-time <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><mi>W</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\leq W(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> już dotarły. Zdarzenie o event-time <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi></mrow><annotation encoding="application/x-tex">e</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span></span></span></span> jest <strong>spóźnione (late)</strong>, gdy napływa już po tym, jak <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>&gt;</mo><mi>e</mi></mrow><annotation encoding="application/x-tex">W(t)&gt;e</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">e</span></span></span></span>.</li>
+<li><strong>Okna</strong>: tumbling (rozłączne, równe), sliding (zachodzące), session (oddzielone okresami nieaktywności).</li>
+<li><strong>OLTP</strong> (Online Transaction Processing) — wiele krótkich transakcji wierszowych (INSERT/UPDATE pojedynczych rekordów). <strong>OLAP</strong> (Online Analytical Processing) — duże agregaty po milionach wierszy.</li>
+<li><strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) — gwarancje transakcji. <strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) — luźniejsze, typowe dla NoSQL.</li>
+<li><strong>Twierdzenie CAP (Brewer)</strong>: w systemie rozproszonym nie da się zagwarantować jednocześnie wszystkich z <strong>C</strong>onsistency, <strong>A</strong>vailability, <strong>P</strong>artition tolerance. <strong>PACELC</strong> (Abadi; if <strong>P</strong>artition then <strong>A</strong>vailability vs <strong>C</strong>onsistency, <strong>E</strong>lse <strong>L</strong>atency vs <strong>C</strong>onsistency) dodaje wymiar normalnej pracy: latencja vs spójność.</li>
+<li><strong>Gwarancje dostarczenia</strong>: at-most-once (możliwa utrata), at-least-once (możliwe duplikaty), exactly-once (każde zdarzenie przetworzone dokładnie raz — najtrudniejsze, w praktyce często &quot;effectively-once&quot;).</li>
+</ul>
+<h2 id="2-osie-porownania">2. Osie porównania</h2>
+<figure class="viz" id="v08">
+  <div class="viz-head">
+    <p class="viz-title">Krajobraz narzędzi: skala danych × latencja</p>
+    <p class="viz-sub">Rejony tła to paradygmaty (nie jedna diagonalna strzałka). Najedź na narzędzie lub kafelek, aby zobaczyć opis i typowe zastosowanie. Przełącznik przyciemnia nieistotne rejony.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v08-svg" viewBox="0 0 680 340" role="img" aria-label="Mapa pozycyjna narzędzi przetwarzania danych na osiach skala danych i latencja"></svg>
+  </div>
+  <div class="viz-controls">
+    <span class="toggle" id="v08-all" role="button" tabindex="0" aria-pressed="true">Wszystko</span>
+    <span class="toggle" id="v08-batch" role="button" tabindex="0" aria-pressed="false">Batch</span>
+    <span class="toggle" id="v08-stream" role="button" tabindex="0" aria-pressed="false">Real-time / streaming</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)" id="v08-readout">Najedź na narzędzie lub rejon…</span>
+  </div>
+  <figcaption><b>Sedno:</b> wybór narzędzia to dwie niezależne osie — <b>skala danych</b> (single-node GB → rozproszony klaster PB) i <b>latencja</b> (batch: minuty–godziny → OLTP/streaming: milisekundy). Każdy paradygmat zajmuje swój rejon; nie ma jednego „lepszego” kierunku, jest dopasowanie do wymagań.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v08-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  var W=680,H=340,L=54,R=16,T=16,B=44;
+  var x0=L,x1=W-R,y0=H-B,y1=T;
+  function mx(sx){return x0+sx/10*(x1-x0);}      // skala 0..10 (single-node → rozproszony)
+  function my(sy){return y0-sy/10*(y0-y1);}       // latencja 0 (batch, dół) .. 10 (real-time, góra)
+
+  var mode="all"; // all | batch | stream
+
+  // Rejony (paradygmaty) — kolory wyłącznie z tokenów
+  var regions=[
+    {sx0:0,   sx1:4,  sy0:0,   sy1:4.2, tok:"--v-blue",   mode:"batch",  label:"Single-node in-memory", sub:"pandas · Polars · DuckDB"},
+    {sx0:4.2, sx1:10, sy0:0,   sy1:3.5, tok:"--v-orange", mode:"batch",  label:"Rozproszony batch",     sub:"Spark · MapReduce"},
+    {sx0:4.2, sx1:10, sy0:3.7, sy1:6.6, tok:"--v-teal",   mode:"batch",  label:"Hurtownia MPP / OLAP",  sub:"BigQuery · Snowflake · ClickHouse"},
+    {sx0:4.2, sx1:10, sy0:6.8, sy1:10,  tok:"--v-amber",  mode:"stream", label:"Streaming",             sub:"Flink · Kafka Streams"},
+    {sx0:0,   sx1:4,  sy0:6.8, sy1:10,  tok:"--v-blue",   mode:"stream", label:"OLTP / RDBMS",          sub:"PostgreSQL · NewSQL"}
+  ];
+
+  // Narzędzia (punkty) — sx skala, sy latencja
+  var tools=[
+    {sx:0.9, sy:1.6, tok:"--v-blue",   mode:"batch",  short:"pandas",     name:"pandas / R",            use:"in-memory <10 GB, eksploracja i prototypy"},
+    {sx:2.9, sy:2.9, tok:"--v-blue",   mode:"batch",  short:"DuckDB",     name:"DuckDB / Polars",       use:"kolumnowy 10 GB–1 TB, OLAP bez klastra"},
+    {sx:4.6, sy:1.5, tok:"--v-orange", mode:"batch",  short:"Dask",       name:"Dask / Ray",            use:"out-of-core, dane > RAM, niski budżet"},
+    {sx:6.9, sy:2.1, tok:"--v-orange", mode:"batch",  short:"Spark",      name:"Apache Spark",          use:"TB–PB ETL, MLlib; DAG + in-memory RDD"},
+    {sx:8.9, sy:0.8, tok:"--v-orange", mode:"batch",  short:"MapReduce",  name:"Hadoop MapReduce",      use:"legacy: shuffle & sort, checkpoint na HDFS"},
+    {sx:5.3, sy:5.2, tok:"--v-teal",   mode:"batch",  short:"ClickHouse", name:"ClickHouse",            use:"vectorized SIMD, sub-sekundowe OLAP"},
+    {sx:7.9, sy:5.0, tok:"--v-teal",   mode:"batch",  short:"BigQuery",   name:"BigQuery / Snowflake",  use:"MPP SQL i BI, separacja compute/storage"},
+    {sx:5.0, sy:7.4, tok:"--v-amber",  mode:"stream", short:"Spark SS",   name:"Spark Structured Streaming", use:"micro-batch, latencja ~sekundy"},
+    {sx:7.1, sy:8.8, tok:"--v-amber",  mode:"stream", short:"Flink",      name:"Apache Flink",          use:"true streaming, watermarks, exactly-once"},
+    {sx:8.9, sy:9.2, tok:"--v-amber",  mode:"stream", short:"Kafka",      name:"Kafka Streams",         use:"event-driven, CEP, latencja <1 s"},
+    {sx:1.4, sy:8.6, tok:"--v-blue",   mode:"stream", short:"Postgres",   name:"PostgreSQL",            use:"OLTP wierszowy, ACID, latencja <10 ms"},
+    {sx:3.4, sy:8.4, tok:"--v-blue",   mode:"stream", short:"NewSQL",     name:"Spanner / CockroachDB", use:"rozproszone OLTP z gwarancjami ACID"}
+  ];
+
+  var tip=null; // grupa tooltipa (rysowana na wierzchu)
+
+  function dim(m){return mode!=="all"&&m!==mode;}
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),
+        GRID=cvar("--v-grid"),AX=cvar("--v-axis"),BG=cvar("--bg2");
+
+    // delikatne linie odniesienia
+    for(var g=2;g<=8;g+=2){
+      svg.appendChild(E("line",{x1:mx(g),y1:y1,x2:mx(g),y2:y0,stroke:GRID,"stroke-width":1,opacity:.5}));
+      svg.appendChild(E("line",{x1:x0,y1:my(g),x2:x1,y2:my(g),stroke:GRID,"stroke-width":1,opacity:.5}));
+    }
+
+    // rejony tła
+    regions.forEach(function(rg){
+      var col=cvar(rg.tok), d=dim(rg.mode);
+      var rx=mx(rg.sx0), ry=my(rg.sy1), rw=mx(rg.sx1)-mx(rg.sx0), rh=my(rg.sy0)-my(rg.sy1);
+      var r=E("rect",{x:rx+2,y:ry+2,width:rw-4,height:rh-4,rx:9,fill:col,"fill-opacity":d?.04:.13,
+                      stroke:col,"stroke-opacity":d?.18:.55,"stroke-width":1.3});
+      r.style.cursor="default";
+      r.addEventListener("mouseenter",function(){readout(rg.label+" — "+rg.sub);});
+      r.addEventListener("mouseleave",function(){readout(null);});
+      svg.appendChild(r);
+      svg.appendChild(E("text",{x:rx+11,y:ry+18,"font-size":11.5,"font-weight":700,
+                      fill:d?MUT:INK,"fill-opacity":d?.5:1},rg.label));
+      svg.appendChild(E("text",{x:rx+11,y:ry+31,"font-size":9.5,fill:col,"fill-opacity":d?.4:.95},rg.sub));
+    });
+
+    // osie
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x1,y2:y0,stroke:AX,"stroke-width":1.4}));
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:AX,"stroke-width":1.4}));
+    svg.appendChild(E("text",{x:(x0+x1)/2,y:H-10,"text-anchor":"middle","font-size":11,fill:MUT},
+                    "skala danych:  single-node (GB)  →  rozproszony klaster (PB)"));
+    var yl=E("text",{x:16,y:(y0+y1)/2,"text-anchor":"middle","font-size":11,fill:MUT,
+                    transform:"rotate(-90 16 "+((y0+y1)/2).toFixed(1)+")"},"latencja:  batch (min–godz)  →  real-time (ms)");
+    svg.appendChild(yl);
+
+    // punkty narzędzi
+    tools.forEach(function(tl,i){
+      var col=cvar(tl.tok), d=dim(tl.mode), px=mx(tl.sx), py=my(tl.sy);
+      var c=E("circle",{cx:px,cy:py,r:6,fill:col,"fill-opacity":d?.22:1,stroke:BG,"stroke-width":2,
+                        tabindex:"0",role:"img","aria-label":tl.name+": "+tl.use});
+      c.style.cursor="pointer";
+      c.style.outline="none";
+      c.addEventListener("mouseenter",function(){showTip(i);});
+      c.addEventListener("mouseleave",function(){hideTip();});
+      c.addEventListener("focus",function(){showTip(i);});
+      c.addEventListener("blur",function(){hideTip();});
+      svg.appendChild(c);
+      svg.appendChild(E("text",{x:px,y:py+16,"text-anchor":"middle","font-size":9.5,"font-weight":600,
+                      fill:d?MUT:INK2,"fill-opacity":d?.45:1,"pointer-events":"none"},tl.short));
+    });
+
+    tip=E("g",{"pointer-events":"none"});
+    svg.appendChild(tip);
+  }
+
+  function readout(txt){
+    document.getElementById("v08-readout").textContent=txt||"Najedź na narzędzie lub rejon…";
+  }
+
+  function showTip(i){
+    hideTip();
+    var tl=tools[i], INK=cvar("--ink"),MUT=cvar("--muted"),BG=cvar("--bg2"),RULE=cvar("--rule"),col=cvar(tl.tok);
+    var px=mx(tl.sx), py=my(tl.sy);
+    var lines=[tl.name,tl.use];
+    var w=Math.max(tl.name.length*6.4, tl.use.length*5.5)+18, h=36;
+    var tx=Math.max(x0, Math.min(px-w/2, x1-w));
+    var ty=py-h-11; if(ty<y1) ty=py+13;
+    tip.appendChild(E("rect",{x:tx,y:ty,width:w,height:h,rx:7,fill:BG,stroke:RULE,"stroke-width":1.2,
+                    style:"filter:drop-shadow(0 2px 5px rgba(0,0,0,.18))"}));
+    tip.appendChild(E("rect",{x:tx,y:ty,width:3.5,height:h,rx:1.5,fill:col}));
+    tip.appendChild(E("text",{x:tx+11,y:ty+15,"font-size":11,"font-weight":700,fill:INK},lines[0]));
+    tip.appendChild(E("text",{x:tx+11,y:ty+29,"font-size":10,fill:MUT},lines[1]));
+    readout(tl.name+" — "+tl.use);
+  }
+  function hideTip(){while(tip.firstChild)tip.removeChild(tip.firstChild);readout(null);}
+
+  var btns={all:document.getElementById("v08-all"),batch:document.getElementById("v08-batch"),stream:document.getElementById("v08-stream")};
+  function setMode(m){
+    mode=m;
+    for(var k in btns)btns[k].setAttribute("aria-pressed",k===m?"true":"false");
+    render();
+  }
+  Object.keys(btns).forEach(function(k){
+    btns[k].addEventListener("click",function(){setMode(k);});
+    btns[k].addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();setMode(k);}});
+  });
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>
+
+<p>Wymiary, wzdłuż których porównujemy narzędzia:</p>
+<ul>
+<li><strong>Skala danych</strong>: GB (single-node) → TB (single-node z formatem kolumnowym) → PB (rozproszony klaster).</li>
+<li><strong>Latencja</strong>: minuty–godziny (batch) → sekundy (micro-batch) → milisekundy (true streaming) → &lt; 10 ms (OLTP).</li>
+<li><strong>Model danych</strong>: relacyjny (wiersz), kolumnowy, dokumentowy, klucz-wartość, grafowy.</li>
+<li><strong>Schemat</strong>: schema-on-write (hurtownia, RDBMS — Relational Database Management System) vs schema-on-read (data lake).</li>
+<li><strong>Tryb transformacji</strong>: ETL (Extract–Transform–Load, transformacja przed zapisem) vs ELT (transformacja w docelowej hurtowni; dominuje od czasu tanich hurtowni chmurowych).</li>
+<li><strong>Architektura zasobów</strong>: shared-memory (jeden węzeł), shared-disk (klaster + wspólny storage), shared-nothing (klaster z lokalnymi dyskami — Hadoop, Spark).</li>
+</ul>
+<h2 id="3-klasy-narzedzi">3. Klasy narzędzi</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Klasa</th>
+<th>Reprezentanci</th>
+<th>Kiedy stosować</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>In-memory single-node</td>
+<td>pandas, NumPy, R</td>
+<td>&lt; 10 GB, eksploracja, prototypowanie</td>
+</tr>
+<tr>
+<td>Single-node kolumnowy</td>
+<td>DuckDB, Polars (Rust + lazy)</td>
+<td>10 GB – 1 TB, OLAP bez klastra</td>
+</tr>
+<tr>
+<td>Out-of-core / lekko rozproszony</td>
+<td>Dask, Modin, Ray</td>
+<td>dane &gt;RAM, niski budżet operacyjny</td>
+</tr>
+<tr>
+<td>Rozproszony batch</td>
+<td>Hadoop MapReduce (legacy), Apache Spark</td>
+<td>TB–PB, ETL, ML (Machine Learning) batch (MLlib)</td>
+</tr>
+<tr>
+<td>Streaming</td>
+<td>Apache Flink (true streaming), Kafka Streams, Spark Structured Streaming (micro-batch)</td>
+<td>event-driven, niska latencja, CEP (Complex Event Processing)</td>
+</tr>
+<tr>
+<td>Hurtownie kolumnowe MPP (Massively Parallel Processing)</td>
+<td>BigQuery, Snowflake, Redshift, ClickHouse, Vertica</td>
+<td>analityka SQL, BI, raporty</td>
+</tr>
+<tr>
+<td>Lakehouse</td>
+<td>Delta Lake, Apache Iceberg, Apache Hudi</td>
+<td>ACID + schema evolution + time travel nad data lake</td>
+</tr>
+<tr>
+<td>Bazy NoSQL</td>
+<td>Cassandra, MongoDB, HBase, Redis, Neo4j</td>
+<td>dopasowanie modelu danych do use case</td>
+</tr>
+<tr>
+<td>NewSQL</td>
+<td>Google Spanner, CockroachDB, YugabyteDB</td>
+<td>rozproszone OLTP z gwarancjami ACID</td>
+</tr>
+<tr>
+<td>Orkiestracja</td>
+<td>Apache Airflow, Dagster, Prefect</td>
+<td>scheduler + DAG (Directed Acyclic Graph), nie silnik przetwarzania</td>
+</tr>
+<tr>
+<td>Transformacje SQL</td>
+<td>dbt (data build tool)</td>
+<td>ELT w hurtowniach, testy, lineage</td>
+</tr>
+</tbody></table></div>
+<p>Spark wyparł czysty Hadoop MapReduce dzięki: przetwarzaniu in-memory, RDD/DataFrame, DAG zamiast sztywnego map→reduce, lazy evaluation oraz optymalizatorowi Catalyst dla Spark SQL/DataFrame/Dataset (nie dla surowych RDD), lineage zamiast checkpointu na HDFS (Hadoop Distributed File System) po każdym kroku. Czysty MR jest dziś legacy; paradygmat shuffle&amp;sort został.</p>
+<h2 id="4-formaty-danych-i-gwarancje">4. Formaty danych i gwarancje</h2>
+<ul>
+<li><strong>Parquet / ORC</strong> — kolumnowe, kompresja, predicate pushdown, late materialization. Standard w analityce (BigQuery, Snowflake, Spark, lakehouse).</li>
+<li><strong>Apache Avro</strong> — wierszowy, ze schemą; standard w Kafka + Schema Registry.</li>
+<li><strong>CSV / JSON</strong> — czytelne, ale nieefektywne (brak schematu, brak kompresji kolumnowej, wolna deserializacja).</li>
+<li><strong>Vectorized execution</strong> (ClickHouse, DuckDB, Photon w Databricks) wykorzystuje SIMD (Single Instruction Multiple Data) i cache-friendliness — stąd przewaga kolumnowych silników w OLAP.</li>
+<li><strong>Exactly-once</strong> w streamingu wymaga albo idempotentnych sinków, albo transakcyjnych commitów (Kafka transactions, distributed snapshots Chandy–Lamporta we Flink, two-phase commit). Sam fakt, że narzędzie reklamuje &quot;exactly-once&quot;, nie wystarczy — sink i źródło muszą to wspierać.</li>
+</ul>
+<h2 id="5-architektury-referencyjne">5. Architektury referencyjne</h2>
+<ul>
+<li><strong>Lambda architecture</strong>: równoległa warstwa batch (Spark) + warstwa speed (Flink/Spark Streaming); duplikacja logiki, ale spójność wyników historycznych.</li>
+<li><strong>Kappa architecture</strong>: tylko streaming z replayowalnym logiem (Kafka); batch = szczególny przypadek długiego replayu. Prostsza operacyjnie w systemach event-streaming, ale nie dominuje uniwersalnie; Lambda nadal bywa sensowna przy ciężkich wsadach i niezależnej warstwie serving.</li>
+</ul>
+<p>Separacja compute/storage (object storage S3/GCS zamiast HDFS) podważyła znaczenie data locality — silniki jak Presto/Trino, Snowflake, BigQuery liczą na szybką sieć, nie na lokalny dysk.</p>
+<h2 id="6-heurystyka-decyzyjna">6. Heurystyka decyzyjna</h2>
+<p>Wybór narzędzia jest problemem decyzyjnym <strong>wielokryterialnym</strong> — kryteria: skala, latencja, budżet, kompetencje zespołu, dojrzałość ekosystemu, ryzyko vendor lock-in:</p>
+<ul>
+<li>&lt; 10 GB, batch, jeden analityk → pandas/DuckDB.</li>
+<li>10 GB – 1 TB, batch → Polars/DuckDB lokalnie albo hurtownia chmurowa + dbt.</li>
+<li><blockquote>
+<p>1 TB batch → Spark + lakehouse (Delta/Iceberg) albo BigQuery/Snowflake.</p>
+</blockquote>
+</li>
+<li>streaming z latencją &lt; 1 s → Flink lub Kafka Streams; &gt; 1 s wystarczy Spark Structured Streaming.</li>
+<li>zespół SQL-only → hurtownia + dbt; zespół Python → Spark/Polars/Dask.</li>
+<li>OLTP z silną spójnością → PostgreSQL; rozproszone OLTP → NewSQL (Spanner, CockroachDB).</li>
+</ul>
+<p>Modele kosztowe są częścią wyboru: BigQuery (per-query bytes scanned), Snowflake (per-second compute), self-hosted Spark (TCO — Total Cost of Ownership infrastruktury). Optymalizacja kosztu = partycjonowanie, klastrowanie, materialized views, dobór rozmiaru warehouse.</p>
+<h2 id="7-powiazania-z-innymi-zagadnieniami">7. Powiązania z innymi zagadnieniami</h2>
+<ul>
+<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data</a></strong>: dobór narzędzia do 5V.</li>
+<li><strong><a href="07_mapreduce.html">MapReduce</a></strong>: historyczny punkt odniesienia każdego silnika.</li>
+<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: skala decyduje (pandas vs Spark vs SQL).</li>
+<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a>/<a href="09_porownanie_modelowania.html">Porównanie modelowania</a></strong>: OLAP, gwiazda/płatek → hurtownia kolumnowa.</li>
+<li><strong><a href="05_raportowanie.html">Raportowanie</a></strong>: BI (Business Intelligence — Tableau, Power BI, Looker, Superset) nad hurtownią/lakehouse.</li>
+<li><strong><a href="13_text_mining.html">Text mining</a></strong>: Spark NLP/Elasticsearch vs spaCy/NLTK lokalnie.</li>
+<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a>/<a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: scikit-learn vs Spark MLlib vs TensorFlow/PyTorch (GPU).</li>
+<li><strong><a href="16_bezpieczenstwo_it.html">Bezpieczeństwo IT</a></strong>: Kerberos, RBAC (Role-Based Access Control), szyfrowanie at-rest/in-transit.</li>
+<li><strong><a href="14_optymalizacja_wielokryterialna.html">Optymalizacja wielokryterialna</a></strong>: MCDM (Multi-Criteria Decision Making) — AHP (Analytic Hierarchy Process), TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution), Pareto.</li>
+</ul>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#1-definicje-fundamentalne">1. Definicje fundamentalne</a></li>
+<li><a href="#2-osie-porownania">2. Osie porównania</a></li>
+<li><a href="#3-klasy-narzedzi">3. Klasy narzędzi</a></li>
+<li><a href="#4-formaty-danych-i-gwarancje">4. Formaty danych i gwarancje</a></li>
+<li><a href="#5-architektury-referencyjne">5. Architektury referencyjne</a></li>
+<li><a href="#6-heurystyka-decyzyjna">6. Heurystyka decyzyjna</a></li>
+<li><a href="#7-powiazania-z-innymi-zagadnieniami">7. Powiązania z innymi zagadnieniami</a></li></ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

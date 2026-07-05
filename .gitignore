@@ -1,0 +1,4 @@
+# Local tooling & retired files — not part of the published site
+.archive/
+.claude/
+.DS_Store

@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bezpieczeństwo systemów i aplikacji</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="stylesheet" href="../assets/notes.css">
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Bezpieczeństwo IT</p>
+    <h1>Bezpieczeństwo systemów i aplikacji</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+    <p>Bezpieczeństwo IT to ochrona aktywów informacyjnych przed zagrożeniami przy zachowaniu funkcjonalności systemu. Projektowanie zaczyna się od <strong>modelu zagrożenia</strong> (threat model): co chronimy, przed kim, jakie są ścieżki ataku. Bez tego mechanizmy obronne są dobierane losowo.</p>
+<h2 id="triada-cia-i-model-dostepu">Triada CIA i model dostępu</h2>
+<p><strong>Triada CIA</strong> (Confidentiality, Integrity, Availability):</p>
+<ul>
+<li><strong>Poufność (Confidentiality)</strong> — dane widoczne tylko dla uprawnionych (szyfrowanie, kontrola dostępu).</li>
+<li><strong>Integralność (Integrity)</strong> — wykrywanie nieautoryzowanych modyfikacji (skróty, podpisy, MAC — Message Authentication Code).</li>
+<li><strong>Dostępność (Availability)</strong> — system odpowiada na żądania (redundancja, anty-DDoS, backup).</li>
+</ul>
+<p>Często rozszerzane o <strong>autentyczność</strong> (potwierdzenie tożsamości) i <strong>niezaprzeczalność</strong> (nadawca nie może zaprzeczyć podpisu — <a href="17_autoryzacja_podpis.html">Autoryzacja i podpis</a>).</p>
+<p><strong>Macierz kontroli dostępu Lampsona</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>:</mo><mi>S</mi><mo>×</mo><mi>O</mi><mo>→</mo><msup><mn>2</mn><mi>R</mi></msup></mrow><annotation encoding="application/x-tex">M: S \times O \to 2^{R}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8413em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span></span></span></span></span></span></span></span></span></span></span></span> — formalny model: dla podmiotu <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>∈</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">s\in S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">s</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> (subject) i obiektu <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mo>∈</mo><mi>O</mi></mrow><annotation encoding="application/x-tex">o\in O</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">o</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span></span></span></span> (object) komórka <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>o</mi><mo stretchy="false">)</mo><mo>⊆</mo><mi>R</mi></mrow><annotation encoding="application/x-tex">M(s,o)\subseteq R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">o</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span></span></span></span> przechowuje <strong>podzbiór</strong> zbioru wszystkich praw <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>=</mo><mo stretchy="false">{</mo><mtext>read</mtext><mo separator="true">,</mo><mtext>write</mtext><mo separator="true">,</mo><mtext>execute</mtext><mo separator="true">,</mo><mo>…</mo><mtext> </mtext><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">R=\{\text{read},\text{write},\text{execute},\dots\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord text"><span class="mord">read</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">write</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">execute</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mclose">}</span></span></span></span> (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>R</mi></msup></mrow><annotation encoding="application/x-tex">2^R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8413em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.00773em;">R</span></span></span></span></span></span></span></span></span></span></span> = zbiór potęgowy, czyli wszystkie podzbiory <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi></mrow><annotation encoding="application/x-tex">R</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span></span></span></span>). Implementacje: ACL (Access Control List — kolumna macierzy, przechowywana przy obiekcie) vs capabilities (wiersz macierzy, przy podmiocie).</p>
+<h2 id="kryptografia-fundament">Kryptografia — fundament</h2>
+<p><strong>Funkcja skrótu kryptograficznego</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>:</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">}</mo><mo>∗</mo></msup><mo>→</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">}</mo><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">h:\{0,1\}^*\to\{0,1\}^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose"><span class="mclose">}</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6887em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mbin mtight">∗</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose"><span class="mclose">}</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span>, gdzie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> = długość skrótu w bitach, ma trzy własności: <strong>preimage</strong> — z <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span> trudno odzyskać dowolne <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> z <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">h(x)=y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span> (koszt <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">\approx 2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span>); <strong>second-preimage</strong> — dla danego <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> trudno znaleźć <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo mathvariant="normal">≠</mo><mi>x</mi></mrow><annotation encoding="application/x-tex">x&#x27;\neq x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9463em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> z <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false">(</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">)</mo><mo>=</mo><mi>h</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">h(x&#x27;)=h(x)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">h</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span></span></span></span> (koszt <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>2</mn><mi>n</mi></msup></mrow><annotation encoding="application/x-tex">\approx 2^n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6644em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span></span></span></span>); <strong>kolizja</strong> — trudno znaleźć dowolną parę <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo mathvariant="normal">≠</mo><msup><mi>x</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup></mrow><annotation encoding="application/x-tex">x\neq x&#x27;</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7519em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span></span></span></span> o tym samym skrócie. <strong>Paradoks urodzin</strong> obniża koszt kolizji do <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>2</mn><mrow><mi>n</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\approx 2^{n/2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.888em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mord mtight">/2</span></span></span></span></span></span></span></span></span></span></span></span> (efektywny poziom bezpieczeństwa <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mi>n</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">=n/2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">n</span><span class="mord">/2</span></span></span></span> bitów), więc SHA-1 (Secure Hash Algorithm, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>160</mn></mrow><annotation encoding="application/x-tex">n=160</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">160</span></span></span></span>, kolizja <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>2</mn><mn>80</mn></msup></mrow><annotation encoding="application/x-tex">\approx 2^{80}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">80</span></span></span></span></span></span></span></span></span></span></span></span>) jest złamany, a SHA-256 (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">n=256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">256</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><msup><mn>2</mn><mn>128</mn></msup></mrow><annotation encoding="application/x-tex">\approx 2^{128}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">128</span></span></span></span></span></span></span></span></span></span></span></span>) zostaje bezpieczny.</p>
+<p><strong>Szyfr symetryczny</strong> — trójka <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mtext>Gen</mtext><mo separator="true">,</mo><mtext>Enc</mtext><mo separator="true">,</mo><mtext>Dec</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(\text{Gen}, \text{Enc}, \text{Dec})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord text"><span class="mord">Gen</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Enc</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Dec</span></span><span class="mclose">)</span></span></span></span> (generacja klucza / szyfrowanie / deszyfrowanie) z jednym kluczem; szybki, AES (Advanced Encryption Standard) — standard. <strong>Szyfr asymetryczny</strong> — para <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>p</mi><mi>k</mi><mo separator="true">,</mo><mi>s</mi><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(pk, sk)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">p</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mclose">)</span></span></span></span> klucz publiczny/prywatny, oparty o problem trudny (faktoryzacja w RSA — Rivest-Shamir-Adleman; logarytm dyskretny w ECC — Elliptic Curve Cryptography); wolny, używany do wymiany kluczy i podpisów.</p>
+<p><strong>MAC (Message Authentication Code)</strong> — funkcja <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext>MAC</mtext><mi>k</mi></msub><mo stretchy="false">(</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\text{MAC}_k(m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord text"><span class="mord">MAC</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> zapewnia integralność + autentyczność z kluczem symetrycznym. <strong>HMAC (Hash-based MAC)</strong> = standardowa konstrukcja MAC z funkcji skrótu. Zwykły skrót integralności bez klucza nie autentykuje (atakujący może zmienić wiadomość i przeliczyć hash).</p>
+<p><strong>KDF (Key Derivation Function)</strong> — przekształca hasło w klucz: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mtext>password</mtext><mo separator="true">,</mo><mtext>salt</mtext><mo separator="true">,</mo><mtext>iter</mtext><mo stretchy="false">)</mo><mo>→</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">f(\text{password}, \text{salt}, \text{iter}) \to k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord text"><span class="mord">password</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">salt</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">iter</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span>. <strong>PBKDF2</strong> (Password-Based KDF 2), <strong>bcrypt</strong>, <strong>scrypt</strong>, <strong>Argon2id</strong> (zwycięzca Password Hashing Competition, memory-hard). <strong>Sól</strong> (per-user, przechowywana z hashem) blokuje rainbow tables; <strong>pieprz</strong> (globalny sekret poza bazą) chroni gdy wycieknie tylko baza. Hashowanie haseł SHA-256 z solą jest zbyt szybkie — GPU robi miliardy hashów/s.</p>
+<p>Częsta pomyłka: szyfrowanie (odwracalne z kluczem) ≠ hashowanie (jednokierunkowe) ≠ kodowanie (Base64 — odwracalne bez klucza, nie chroni nic).</p>
+<h2 id="szyfrowanie-at-rest-in-transit-in-use">Szyfrowanie at rest / in transit / in use</h2>
+<ul>
+<li><strong>At rest</strong> — dane na dysku: LUKS (Linux Unified Key Setup), BitLocker, szyfrowanie kolumn w bazie (TDE — Transparent Data Encryption).</li>
+<li><strong>In transit</strong> — w sieci: TLS 1.3 (Transport Layer Security), IPsec (Internet Protocol Security), VPN (Virtual Private Network).</li>
+<li><strong>In use</strong> — w pamięci: trusted execution environment (Intel SGX — Software Guard Extensions, AMD SEV — Secure Encrypted Virtualization), MPC (Multi-Party Computation), FHE (Fully Homomorphic Encryption). SGX podważone przez ataki side-channel (Foreshadow).</li>
+</ul>
+<h2 id="bezpieczenstwo-systemu-operacyjnego">Bezpieczeństwo systemu operacyjnego</h2>
+<p><strong>Pierścienie ochrony (rings)</strong>: formalna architektura x86 definiuje tylko Ring 0 (kernel mode — pełny dostęp do sprzętu) oraz Ring 3 (user mode — wymaga syscalla). Nieformalnie mówi się też o &quot;ujemnych pierścieniach&quot; (rozszerzenie popularnonaukowe, nie część specyfikacji sprzętowej): Ring -1 (hypervisor), Ring -2 (SMM — System Management Mode), Ring -3 (Intel ME — Management Engine). Atak na niższy pierścień kompromituje wszystkie wyższe.</p>
+<p><strong>Kontrola dostępu w OS</strong>: <strong>DAC (Discretionary Access Control)</strong> — uprawnienia POSIX <code>rwx</code>, właściciel decyduje, podatny na trojany (proces dziedziczy uprawnienia użytkownika). <strong>MAC (Mandatory Access Control</strong> — uwaga: inny skrót niż kryptograficzny MAC = Message Authentication Code) — SELinux, AppArmor; polityka systemowa nadpisuje wolę właściciela. (Modele DAC/MAC/RBAC/ABAC szczegółowo w <a href="17_autoryzacja_podpis.html">Autoryzacji i podpisie</a>.)</p>
+<p><strong>Izolacja procesów</strong> — rosnące poziomy:</p>
+<ul>
+<li><strong>Sandbox</strong> (seccomp-bpf — filtrowanie syscalli, AppArmor) — w tym samym kernelu.</li>
+<li><strong>Kontener</strong> (Docker, podman; namespaces + cgroups) — dzieli kernel z hostem; <em>nie</em> jest granicą bezpieczeństwa multi-tenant.</li>
+<li><strong>Maszyna wirtualna</strong> (VM, KVM — Kernel-based Virtual Machine / Xen) — własny kernel, izolacja na poziomie hypervisora; najsilniejsza, ale podatna na VM escape (Venom).</li>
+</ul>
+<p><strong>Hardening pamięci</strong>:</p>
+<ul>
+<li><strong>ASLR (Address Space Layout Randomization)</strong> — randomizuje adresy, blokuje stałe offsety w eksploitach.</li>
+<li><strong>DEP/NX (Data Execution Prevention / No-eXecute)</strong>, zasada <strong>W ⊕ X</strong> (write XOR execute) — strona albo zapisywalna, albo wykonywalna; blokuje shellcode w buforze.</li>
+<li><strong>Stack canaries</strong> — wartość kontrolna przed adresem powrotu, wykrywa stack overflow.</li>
+<li><strong>CFI (Control Flow Integrity)</strong> — weryfikuje legalność celów wywołań pośrednich; razem z ASLR blokuje ROP (Return-Oriented Programming — łańcuchy istniejących gadgetów omijających DEP).</li>
+</ul>
+<p><strong>Zasada najmniejszych przywilejów</strong> (Saltzer-Schroeder) — proces ma tylko uprawnienia niezbędne do zadania. <strong>SUID (Set User ID)</strong> — bit pozwalający binarce działać z uprawnieniami właściciela pliku; wektor lokalnej eskalacji (GTFOBins). Linux <strong>capabilities</strong> (CAP_NET_BIND_SERVICE itd.) drobnoziarniście zastępują roota.</p>
+<p><strong>TCB (Trusted Computing Base)</strong> — minimalny zbiór komponentów (kernel, firmware, sterowniki) których kompromitacja łamie politykę bezpieczeństwa. <strong>Secure Boot</strong> weryfikuje podpisy bootloadera; <strong>TPM (Trusted Platform Module)</strong> mierzy hashe komponentów do PCR (Platform Configuration Register) i służy jako root of trust dla attestation.</p>
+<p>Aktualizacje i łatanie — wektor odpowiedzialny za większość udanych ataków masowych (WannaCry przez nieparowaną SMB — Server Message Block).</p>
+<h2 id="bezpieczenstwo-aplikacji-owasp-top-10-2025">Bezpieczeństwo aplikacji — OWASP Top 10 (2025; 2021 wciąż często w sylabusach)</h2>
+<p>OWASP (Open Worldwide Application Security Project) — niekomercyjna organizacja publikująca standardy bezpieczeństwa aplikacji webowych. Top 10 2025 jest aktualnym wydaniem; lista 2021 nadal bywa spotykana w sylabusach, więc traktuj ją jako historyczną bazę i porównuj z aktualizacją 2025:</p>
+<ol>
+<li><strong>A01 Broken Access Control</strong> — IDOR (Insecure Direct Object Reference), brak weryfikacji uprawnień.</li>
+<li><strong>A02 Cryptographic Failures</strong> — słaba kryptografia, brak szyfrowania.</li>
+<li><strong>A03 Injection</strong> — SQLi (SQL Injection), command injection, LDAP (Lightweight Directory Access Protocol) injection.</li>
+<li><strong>A04 Insecure Design</strong> — brak modelu zagrożenia w fazie projektu.</li>
+<li><strong>A05 Security Misconfiguration</strong> — domyślne hasła, otwarte porty.</li>
+<li><strong>A06 Vulnerable &amp; Outdated Components</strong> — biblioteki z CVE (Common Vulnerabilities and Exposures).</li>
+<li><strong>A07 Authentication Failures</strong> — słabe hasła, brak rate limiting.</li>
+<li><strong>A08 Software &amp; Data Integrity Failures</strong> — supply chain.</li>
+<li><strong>A09 Logging &amp; Monitoring Failures</strong> — niewykryte włamania.</li>
+<li><strong>A10 SSRF (Server-Side Request Forgery)</strong> — serwer pobiera URL podany przez atakującego.</li>
+</ol>
+<h2 id="klasyczne-ataki-aplikacyjne">Klasyczne ataki aplikacyjne</h2>
+<ul>
+<li><strong>SQL Injection</strong> — wstrzyknięcie SQL (Structured Query Language) przez nieoczyszczone wejście (<code>' OR 1=1 --</code>). Obrona: <strong>prepared statements</strong> / parametryzowane zapytania (nie konkatenacja stringów), ORM, najmniejsze uprawnienia konta DB.</li>
+<li><strong>XSS (Cross-Site Scripting)</strong> — wariant stored / reflected / DOM-based (Document Object Model); wstrzyknięcie JS (JavaScript) w stronę ofiary. Obrona: escape kontekstowy (HTML/JS/URL), <strong>CSP (Content Security Policy)</strong>, flagi <code>HttpOnly</code>/<code>Secure</code> na ciasteczkach. SQLi atakuje serwer, XSS przeglądarkę ofiary.</li>
+<li><strong>CSRF (Cross-Site Request Forgery)</strong> — wykorzystanie aktywnej sesji ofiary do akcji bez jej wiedzy. Obrona: tokeny anty-CSRF, ciasteczka <code>SameSite</code>, weryfikacja <code>Origin</code>/<code>Referer</code>.</li>
+<li><strong>Buffer overflow</strong> — stack overflow nadpisuje return address (kontrola przepływu od razu); heap overflow nadpisuje metadane alokatora (eksploatacja pośrednia). Obrona: stack canaries, DEP, ASLR, CFI, języki memory-safe (Rust, Go).</li>
+<li><strong>TOCTOU (Time-Of-Check Time-Of-Use)</strong> — race condition między sprawdzeniem warunku a użyciem zasobu (<code>access()</code> → <code>open()</code> z podmianą symlinka). Obrona: atomowe operacje (<code>O_CREAT|O_EXCL</code>, <code>openat</code>).</li>
+<li><strong>Supply chain</strong> — typosquatting w npm/PyPI, kompromitacja CI/CD (Continuous Integration / Continuous Deployment) (SolarWinds 2020, xz-utils backdoor 2024). Obrona: SBOM (Software Bill of Materials), lockfiles, podpisywanie artefaktów (Sigstore), skanery zależności.</li>
+</ul>
+<h2 id="malware-phishing-ddos">Malware, phishing, DDoS</h2>
+<p><strong>Taksonomia malware</strong>:</p>
+<ul>
+<li><strong>Wirus</strong> — wymaga nosiciela (infekuje pliki).</li>
+<li><strong>Robak</strong> — propaguje się autonomicznie przez sieć (Morris, WannaCry).</li>
+<li><strong>Trojan</strong> — udaje legalny program.</li>
+<li><strong>Rootkit</strong> — ukrywa obecność modyfikując kernel/syscalle (kernel rootkit — Ring 0, niewidoczny dla AV — Antivirus w userspace).</li>
+<li><strong>Ransomware</strong> — szyfruje dane i żąda okupu (CryptoLocker; NotPetya był w istocie wiperem podszywającym się pod ransomware — szyfrował bezpowrotnie, okup to fasada).</li>
+<li><strong>RAT (Remote Access Trojan)</strong>, <strong>keylogger</strong>, <strong>cryptojacker</strong>, <strong>fileless malware</strong> (living-off-the-land przez PowerShell/WMI — Windows Management Instrumentation).</li>
+</ul>
+<p><strong>Phishing</strong> — spear phishing (celowany), <strong>BEC (Business Email Compromise)</strong>, smishing (SMS — Short Message Service), vishing (głos). Obrona: szkolenia, MFA (Multi-Factor Authentication) odporne na phishing (FIDO2 — Fast IDentity Online 2 / WebAuthn), filtry mailowe (DMARC — Domain-based Message Authentication, Reporting &amp; Conformance; SPF — Sender Policy Framework; DKIM — DomainKeys Identified Mail).</p>
+<p><strong>DDoS (Distributed Denial of Service)</strong> — typy: volumetric (zalanie pasma), protocol (SYN flood — wykorzystuje 3-way handshake TCP), application-layer (HTTP flood). Obrona: CDN (Content Delivery Network), anty-DDoS, rate limiting, scrubbing center.</p>
+<h2 id="backup-i-disaster-recovery">Backup i disaster recovery</h2>
+<ul>
+<li><strong>Strategia 3-2-1</strong> — 3 kopie danych, 2 różne nośniki, 1 kopia offsite.</li>
+<li><strong>RTO (Recovery Time Objective)</strong> — maksymalny dopuszczalny czas niedostępności po incydencie.</li>
+<li><strong>RPO (Recovery Point Objective)</strong> — maksymalna dopuszczalna utrata danych mierzona w czasie (np. RPO=1h ⇒ backup co godzinę).</li>
+<li>Testowanie restore&#39;ów (backup nieprzetestowany = brak backupu).</li>
+<li>Przeciwko ransomware: kopie <strong>immutable</strong> / <strong>air-gapped</strong> / WORM (Write Once Read Many).</li>
+</ul>
+<h2 id="narzedzia-obronne-i-standardy">Narzędzia obronne i standardy</h2>
+<figure class="viz" id="v16">
+  <div class="viz-head">
+    <p class="viz-title">Obrona w głąb: koncentryczne warstwy wokół rdzenia DANE</p>
+    <p class="viz-sub">Klik lub najedź na warstwę (albo użyj przycisków) → zagrożenie i odpowiadająca mu kontrola. Włącz „Droga atakującego”, aby zobaczyć, ile warstw trzeba przełamać, by dotrzeć do wybranej.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v16-svg" viewBox="0 0 680 340" role="img" aria-label="Diagram koncentryczny obrony w głąb: warstwy fizyczna, sieć, host/OS, aplikacja i rdzeń danych"></svg>
+  </div>
+  <div class="viz-controls">
+    <span class="toggle" id="v16-L0" role="button" tabindex="0" aria-pressed="false">Fizyczna</span>
+    <span class="toggle" id="v16-L1" role="button" tabindex="0" aria-pressed="false">Sieć</span>
+    <span class="toggle" id="v16-L2" role="button" tabindex="0" aria-pressed="false">Host / OS</span>
+    <span class="toggle" id="v16-L3" role="button" tabindex="0" aria-pressed="false">Aplikacja</span>
+    <span class="toggle" id="v16-L4" role="button" tabindex="0" aria-pressed="true">Dane</span>
+    <span class="toggle" id="v16-atk" role="button" tabindex="0" aria-pressed="false">Droga atakującego</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      warstwa: <b id="v16-name">Dane</b> · do przełamania: <b id="v16-n">5</b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> pojedynczy mechanizm zawodzi, więc kontrole układa się warstwami — atakujący musi pokonać wszystkie pierścienie (fizyczny, sieć, host/OS, aplikacja), zanim dosięgnie rdzenia z danymi; nawet po przełamaniu jednej warstwy szyfrowanie i kontrola dostępu na kolejnej wciąż chronią.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v16-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  var CX=172, CY=170;
+  // pierścienie zewnętrzne→wewnętrzne; rO=promień zewn., rI=wewn.
+  var LAYERS=[
+    {name:"Fizyczna", tok:"--v-teal",
+     zagr:["Kradzież sprzętu, dostęp do konsoli,","podmiana nośnika rozruchowego."],
+     kontr:["Secure Boot + TPM (root of trust),","szyfrowanie at rest: LUKS / BitLocker."], rO:152, rI:122},
+    {name:"Sieć", tok:"--v-blue",
+     zagr:["DDoS, sniffing, MITM,","skanowanie i atak na porty."],
+     kontr:["Firewall (nftables), IDS/IPS (Suricata),","TLS 1.3, VPN / IPsec."], rO:122, rI:92},
+    {name:"Host / OS", tok:"--v-amber",
+     zagr:["Eskalacja przywilejów, rootkit (Ring 0),","malware, exploit pamięci."],
+     kontr:["Hardening: ASLR, DEP/NX (W⊕X), CFI;","MAC (SELinux); least privilege; EDR."], rO:92, rI:62},
+    {name:"Aplikacja", tok:"--v-orange",
+     zagr:["OWASP Top 10: SQLi, XSS,","CSRF, SSRF, injection."],
+     kontr:["Prepared statements, walidacja wejścia,","WAF (ModSecurity), CSP, escaping."], rO:62, rI:32},
+    {name:"Dane", tok:"--ink",
+     zagr:["Utrata poufności, naruszenie","integralności, skasowanie danych."],
+     kontr:["Szyfrowanie + HMAC/podpis (integralność),","ACL (least privilege), backup 3-2-1."], rO:32, rI:0}
+  ];
+
+  var selected=4;   // wybrana klikiem/przyciskiem
+  var hover=null;   // podświetlona najechaniem
+
+  function donut(rO,rI){
+    var d="M "+(CX-rO)+" "+CY+" A "+rO+" "+rO+" 0 1 0 "+(CX+rO)+" "+CY+" A "+rO+" "+rO+" 0 1 0 "+(CX-rO)+" "+CY+" Z";
+    if(rI>0) d+=" M "+(CX-rI)+" "+CY+" A "+rI+" "+rI+" 0 1 1 "+(CX+rI)+" "+CY+" A "+rI+" "+rI+" 0 1 1 "+(CX-rI)+" "+CY+" Z";
+    return d;
+  }
+  // konwersja "#rrggbb" -> "rgba(...)"; obsługa też rgb()
+  function rgba(col,a){
+    col=col.trim();
+    if(col.charAt(0)==="#"){
+      var h=col.slice(1);
+      if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+      return "rgba("+r+","+g+","+b+","+a+")";
+    }
+    var m=col.match(/rgba?\(([^)]+)\)/);
+    if(m){var p=m[1].split(",");return "rgba("+p[0].trim()+","+p[1].trim()+","+p[2].trim()+","+a+")";}
+    return col;
+  }
+
+  function render(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"), MUT=cvar("--muted"), BG=cvar("--bg2"), RULE=cvar("--v-grid"),
+        WARN=cvar("--v-orange");
+    var active = (hover!=null)?hover:selected;
+
+    // --- pierścienie (od zewnątrz) ---
+    for(var i=0;i<LAYERS.length;i++){
+      var Ly=LAYERS[i], col=cvar(Ly.tok);
+      var isAct=(i===active), crossed=(document.getElementById("v16-atk").getAttribute("aria-pressed")==="true" && i<=active);
+      var el=E("path",{d:donut(Ly.rO,Ly.rI),"fill-rule":"evenodd",
+        fill:rgba(col,isAct?0.34:0.13), stroke:col, "stroke-width":isAct?2.6:1.4,
+        cursor:"pointer"});
+      el.setAttribute("data-i",i);
+      el.addEventListener("mouseenter",function(){hover=parseInt(this.getAttribute("data-i"),10);render();});
+      el.addEventListener("mouseleave",function(){hover=null;render();});
+      el.addEventListener("click",function(){setSel(parseInt(this.getAttribute("data-i"),10));});
+      svg.appendChild(el);
+      if(crossed){ // dodatkowy pierścień „przełamana”
+        svg.appendChild(E("circle",{cx:CX,cy:CY,r:(Ly.rO+Ly.rI)/2,fill:"none",
+          stroke:WARN,"stroke-width":2.2,"stroke-dasharray":"5 4",opacity:0.9,"pointer-events":"none"}));
+      }
+    }
+    // etykiety warstw (u góry każdej opaski) — rozróżnienie nie tylko kolorem
+    for(var j=0;j<LAYERS.length;j++){
+      var Lj=LAYERS[j];
+      if(j<LAYERS.length-1){
+        var my=CY-(Lj.rO+Lj.rI)/2;
+        svg.appendChild(E("text",{x:CX,y:my+4,"text-anchor":"middle","font-size":10.5,
+          "font-weight":j===active?700:500, fill: j===active?INK:MUT,"pointer-events":"none"}, Lj.name.toUpperCase()));
+      }
+    }
+    // rdzeń DANE
+    svg.appendChild(E("text",{x:CX,y:CY-3,"text-anchor":"middle","font-size":12,"font-weight":700,
+      fill:INK,"pointer-events":"none"},"DANE"));
+    svg.appendChild(E("text",{x:CX,y:CY+11,"text-anchor":"middle","font-size":8.5,
+      fill:MUT,"pointer-events":"none"},"rdzeń"));
+
+    // --- droga atakującego ---
+    var atk=document.getElementById("v16-atk").getAttribute("aria-pressed")==="true";
+    if(atk){
+      var yEnd=CY-(LAYERS[active].rO+LAYERS[active].rI)/2;
+      svg.appendChild(E("line",{x1:CX,y1:CY-168,x2:CX,y2:yEnd+9,stroke:WARN,"stroke-width":2,
+        "stroke-dasharray":"2 3","pointer-events":"none"}));
+      svg.appendChild(E("path",{d:"M "+CX+" "+(yEnd+2)+" l -4 -8 l 8 0 z",fill:WARN,"pointer-events":"none"}));
+      // znaczniki przekroczonych granic
+      for(var k=0;k<=active;k++){
+        svg.appendChild(E("line",{x1:CX-6,y1:CY-LAYERS[k].rO,x2:CX+6,y2:CY-LAYERS[k].rO,
+          stroke:WARN,"stroke-width":2,"pointer-events":"none"}));
+      }
+      svg.appendChild(E("text",{x:CX+10,y:CY-160,"text-anchor":"start","font-size":11,"font-weight":700,
+        fill:WARN,"pointer-events":"none"},"×"+(active+1)));
+    }
+
+    // --- panel informacyjny (prawa strona) ---
+    var PX=352, PW=310;
+    svg.appendChild(E("rect",{x:PX,y:18,width:PW,height:304,rx:10,fill:BG,stroke:RULE,"stroke-width":1}));
+    var acol=cvar(LAYERS[active].tok);
+    svg.appendChild(E("rect",{x:PX+16,y:36,width:6,height:20,rx:2,fill:acol}));
+    svg.appendChild(E("text",{x:PX+30,y:52,"font-size":16,"font-weight":700,fill:INK},
+      LAYERS[active].name==="Dane"?"Dane (rdzeń)":LAYERS[active].name));
+    svg.appendChild(E("line",{x1:PX+16,y1:66,x2:PX+PW-16,y2:66,stroke:RULE,"stroke-width":1}));
+
+    svg.appendChild(E("text",{x:PX+16,y:88,"font-size":10.5,"font-weight":700,fill:WARN,
+      "letter-spacing":"0.5"},"ZAGROŻENIE"));
+    LAYERS[active].zagr.forEach(function(ln,ix){
+      svg.appendChild(E("text",{x:PX+16,y:107+ix*17,"font-size":12.5,fill:INK},ln));
+    });
+
+    var okc=cvar("--v-teal");
+    svg.appendChild(E("text",{x:PX+16,y:160,"font-size":10.5,"font-weight":700,fill:okc,
+      "letter-spacing":"0.5"},"KONTROLA"));
+    LAYERS[active].kontr.forEach(function(ln,ix){
+      svg.appendChild(E("text",{x:PX+16,y:179+ix*17,"font-size":12.5,fill:INK},ln));
+    });
+
+    svg.appendChild(E("line",{x1:PX+16,y1:232,x2:PX+PW-16,y2:232,stroke:RULE,"stroke-width":1}));
+    svg.appendChild(E("text",{x:PX+16,y:256,"font-size":11.5,fill:MUT},"Warstw obrony do rdzenia od zewnątrz:"));
+    svg.appendChild(E("text",{x:PX+16,y:281,"font-size":13,"font-weight":700,fill:INK},
+      "aby dosięgnąć tej warstwy → przełamać "+(active+1)+"/5"));
+    svg.appendChild(E("text",{x:PX+16,y:304,"font-size":11,fill:MUT},
+      "Obrona w głąb: brak jednego „muru”, wiele warstw."));
+
+    // --- odczyt na żywo w kontrolkach ---
+    document.getElementById("v16-name").textContent=LAYERS[active].name;
+    document.getElementById("v16-n").textContent=String(active+1);
+    for(var b=0;b<5;b++){
+      document.getElementById("v16-L"+b).setAttribute("aria-pressed", b===selected?"true":"false");
+    }
+  }
+
+  function setSel(i){ selected=i; hover=null; render(); }
+
+  for(var b=0;b<5;b++){
+    (function(idx){
+      var btn=document.getElementById("v16-L"+idx);
+      btn.addEventListener("click",function(){setSel(idx);});
+      btn.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();setSel(idx);}});
+      btn.addEventListener("mouseenter",function(){hover=idx;render();});
+      btn.addEventListener("mouseleave",function(){hover=null;render();});
+    })(b);
+  }
+  var atk=document.getElementById("v16-atk");
+  function tgl(){atk.setAttribute("aria-pressed",atk.getAttribute("aria-pressed")==="true"?"false":"true");render();}
+  atk.addEventListener("click",tgl);
+  atk.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();tgl();}});
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>
+
+<ul>
+<li><strong>Firewall</strong> sieciowy (iptables/nftables, pf) i <strong>WAF (Web Application Firewall)</strong> — ModSecurity dla aplikacji webowych.</li>
+<li><strong>IDS/IPS (Intrusion Detection/Prevention System)</strong> — Snort, Suricata.</li>
+<li><strong>SIEM (Security Information and Event Management)</strong> — Splunk, ELK (Elasticsearch + Logstash + Kibana); agregacja logów i korelacja zdarzeń.</li>
+<li><strong>EDR (Endpoint Detection and Response)</strong> — monitoring stacji końcowych.</li>
+<li>IC11  — blokowanie IP po powtórzonych próbach logowania.</li>
+<li><strong>CVE</strong> — globalny katalog podatności; <strong>CVSS (Common Vulnerability Scoring System)</strong> — punktacja krytyczności 0–10.</li>
+<li><strong>MITRE ATT&amp;CK</strong> (Adversarial Tactics, Techniques &amp; Common Knowledge) — taksonomia taktyk i technik atakujących.</li>
+</ul>
+<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
+<ul>
+<li><strong><a href="17_autoryzacja_podpis.html">Autoryzacja, podpis</a></strong> — bezpośrednia kontynuacja: modele DAC/MAC/RBAC/ABAC, MFA, PKI (Public Key Infrastructure), podpis cyfrowy, eIDAS.</li>
+<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong> — anonimizacja, pseudonimizacja, maskowanie danych wrażliwych (RODO / GDPR) realizują wymóg poufności.</li>
+<li><strong><a href="10_klasyczne_ml.html">ML</a> / <a href="11_sieci_neuronowe.html">sieci neuronowe</a></strong> — ataki adversarialne, model poisoning, model stealing, membership inference; specyfika bezpieczeństwa ML.</li>
+<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong> — wybór narzędzi determinowany przez wymagania bezpieczeństwa i certyfikacje (ISO 27001, SOC 2 — Service Organization Control 2).</li>
+</ul>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#triada-cia-i-model-dostepu">Triada CIA i model dostępu</a></li>
+<li><a href="#kryptografia-fundament">Kryptografia — fundament</a></li>
+<li><a href="#szyfrowanie-at-rest-in-transit-in-use">Szyfrowanie at rest / in transit / in use</a></li>
+<li><a href="#bezpieczenstwo-systemu-operacyjnego">Bezpieczeństwo systemu operacyjnego</a></li>
+<li><a href="#bezpieczenstwo-aplikacji-owasp-top-10-2025">Bezpieczeństwo aplikacji — OWASP Top 10 (2025/2021)</a></li>
+<li><a href="#klasyczne-ataki-aplikacyjne">Klasyczne ataki aplikacyjne</a></li>
+<li><a href="#malware-phishing-ddos">Malware, phishing, DDoS</a></li>
+<li><a href="#backup-i-disaster-recovery">Backup i disaster recovery</a></li>
+<li><a href="#narzedzia-obronne-i-standardy">Narzędzia obronne i standardy</a></li>
+<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

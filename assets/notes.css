@@ -1,0 +1,193 @@
+/* ============================================================
+   Notatki egzaminacyjne — system wizualny
+   Reguła: powierzchnia czytania jest CZARNO-BIAŁA.
+   Kolor pojawia się WYŁĄCZNIE w wizualizacjach i w blokach NOTE.
+   ============================================================ */
+
+/* ---------- fonts (vendored, offline) ---------- */
+@font-face{ font-family:"Serif4"; src:url("fonts/serif-400.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+@font-face{ font-family:"Serif4"; src:url("fonts/serif-400i.woff2") format("woff2"); font-weight:400; font-style:italic; font-display:swap; }
+@font-face{ font-family:"Serif4"; src:url("fonts/serif-600.woff2") format("woff2"); font-weight:600; font-style:normal; font-display:swap; }
+@font-face{ font-family:"Serif4"; src:url("fonts/serif-700.woff2") format("woff2"); font-weight:700; font-style:normal; font-display:swap; }
+@font-face{ font-family:"PlexSans"; src:url("fonts/sans-500.woff2") format("woff2"); font-weight:500; font-style:normal; font-display:swap; }
+@font-face{ font-family:"PlexSans"; src:url("fonts/sans-600.woff2") format("woff2"); font-weight:600; font-style:normal; font-display:swap; }
+@font-face{ font-family:"PlexSans"; src:url("fonts/sans-700.woff2") format("woff2"); font-weight:700; font-style:normal; font-display:swap; }
+@font-face{ font-family:"PlexMono"; src:url("fonts/mono-400.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:swap; }
+
+/* ---------- tokens ---------- */
+:root{
+  --bg:#ffffff; --bg2:#fafaf9; --ink:#17181c; --ink2:#4a4e56; --muted:#797e87;
+  --rule:#e7e7e3; --rule2:#efefec; --code-bg:#f6f6f3; --code-ink:#8a3b2e;
+  --sel:#fdeecb; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  /* callout accents — the only color allowed in prose */
+  --note:#2f6ca8; --note-bg:#eef4fb;
+  --key:#1f7a4d;  --key-bg:#ecf6f0;
+  --warn:#a86a12; --warn-bg:#faf3e6;
+  --serif:"Serif4",Georgia,"Times New Roman",serif;
+  --sans:"PlexSans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"PlexMono",ui-monospace,Menlo,Consolas,monospace;
+  --maxw:720px;
+  /* viz accents — used ONLY inside figure.viz */
+  --v-blue:#2f6df6; --v-orange:#e0662e; --v-teal:#0f9d8f; --v-amber:#c98a00;
+  --v-grid:#e2e2de; --v-axis:#9a9ea6;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#15161a; --bg2:#1a1c21; --ink:#e8e9ec; --ink2:#b3b7bf; --muted:#828892;
+    --rule:#2a2c33; --rule2:#23252b; --code-bg:#1d1f25; --code-ink:#e0997f;
+    --sel:#3a3320; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.4);
+    --note:#78add9; --note-bg:#182430;
+    --key:#5cc48b;  --key-bg:#15241b;
+    --warn:#daa441; --warn-bg:#282013;
+    --v-blue:#6aa0ff; --v-orange:#ff8a4c; --v-teal:#2fd6c3; --v-amber:#f2c14e;
+    --v-grid:#2a3140; --v-axis:#5c6575;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#ffffff; --bg2:#fafaf9; --ink:#17181c; --ink2:#4a4e56; --muted:#797e87;
+  --rule:#e7e7e3; --rule2:#efefec; --code-bg:#f6f6f3; --code-ink:#8a3b2e;
+  --sel:#fdeecb; --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);
+  --note:#2f6ca8; --note-bg:#eef4fb; --key:#1f7a4d; --key-bg:#ecf6f0; --warn:#a86a12; --warn-bg:#faf3e6;
+}
+:root[data-theme="light"]{ --v-blue:#2f6df6; --v-orange:#e0662e; --v-teal:#0f9d8f; --v-amber:#c98a00; --v-grid:#e2e2de; --v-axis:#9a9ea6; }
+:root[data-theme="dark"]{
+  --bg:#15161a; --bg2:#1a1c21; --ink:#e8e9ec; --ink2:#b3b7bf; --muted:#828892;
+  --rule:#2a2c33; --rule2:#23252b; --code-bg:#1d1f25; --code-ink:#e0997f;
+  --sel:#3a3320; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.4);
+  --note:#78add9; --note-bg:#182430; --key:#5cc48b; --key-bg:#15241b; --warn:#daa441; --warn-bg:#282013;
+  --v-blue:#6aa0ff; --v-orange:#ff8a4c; --v-teal:#2fd6c3; --v-amber:#f2c14e; --v-grid:#2a3140; --v-axis:#5c6575;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--serif); font-size:19px; line-height:1.66;
+  font-feature-settings:"kern" 1,"liga" 1; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{ background:var(--sel); }
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50; background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(8px); border-bottom:1px solid var(--rule);
+  display:flex; align-items:center; gap:14px; padding:10px 20px;
+  font-family:var(--sans); font-size:13px;
+}
+.topbar a{ color:var(--ink2); text-decoration:none; }
+.topbar a:hover{ color:var(--ink); }
+.topbar .code{ font-family:var(--mono); font-weight:600; font-size:12px; padding:2px 7px; border:1px solid var(--rule); border-radius:6px; color:var(--ink2); }
+.topbar .sp{ flex:1; }
+.iconbtn{ font-family:var(--sans); cursor:pointer; background:none; border:1px solid var(--rule); color:var(--ink2);
+  border-radius:7px; padding:5px 10px; font-size:12.5px; display:inline-flex; gap:6px; align-items:center; }
+.iconbtn:hover{ border-color:var(--ink2); color:var(--ink); }
+
+/* ---------- layout ---------- */
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:38px 22px 100px; }
+.layout{ display:block; }
+@media(min-width:1080px){
+  .layout{ display:grid; grid-template-columns:1fr var(--maxw) 1fr; gap:0; }
+  .wrap{ grid-column:2; }
+  .toc{ grid-column:3; }
+}
+
+/* ---------- headings (sans) ---------- */
+h1,h2,h3,h4{ font-family:var(--sans); line-height:1.2; text-wrap:balance; color:var(--ink); }
+h1{ font-size:33px; font-weight:700; letter-spacing:-.02em; margin:6px 0 6px; }
+.subtitle{ font-family:var(--sans); color:var(--muted); font-size:15px; margin:0 0 30px; font-weight:500; }
+h2{ font-size:22px; font-weight:600; letter-spacing:-.01em; margin:44px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--rule); }
+h3{ font-size:17.5px; font-weight:600; margin:28px 0 8px; }
+h4{ font-size:15px; font-weight:600; margin:20px 0 6px; color:var(--ink2); text-transform:none; }
+
+.eyebrow{ font-family:var(--sans); font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 6px; }
+p{ margin:0 0 15px; }
+
+/* ---------- index / landing ---------- */
+.wrap-index{ max-width:860px; }
+.wrap-index>.subtitle{ font-size:16px; max-width:64ch; line-height:1.55; }
+.group{ margin:38px 0 0; }
+.group h2{ font-size:15px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--ink2); border-bottom:1px solid var(--rule); padding-bottom:8px; margin:0 0 16px; }
+.ncards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:640px){ .ncards{ grid-template-columns:1fr; } }
+.ncard{ display:flex; gap:14px; align-items:flex-start; padding:15px 17px; border:1px solid var(--rule); border-radius:11px;
+  background:var(--bg2); text-decoration:none; color:var(--ink); transition:border-color .15s,transform .15s,box-shadow .15s; }
+.ncard:hover{ border-color:var(--ink2); transform:translateY(-2px); box-shadow:var(--shadow); }
+.ncard-idx{ font-family:var(--mono); font-size:12px; color:var(--muted); padding-top:2px; min-width:1.6em; }
+.ncard-body{ display:flex; flex-direction:column; gap:3px; }
+.ncard-title{ font-family:var(--sans); font-weight:600; font-size:15px; line-height:1.25; }
+.ncard-desc{ font-family:var(--serif); font-size:13.5px; color:var(--ink2); line-height:1.4; }
+a{ color:var(--ink); text-decoration:underline; text-decoration-color:var(--rule); text-underline-offset:2px; }
+a:hover{ text-decoration-color:var(--ink2); }
+strong{ font-weight:700; }
+em{ font-style:italic; }
+hr{ border:none; border-top:1px solid var(--rule); margin:32px 0; }
+
+ul,ol{ margin:0 0 15px; padding-left:1.35em; }
+li{ margin:5px 0; }
+li::marker{ color:var(--muted); }
+
+/* ---------- code (mono, no color except subtle) ---------- */
+code{ font-family:var(--mono); font-size:.82em; background:var(--code-bg); padding:.12em .38em; border-radius:5px; }
+pre{ background:var(--code-bg); border:1px solid var(--rule); border-radius:10px; padding:15px 17px; overflow-x:auto; margin:0 0 18px; line-height:1.5; }
+pre code{ background:none; padding:0; font-size:13.5px; color:var(--ink); }
+
+/* ---------- tables ---------- */
+.tablewrap{ overflow-x:auto; margin:0 0 20px; }
+table{ border-collapse:collapse; width:100%; font-family:var(--sans); font-size:14px; }
+th,td{ text-align:left; padding:8px 12px; border-bottom:1px solid var(--rule); vertical-align:top; }
+th{ font-weight:600; color:var(--ink2); border-bottom:1.5px solid var(--rule2); background:var(--bg2); }
+td{ color:var(--ink2); }
+tbody tr:hover td{ background:var(--bg2); }
+td .mono,th .mono{ font-family:var(--mono); }
+
+/* ---------- KaTeX math ---------- */
+.katex{ font-size:1.02em; }
+.katex-display{ margin:18px 0; padding:6px 2px; overflow-x:auto; overflow-y:hidden; }
+.katex-display>.katex{ color:var(--ink); }
+/* inline math stays in ink; never colored */
+
+/* ---------- callouts: the ONLY color in prose ---------- */
+.callout{ border:1px solid var(--rule); border-left-width:4px; border-radius:8px; padding:12px 16px; margin:0 0 20px;
+  font-size:16px; background:var(--bg2); }
+.callout .clabel{ font-family:var(--sans); font-weight:700; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  display:block; margin-bottom:4px; }
+.callout p:last-child{ margin-bottom:0; }
+.callout.note{ border-left-color:var(--note); background:var(--note-bg); }
+.callout.note .clabel{ color:var(--note); }
+.callout.key{ border-left-color:var(--key); background:var(--key-bg); }
+.callout.key .clabel{ color:var(--key); }
+.callout.warn{ border-left-color:var(--warn); background:var(--warn-bg); }
+.callout.warn .clabel{ color:var(--warn); }
+blockquote{ border-left:4px solid var(--rule); margin:0 0 20px; padding:6px 16px; color:var(--ink2); font-style:italic; }
+
+/* ---------- figure / interactive viz container ---------- */
+figure.viz{ margin:26px 0; border:1px solid var(--rule); border-radius:12px; background:var(--bg2); overflow:hidden; box-shadow:var(--shadow); }
+figure.viz .viz-head{ padding:14px 18px 0; }
+figure.viz .viz-title{ font-family:var(--sans); font-weight:600; font-size:15px; margin:0; }
+figure.viz .viz-sub{ font-family:var(--sans); font-size:12.5px; color:var(--muted); margin:3px 0 0; }
+figure.viz .viz-body{ padding:6px 18px 0; }
+figure.viz .viz-controls{ display:flex; flex-wrap:wrap; gap:10px 22px; align-items:center; padding:12px 18px; font-family:var(--sans); font-size:13px; color:var(--ink2); border-top:1px solid var(--rule); background:var(--bg); }
+figure.viz figcaption{ font-family:var(--sans); font-size:12.5px; color:var(--ink2); line-height:1.5; padding:12px 18px; border-top:1px solid var(--rule);
+  background:var(--bg); position:relative; padding-left:22px; }
+figure.viz figcaption::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--key); }
+.viz-controls label{ display:inline-flex; align-items:center; gap:8px; font-weight:500; }
+.viz-controls input[type=range]{ accent-color:var(--ink); width:150px; }
+.viz-controls .val{ font-family:var(--mono); font-size:12px; color:var(--ink); min-width:2.6em; }
+.viz-controls .toggle{ cursor:pointer; border:1px solid var(--rule); border-radius:20px; padding:4px 12px; user-select:none; }
+.viz-controls .toggle[aria-pressed=true]{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+svg{ display:block; max-width:100%; height:auto; }
+svg text{ font-family:var(--sans); }
+
+/* ---------- sidebar TOC ---------- */
+.toc{ display:none; }
+@media(min-width:1080px){
+  .toc{ display:block; position:sticky; top:70px; align-self:start; padding:38px 20px; max-height:calc(100vh - 70px); overflow-y:auto; }
+  .toc h5{ font-family:var(--sans); font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; font-weight:700; }
+  .toc ol{ list-style:none; padding:0; margin:0; font-family:var(--sans); font-size:13px; }
+  .toc li{ margin:0; }
+  .toc a{ display:block; padding:4px 10px; color:var(--muted); text-decoration:none; border-left:2px solid var(--rule); line-height:1.35; }
+  .toc a:hover{ color:var(--ink); }
+  .toc a.active{ color:var(--ink); border-left-color:var(--ink); font-weight:600; }
+}
+@media(prefers-reduced-motion:reduce){ *{ scroll-behavior:auto!important; } }
+html{ scroll-behavior:smooth; }
