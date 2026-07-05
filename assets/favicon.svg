@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Notatki egzaminacyjne — postęp nauki">
+  <rect width="32" height="32" rx="7" fill="#17181c"/>
+  <!-- progress track -->
+  <circle cx="16" cy="16" r="9" fill="none" stroke="#3a3d44" stroke-width="3.5"/>
+  <!-- learned arc (~68%), echoes the dashboard ring + ● opanowane accent -->
+  <circle cx="16" cy="16" r="9" fill="none" stroke="#5cc48b" stroke-width="3.5"
+          stroke-linecap="round" transform="rotate(-90 16 16)"
+          stroke-dasharray="38.4 56.5"/>
+</svg>
