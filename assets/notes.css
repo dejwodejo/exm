@@ -191,3 +191,97 @@ svg text{ font-family:var(--sans); }
 }
 @media(prefers-reduced-motion:reduce){ *{ scroll-behavior:auto!important; } }
 html{ scroll-behavior:smooth; }
+
+/* ============================================================
+   Progress tracker — "opanowane" per section.
+   Greyscale by rule; the ONLY color is --key (●, opanowane),
+   consistent with the callout / figcaption accent.
+   ============================================================ */
+
+/* ---- tri-state marker beside a heading (○ ◐ ●) ---- */
+h2:has(> .mark), h3:has(> .mark){ position:relative; }
+.mark{
+  font-family:var(--sans); font-size:.72em; line-height:1; cursor:pointer;
+  background:none; border:none; padding:2px; margin:0; color:var(--muted);
+  transition:color .12s, transform .12s; -webkit-tap-highlight-color:transparent;
+}
+.mark:hover{ color:var(--ink); transform:scale(1.15); }
+.mark[data-s="1"]{ color:var(--ink); }
+.mark[data-s="2"]{ color:var(--key); }
+.mark:focus-visible{ outline:2px solid var(--key); outline-offset:2px; border-radius:4px; }
+@media(min-width:760px){
+  /* park the marker in the left gutter so prose alignment is untouched */
+  h2 > .mark, h3 > .mark{ position:absolute; left:-1.5em; top:.28em; }
+  h3 > .mark{ top:.18em; }
+}
+@media(max-width:759px){
+  h2 > .mark, h3 > .mark{ margin-right:.45em; vertical-align:.08em; }
+}
+
+/* ---- shared meter bar (per-note + cards + dashboard) ---- */
+.meter{ position:relative; height:4px; border-radius:3px; background:var(--rule); overflow:hidden; }
+.meter > i{ position:absolute; top:0; bottom:0; left:0; display:block; }
+.meter > i.rev{ background:var(--ink2); opacity:.32; }
+.meter > i.lrn{ background:var(--key); }
+
+/* ---- per-note progress strip (under the subtitle) ---- */
+.note-progress{
+  display:flex; align-items:center; gap:12px; margin:0 0 30px;
+  font-family:var(--sans); font-size:12.5px; color:var(--muted);
+}
+.note-progress .meter{ flex:1; max-width:260px; }
+.note-progress .np-frac{ font-family:var(--mono); font-size:12px; color:var(--ink2); }
+.note-progress .np-frac b{ color:var(--key); font-weight:600; }
+
+/* ---- index: dashboard panel ---- */
+.dash{
+  border:1px solid var(--rule); border-radius:14px; background:var(--bg2);
+  box-shadow:var(--shadow); padding:20px 22px; margin:8px 0 34px;
+  display:grid; grid-template-columns:auto 1fr; gap:24px; align-items:center;
+}
+@media(max-width:560px){ .dash{ grid-template-columns:1fr; gap:16px; text-align:center; } }
+.dash h2{ all:unset; }
+.dash-eyebrow{
+  font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--muted); grid-column:1 / -1; margin:0 0 -8px;
+}
+.dash-ring{ position:relative; width:104px; height:104px; justify-self:center; }
+.dash-ring svg{ width:104px; height:104px; }
+.dash-ring .ring-pct{
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; font-family:var(--mono); line-height:1;
+}
+.dash-ring .ring-pct b{ font-size:25px; font-weight:400; color:var(--ink); }
+.dash-ring .ring-pct span{ font-size:10px; color:var(--muted); margin-top:3px; letter-spacing:.04em; }
+.dash-side{ min-width:0; }
+.dash-legend{ display:flex; flex-wrap:wrap; gap:6px 18px; font-family:var(--sans); font-size:12.5px; color:var(--ink2); margin:0 0 14px; }
+.dash-legend span{ display:inline-flex; align-items:center; gap:7px; }
+.dash-legend .dot{ width:9px; height:9px; border-radius:50%; }
+.dash-legend .dot.lrn{ background:var(--key); }
+.dash-legend .dot.rev{ background:var(--ink2); opacity:.5; }
+.dash-legend .dot.non{ background:var(--rule); border:1px solid var(--muted); }
+.dash-legend b{ font-family:var(--mono); font-weight:400; color:var(--ink); }
+.dash-list{ margin:0; }
+.dash-list .dl-h{ font-family:var(--sans); font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+.dash-row{ display:grid; grid-template-columns:1.1em 1fr auto; align-items:center; gap:10px; padding:5px 0; border-top:1px solid var(--rule2); }
+.dash-row:first-of-type{ border-top:none; }
+.dash-row .g{ font-family:var(--sans); font-size:13px; text-align:center; color:var(--muted); }
+.dash-row .g[data-s="1"]{ color:var(--ink); }
+.dash-row .g[data-s="2"]{ color:var(--key); }
+.dash-row a{ font-family:var(--sans); font-size:13.5px; color:var(--ink); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dash-row a:hover{ text-decoration:underline; text-decoration-color:var(--ink2); }
+.dash-row .rf{ display:flex; align-items:center; gap:9px; }
+.dash-row .rf .meter{ width:56px; }
+.dash-row .rf .fr{ font-family:var(--mono); font-size:11.5px; color:var(--ink2); min-width:3.4em; text-align:right; }
+.dash-row .rf .stale{ font-family:var(--sans); font-size:11px; color:var(--warn); }
+.dash-done{ font-family:var(--sans); font-size:13px; color:var(--key); }
+.dash-reset{ display:block; margin:14px 0 0; font-family:var(--sans); font-size:11.5px; color:var(--muted); background:none; border:none; cursor:pointer; padding:0; }
+.dash-reset:hover{ color:var(--ink); text-decoration:underline; }
+
+/* ---- index: per-card meter + fraction, group tally ---- */
+.ncard{ position:relative; }
+.ncard-meter{ position:absolute; left:1px; right:1px; bottom:1px; height:2px; border-radius:0 0 10px 10px; }
+.ncard-frac{ font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-left:auto; padding-top:2px; white-space:nowrap; }
+.ncard-frac.full{ color:var(--key); }
+.group h2 .group-count{ float:right; font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:0; text-transform:none; color:var(--muted); }
+.group h2 .group-count b{ color:var(--key); font-weight:400; }
