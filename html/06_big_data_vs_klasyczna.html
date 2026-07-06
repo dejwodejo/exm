@@ -1,406 +1,1005 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Klasyczna analiza vs Big Data</title>
-<link rel="stylesheet" href="../assets/katex/katex.min.css">
-<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/notes.css">
-</head><body>
-<div class="topbar">
-  <a href="../index.html">← Wszystkie notatki</a>
-  <span class="sp"></span>
-  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
-  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
-</div>
-<div class="layout">
-  <main class="wrap">
-    <p class="eyebrow">Big Data i systemy rozproszone</p>
-    <h1>Klasyczna analiza vs Big Data</h1>
-    <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="1-definicje-fundamentalne-potrzebne-dalej">1. Definicje fundamentalne (potrzebne dalej)</h2>
-<ul>
-<li><strong>Populacja generalna</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">P</mi></mrow><annotation encoding="application/x-tex">\mathcal{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal" style="margin-right:0.08222em;">P</span></span></span></span> — zbiór wszystkich obiektów objętych badaniem. <strong>Próba</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">X_1,\ldots,X_n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> — skończony, zwykle losowy, podzbiór populacji.</li>
-<li><strong>Zmienna losowa</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo>:</mo><mi mathvariant="normal">Ω</mi><mo>→</mo><mi mathvariant="double-struck">R</mi></mrow><annotation encoding="application/x-tex">X:\Omega\to\mathbb{R}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Ω</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">R</span></span></span></span> — przypisuje liczbę wynikowi losowego doświadczenia (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Ω</mi></mrow><annotation encoding="application/x-tex">\Omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">Ω</span></span></span></span> to przestrzeń zdarzeń elementarnych, konceptualnie odrębna od populacji obiektów <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">P</mi></mrow><annotation encoding="application/x-tex">\mathcal{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal" style="margin-right:0.08222em;">P</span></span></span></span>).</li>
-<li><strong>Estymator</strong> parametru <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span></span></span> — funkcja próby <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mi>n</mi></msub><mo>=</mo><mi>T</mi><mo stretchy="false">(</mo><msub><mi>X</mi><mn>1</mn></msub><mo separator="true">,</mo><mo>…</mo><mo separator="true">,</mo><msub><mi>X</mi><mi>n</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\hat\theta_n=T(X_1,\ldots,X_n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1079em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, mająca przybliżać nieznany <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>θ</mi></mrow><annotation encoding="application/x-tex">\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span></span></span>.</li>
-<li><strong>Obciążenie</strong>: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>bias</mtext><mo stretchy="false">(</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo stretchy="false">]</mo><mo>−</mo><mi>θ</mi></mrow><annotation encoding="application/x-tex">\text{bias}(\hat\theta)=\mathbb{E}[\hat\theta]-\theta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">bias</span></span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathbb">E</span><span class="mopen">[</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span></span></span> (nieobciążony, gdy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>). <strong>MSE</strong> (mean squared error, błąd średniokwadratowy): <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext>MSE</mtext><mo stretchy="false">(</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo stretchy="false">)</mo><mo>=</mo><mi mathvariant="double-struck">E</mi><mo stretchy="false">[</mo><mo stretchy="false">(</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo>−</mo><mi>θ</mi><msup><mo stretchy="false">)</mo><mn>2</mn></msup><mo stretchy="false">]</mo><mo>=</mo><mtext>Var</mtext><mo stretchy="false">(</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo stretchy="false">)</mo><mo>+</mo><mtext>bias</mtext><mo stretchy="false">(</mo><mover accent="true"><mi>θ</mi><mo>^</mo></mover><msup><mo stretchy="false">)</mo><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\text{MSE}(\hat\theta)=\mathbb{E}[(\hat\theta-\theta)^2]=\text{Var}(\hat\theta)+\text{bias}(\hat\theta)^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">MSE</span></span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathbb">E</span><span class="mopen">[(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">]</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Var</span></span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">bias</span></span><span class="mopen">(</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span> — rozkład błędu na wariancję i obciążenie.</li>
-<li><strong>Test statystyczny</strong> składa się z: pary hipotez <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">H_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> vs <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">H_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, statystyki testowej <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span></span></span></span> (o wartości zaobserwowanej <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>t</mi><mtext>obs</mtext></msub></mrow><annotation encoding="application/x-tex">t_{\text{obs}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">obs</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>), poziomu istotności <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mi>P</mi><mo stretchy="false">(</mo><mtext>odrzucenie </mtext><msub><mi>H</mi><mn>0</mn></msub><mo>∣</mo><msub><mi>H</mi><mn>0</mn></msub><mtext> prawdziwa</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\alpha=P(\text{odrzucenie }H_0\mid H_0\text{ prawdziwa})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord text"><span class="mord">odrzucenie </span></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord text"><span class="mord"> prawdziwa</span></span><span class="mclose">)</span></span></span></span> oraz <strong>p-value</strong> = prawdopodobieństwa statystyki co najmniej tak skrajnej jak <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>t</mi><mtext>obs</mtext></msub></mrow><annotation encoding="application/x-tex">t_{\text{obs}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">obs</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> przy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>H</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">H_0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: prawostronnie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi>T</mi><mo>≥</mo><msub><mi>t</mi><mtext>obs</mtext></msub><mo>∣</mo><msub><mi>H</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(T\geq t_{\text{obs}}\mid H_0)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">obs</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>, dwustronnie dla symetrycznej statystyki testowej <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><mi>T</mi><mi mathvariant="normal">∣</mi><mo>≥</mo><mi mathvariant="normal">∣</mi><msub><mi>t</mi><mtext>obs</mtext></msub><mi mathvariant="normal">∣</mi><mo>∣</mo><msub><mi>H</mi><mn>0</mn></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P(|T|\geq |t_{\text{obs}}|\mid H_0)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">∣</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">obs</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0813em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>.</li>
-<li><strong>Złożoność asymptotyczna</strong> <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(g(n))</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">))</span></span></span></span> — tempo wzrostu kosztu ograniczone z góry przez <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">g(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> z dokładnością do stałej; miara skalowalności algorytmu.</li>
-</ul>
-<h2 id="2-big-data-model-5v">2. Big Data — model 5V</h2>
-<p><strong>Big Data</strong> to dane, których właściwości uniemożliwiają stosowanie klasycznych narzędzi (jednowęzłowy RDBMS — Relational Database Management System, in-memory pandas/R). Charakteryzuje się modelem 5V (rdzeń to 3V Laneya z 2001: Volume, Velocity, Variety; Veracity i Value dodane później):</p>
-<ul>
-<li><strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej maszynie.</li>
-<li><strong>Velocity</strong> — tempo napływu (strumieniowe, near-real-time).</li>
-<li><strong>Variety</strong> — różnorodność: ustrukturyzowane, semi-strukturyzowane (JSON — JavaScript Object Notation, logi), nieustrukturyzowane (tekst, obraz, audio).</li>
-<li><strong>Veracity</strong> — niepewność/jakość (szum, brakujące, sprzeczne źródła).</li>
-<li><strong>Value</strong> — wartość biznesowa wydobyta z danych (kryterium &quot;po co to robimy&quot;).</li>
-</ul>
-<p>Granica &quot;duże dane&quot; vs &quot;Big Data&quot; jest <strong>mieszana</strong> — istnieją progi ilościowe (TB-PB, jeden vs wiele węzłów), ale klasyfikacja zależy też od variety i velocity, nie tylko volume: gdy musimy zmienić paradygmat (rozproszenie, schema-on-read, aproksymacje) — to Big Data. Sam wzrost <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> to nadal klasyka.</p>
-<h2 id="3-paradygmat-klasyczny">3. Paradygmat klasyczny</h2>
-<ul>
-<li><strong>Próbka reprezentatywna</strong> z populacji + <strong>wnioskowanie statystyczne</strong> o parametrach.</li>
-<li>Fundament probabilistyczny (oznaczenia: <strong>i.i.d.</strong> — independent and identically distributed, niezależne o jednakowym rozkładzie; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>P</mi></mpadded></mover></mrow><annotation encoding="application/x-tex">\xrightarrow{P}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
--16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
- 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
- 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
--40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
--12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
- 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span></span></span></span> zbieżność według prawdopodobieństwa; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>d</mi></mpadded></mover></mrow><annotation encoding="application/x-tex">\xrightarrow{d}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1191em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
--16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
- 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
- 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
--40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
--12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
- 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span></span></span></span> zbieżność według rozkładu; <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{N}(0,1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> standardowy rozkład normalny):<ul>
-<li><strong>Słabe Prawo Wielkich Liczb (LLN)</strong>: dla <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">X_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> i.i.d. ze średnią <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi></mrow><annotation encoding="application/x-tex">\mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span> zachodzi <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mi>n</mi></msub><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>P</mi></mpadded></mover><mi>μ</mi></mrow><annotation encoding="application/x-tex">\bar X_n\xrightarrow{P}\mu</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2503em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
--16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
- 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
- 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
--40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
--12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
- 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span>.</li>
-<li><strong>Centralne Twierdzenie Graniczne (CLT)</strong>: dla <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>X</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">X_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> i.i.d. ze skończoną wariancją <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>σ</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">\sigma^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msqrt><mi>n</mi></msqrt><mo stretchy="false">(</mo><msub><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mi>n</mi></msub><mo>−</mo><mi>μ</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>σ</mi><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>d</mi></mpadded></mover><mi mathvariant="script">N</mi><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\sqrt{n}(\bar X_n-\mu)/\sigma\xrightarrow{d}\mathcal{N}(0,1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0701em;vertical-align:-0.25em;"></span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.3581em;vertical-align:-0.25em;"></span><span class="mord mathnormal">μ</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight">d</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
--16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
- 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
- 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
--40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
--12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
- 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.14736em;">N</span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> — stąd przedział ufności <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mover accent="true"><mi>X</mi><mo>ˉ</mo></mover><mi>n</mi></msub><mo>±</mo><msub><mi>z</mi><mrow><mn>1</mn><mo>−</mo><mi>α</mi><mi mathvariant="normal">/</mi><mn>2</mn></mrow></msub><mtext> </mtext><mi>σ</mi><mi mathvariant="normal">/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">\bar X_n\pm z_{1-\alpha/2}\,\sigma/\sqrt{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9701em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8201em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span></span><span style="top:-3.2523em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0785em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">±</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1555em;vertical-align:-0.3552em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.0037em;">α</span><span class="mord mtight">/2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mord">/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span> oraz testy.</li>
-</ul>
-</li>
-<li>Skalowanie <strong>pionowe (scale-up)</strong>: większa pamięć/CPU jednej maszyny.</li>
-<li><strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) — gwarancje transakcyjne RDBMS.</li>
-<li><strong>ETL</strong> (Extract–Transform–Load) i <strong>schema-on-write</strong>: schemat ustalony przed załadowaniem do hurtowni.</li>
-<li>Narzędzia: pandas, NumPy, scikit-learn, R, SAS, klasyczne hurtownie (PostgreSQL, Oracle).</li>
-</ul>
-<h2 id="4-paradygmat-big-data">4. Paradygmat Big Data</h2>
-<ul>
-<li><strong>N≈all</strong> (często dane administracyjne lub wyczerpujące względem systemu, ale niekoniecznie prawdziwa populacja docelowa) zamiast próby.</li>
-<li>Przesunięcie celu: z <strong>inferencji</strong> (testy hipotez) na <strong>predykcję</strong> (modele uczenia maszynowego).</li>
-<li>Skalowanie <strong>poziome (scale-out)</strong>: klaster commodity hardware; ekonomicznie i fizycznie nieuniknione przy TB–PB.</li>
-<li><strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) — łagodniejsze gwarancje, wymuszone przez systemy rozproszone.</li>
-<li><strong>ELT</strong> + <strong>schema-on-read</strong>: surowe dane do data lake, schemat dopiero przy odczycie (większa elastyczność, ryzyko &quot;data swamp&quot;).</li>
-<li><strong>Batch vs streaming</strong>: przetwarzanie wsadowe (Hadoop/Spark batch) vs strumieniowe (Kafka, Flink, Spark Structured Streaming) z pojęciami event time / processing time / watermarks.</li>
-<li>Architektury: data lake (HDFS — Hadoop Distributed File System, lub S3) → <strong>lakehouse</strong> (Delta Lake, Iceberg, Hudi) łączący elastyczność lake z transakcyjnością hurtowni (DWH — Data Warehouse).</li>
-</ul>
-<h2 id="5-twierdzenie-cap-i-mapreduce">5. Twierdzenie CAP i MapReduce</h2>
-<p><strong>Twierdzenie CAP (Brewer)</strong>: w systemie rozproszonym <strong>w obecności partycji sieciowej</strong> musisz wybrać C lub A (Gilbert-Lynch 2002 — formalizacja przypuszczenia Brewera 2000); bez partycji oba możliwe. Składowe: <strong>C</strong>onsistency (wszystkie węzły widzą te same dane), <strong>A</strong>vailability (każde żądanie dostaje odpowiedź), <strong>P</strong>artition tolerance (system działa mimo zerwania połączeń). W praktyce <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span></span></span></span> jest wymuszone (sieć zawodzi), więc wybór sprowadza się do <strong>CP</strong> lub <strong>AP</strong>. Stąd dychotomia RDBMS (CP, ACID) vs wiele NoSQL (AP, BASE).</p>
-<p><strong>Częsty mit</strong>: mapowanie ACID↔CP, BASE↔AP. To różne wymiary: ACID dotyczy transakcji, CAP dotyczy replikacji w obecności partycji. PostgreSQL na pojedynczym węźle nie podpada pod CAP. Część systemów NoSQL (MongoDB ≥ 4.0, FoundationDB) obsługuje ACID, a bazy NewSQL (CockroachDB) łączą rozproszenie z pełnym ACID.</p>
-<p><strong>MapReduce</strong> — model obliczeń rozproszonych:</p>
-<div class="mathblock"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>Map</mtext><mo>:</mo><mo stretchy="false">(</mo><msub><mi>k</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>1</mn></msub><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>k</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mo separator="true">,</mo><mspace width="2em"/><mtext>Reduce</mtext><mo>:</mo><mo stretchy="false">(</mo><msub><mi>k</mi><mn>2</mn></msub><mo separator="true">,</mo><mo stretchy="false">[</mo><msub><mi>v</mi><mn>2</mn></msub><mo stretchy="false">]</mo><mo stretchy="false">)</mo><mo>→</mo><mo stretchy="false">[</mo><mo stretchy="false">(</mo><msub><mi>k</mi><mn>3</mn></msub><mo separator="true">,</mo><msub><mi>v</mi><mn>3</mn></msub><mo stretchy="false">)</mo><mo stretchy="false">]</mo><mi mathvariant="normal">.</mi></mrow><annotation encoding="application/x-tex">\text{Map}: (k_1, v_1) \to [(k_2, v_2)],\qquad \text{Reduce}: (k_2, [v_2]) \to [(k_3, v_3)].</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Map</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:2em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Reduce</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">])</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0315em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)]</span><span class="mord">.</span></span></span></span></span></div>
-<p>Pozwala wyrazić wiele zadań przetwarzania jako kombinację dwóch funkcji uruchamianych równolegle na klastrze (szczegóły w <a href="07_mapreduce.html">MapReduce</a>). Spark uogólnia ten model przez DAG (Directed Acyclic Graph, skierowany graf acykliczny) operacji i in-memory caching (rzędy wielkości szybciej niż klasyczny Hadoop MR).</p>
-<h2 id="6-pulapki-teoretyczne-duzej-skali">6. Pułapki teoretyczne dużej skali</h2>
-<ul>
-<li><strong>Kryzys p-value przy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">n\to\infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span></strong>: ponieważ moc testu rośnie z <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>, dla dowolnego prawdziwego efektu <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo mathvariant="normal">≠</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\neq 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> mamy p-value <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mo stretchy="true" minsize="3.0em">→</mo><mpadded width="+0.6em" lspace="0.3em"><mi>P</mi></mpadded></mover><mn>0</mn></mrow><annotation encoding="application/x-tex">\xrightarrow{P}0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">P</span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="0.522em" viewBox="0 0 400000 522" preserveAspectRatio="xMaxYMin slice"><path d="M0 241v40h399891c-47.3 35.3-84 78-110 128
--16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20
- 11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7
- 39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85
--40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5
--12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67
- 151.7 139 205zm0 0v40h399900v-40z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> — dowolnie mały efekt staje się &quot;istotny&quot; przy dostatecznie dużym <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>. <strong>Istotność statystyczna ≠ istotność praktyczna</strong> — trzeba raportować wielkość efektu (effect size, np. Cohena <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>=</mo><mo stretchy="false">(</mo><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mn>1</mn></msub><mo>−</mo><msub><mover accent="true"><mi>x</mi><mo>ˉ</mo></mover><mn>2</mn></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><msub><mi>s</mi><mtext>pooled</mtext></msub></mrow><annotation encoding="application/x-tex">d=(\bar x_1-\bar x_2)/s_{\text{pooled}}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">x</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mord">/</span><span class="mord"><span class="mord mathnormal">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">pooled</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>), nie tylko p.</li>
-<li><strong>Big Data paradox</strong> (Meng 2018): błąd losowy maleje jak <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi mathvariant="normal">/</mi><msqrt><mi>n</mi></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{n}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0503em;vertical-align:-0.25em;"></span><span class="mord">1/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">n</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span>, ale <strong>błąd systematyczny (selection bias) nie znika</strong> z większą próbą — duża próba nielosowa bywa mniej dokładna niż mała reprezentatywna. &quot;Więcej danych&quot; nie zwalnia z myślenia o tym, jak dane zebrano.</li>
-<li><strong>Curse of dimensionality</strong>: objętość kuli wpisanej w <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mn>0</mn><mo separator="true">,</mo><mn>1</mn><msup><mo stretchy="false">]</mo><mi>d</mi></msup></mrow><annotation encoding="application/x-tex">[0,1]^d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0991em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose"><span class="mclose">]</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span> dąży do zera względem kostki przy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>→</mo><mi mathvariant="normal">∞</mi></mrow><annotation encoding="application/x-tex">d\to\infty</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>, więc masa skupia się w narożnikach, a odległości się koncentrują (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mrow><mi>max</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mi mathvariant="normal">∥</mi><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">∥</mi><mo>−</mo><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mi mathvariant="normal">∥</mi><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">∥</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><msub><mrow><mi>min</mi><mo>⁡</mo></mrow><mi>i</mi></msub><mi mathvariant="normal">∥</mi><msub><mi>x</mi><mi>i</mi></msub><mi mathvariant="normal">∥</mi><mo>→</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">(\max_i\|x_i\|-\min_i\|x_i\|)/\min_i\|x_i\|\to 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mop"><span class="mop">max</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">min</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∥</span><span class="mclose">)</span><span class="mord">/</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">min</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∥</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∥</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>) — znika kontrast między bliskim a dalekim sąsiadem, przez co <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span>-NN i kernel density estimation tracą sens. Remedium: redukcja wymiaru (PCA), regularyzacja, embeddingi.</li>
-<li><strong>Wielokrotne porównania</strong>: przy <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> niezależnych testach na poziomie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span> prawdopodobieństwo choć jednego fałszywie dodatniego to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><msup><mo stretchy="false">)</mo><mi>m</mi></msup></mrow><annotation encoding="application/x-tex">1-(1-\alpha)^m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span></span></span></span> — stąd poprawka Bonferroniego (<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mi mathvariant="normal">/</mi><mi>m</mi></mrow><annotation encoding="application/x-tex">\alpha/m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mord">/</span><span class="mord mathnormal">m</span></span></span></span>) lub kontrola FDR metodą Benjamini–Hochberg.</li>
-<li><strong>Two cultures Breimana</strong>: modelowanie statystyczne (rozkłady, interpretowalność) vs algorytmiczne (predykcja, czarne skrzynki); Big Data sprzyja temu drugiemu, ale przyczynowość (causal inference) pozostaje potrzebna.</li>
-</ul>
-<h2 id="7-algorytmy-aproksymacyjne">7. Algorytmy aproksymacyjne</h2>
-<p>Gdy dokładny wynik jest zbyt drogi obliczeniowo, używa się estymatorów probabilistycznych z gwarancją:</p>
-<div class="mathblock"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>P</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><mover accent="true"><mi>θ</mi><mo>^</mo></mover><mo>−</mo><mi>θ</mi><mi mathvariant="normal">∣</mi><mo>&gt;</mo><mi>ε</mi><mo stretchy="false">)</mo><mo>&lt;</mo><mi>δ</mi><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">P(|\hat\theta - \theta|&gt;\varepsilon)&lt;\delta,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2079em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">θ</span><span class="mord">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">ε</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03785em;">δ</span><span class="mpunct">,</span></span></span></span></span></div>
-<p>gdzie <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ε</mi></mrow><annotation encoding="application/x-tex">\varepsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span> to tolerancja błędu, a <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi></mrow><annotation encoding="application/x-tex">\delta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03785em;">δ</span></span></span></span> — dopuszczalne prawdopodobieństwo jej przekroczenia.</p>
-<ul>
-<li><strong>HyperLogLog</strong> — count-distinct (liczba unikatów) przy stałym rozmiarze rejestru <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>; pamięć <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log\log n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> na komórkę (nie liniowo od <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>), błąd względny <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≈</mo><mn>1</mn><mo separator="true" lspace="0em" rspace="0em">,</mo><mn>04</mn><mi mathvariant="normal">/</mi><msqrt><mi>m</mi></msqrt></mrow><annotation encoding="application/x-tex">\approx 1{,}04/\sqrt{m}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4831em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0503em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">04/</span><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal">m</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width="400em" height="1.08em" viewBox="0 0 400000 1080" preserveAspectRatio="xMinYMin slice"><path d="M95,702
-c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
-c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
-c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10
-s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429
-c69,-144,104.5,-217.7,106.5,-221
-l0 -0
-c5.3,-9.3,12,-14,20,-14
-H400000v40H845.2724
-s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7
-c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z
-M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span>. Ściśle <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mn>1</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(1)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> tylko jako inżynierskie przybliżenie stałego rejestru.</li>
-<li><strong>Count-Min Sketch</strong> — częstości elementów z błędem addytywnym.</li>
-<li><strong>Bloom filter</strong> — test przynależności bez fałszywie ujemnych (false positives kontrolowane).</li>
-<li><strong>Reservoir sampling</strong> — losowa próba o stałym rozmiarze ze strumienia o nieznanej długości.</li>
-</ul>
-<p>To matematyczna konsekwencja połączenia dużego wolumenu (Volume) i wysokiego tempa napływu (Velocity): rezygnacja z dokładności w zamian za skalowalność.</p>
-<h2 id="8-stos-technologiczny-kiedy-co-stosowac">8. Stos technologiczny — kiedy co stosować</h2>
-<p>Heurystyka skali (przybliżona):</p>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Skala danych</th>
-<th>Narzędzia</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>&lt; 10 GB, single-node</td>
-<td>pandas, NumPy, R, DuckDB, SQLite</td>
-</tr>
-<tr>
-<td>10 GB – 1 TB, jeden mocny węzeł</td>
-<td>Polars, Dask, Modin, single-node Spark, hurtownia chmurowa</td>
-</tr>
-<tr>
-<td>&gt; 1 TB albo stały streaming</td>
-<td>Apache Spark (PySpark, MLlib), Flink, Kafka + lakehouse (Delta/Iceberg)</td>
-</tr>
-</tbody></table></div>
-<p>Formaty kolumnowe (<strong>Parquet</strong>, <strong>ORC</strong>) z kompresją i predicate pushdown są standardem w Big Data — trzymanie TB w CSV (Comma-Separated Values) to klasyczny błąd.</p>
-<p><strong>Pułapki praktyczne</strong>:</p>
-<ul>
-<li><strong>Premature Big Data</strong> — stawianie klastra Spark dla 10 GB, które DuckDB obsłuży na laptopie; narzut rozproszenia często przewyższa korzyści.</li>
-<li><strong><code>collect()</code> / <code>toPandas()</code></strong> w PySpark na dużym DataFrame → OOM (Out Of Memory, wyczerpanie pamięci) w driverze.</li>
-<li><strong>Data skew</strong> — nierównomierny rozkład kluczy w <code>groupBy</code>/<code>join</code> zabija wydajność (remedia: salting, broadcast join).</li>
-<li><strong>Koszt operacyjny</strong> — w chmurze (BigQuery slots, Snowflake credits) optymalizacja kosztów jest częścią inżynierii, której klasyczna analiza nie ma.</li>
-</ul>
-<h2 id="9-synteza-paradygmatow">9. Synteza paradygmatów</h2>
-<figure class="viz" id="v06">
-  <div class="viz-head">
-    <p class="viz-title">Klasyka vs Big Data: linijka skali i lustro paradygmatów</p>
-    <p class="viz-sub">Przesuń rozmiar danych (GB → PB). Wskaźnik na linijce mówi, po której stronie progu jesteś, a tabela podświetla właściwą kolumnę. Włącz streaming, by zobaczyć, że o Big Data decyduje nie tylko Volume.</p>
-  </div>
-  <div class="viz-body">
-    <svg id="v06-svg" viewBox="0 0 680 340" role="img" aria-label="Lustrzana tabela klasycznej analizy i Big Data z linijką rozmiaru danych"></svg>
-  </div>
-  <div class="viz-controls">
-    <label>Rozmiar danych
-      <input id="v06-r" type="range" min="0" max="6" step="0.01" value="1.5">
-      <span class="val" id="v06-rv">30 GB</span>
-    </label>
-    <span class="toggle" id="v06-stream" role="button" tabindex="0" aria-pressed="false">Streaming (Velocity)</span>
-    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
-      werdykt: <b id="v06-verdict">–</b>
-    </span>
-  </div>
-  <figcaption><b>Sedno:</b> granica jest mieszana — próg ilościowy to ok. <b>1 TB</b> (jeden vs wiele węzłów), ale gdy dochodzi wysoka <i>Velocity</i> (streaming) albo <i>Variety</i>, zmiana paradygmatu (rozproszenie, BASE, schema-on-read) bywa konieczna nawet przy mniejszym wolumenie. Sam wzrost <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> to wciąż klasyka.</figcaption>
-</figure>
-<script>
-(function(){
-  "use strict";
-  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v06-svg");
-  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
-  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Klasyczna analiza vs Big Data</title>
+    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/notes.css" />
+  <script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head>
+  <body>
+    <div class="topbar">
+      <a href="../index.html">← Wszystkie notatki</a>
+      <span class="sp"></span>
+      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
+        Drukuj
+      </button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
+        ◐ Motyw
+      </button>
+    </div>
+    <div class="layout">
+      <main class="wrap">
+        <p class="eyebrow">Big Data i systemy rozproszone</p>
+        <h1>Klasyczna analiza vs Big Data</h1>
+        <p class="subtitle">Notatka egzaminacyjna</p>
+        <h2 id="1-definicje-fundamentalne-potrzebne-dalej">
+          1. Definicje fundamentalne (potrzebne dalej)
+        </h2>
+        <ul>
+          <li>
+            <strong>Populacja generalna</strong>
+            \(\mathcal{P}\)
+            — zbiór wszystkich obiektów objętych badaniem.
+            <strong>Próba</strong>
+            \(X_1,\ldots,X_n\)
+            — skończony, zwykle losowy, podzbiór populacji.
+          </li>
+          <li>
+            <strong>Zmienna losowa</strong>
+            \(X:\Omega\to\mathbb{R}\)
+            — przypisuje liczbę wynikowi losowego doświadczenia (\(\Omega\)
+            to przestrzeń zdarzeń elementarnych, konceptualnie odrębna od
+            populacji obiektów
+            \(\mathcal{P}\)).
+          </li>
+          <li>
+            <strong>Estymator</strong> parametru
+            \(\theta\)
+            — funkcja próby
+            \(\hat\theta_n=T(X_1,\ldots,X_n)\), mająca przybliżać nieznany
+            \(\theta\).
+          </li>
+          <li>
+            <strong>Obciążenie</strong>:
+            \(\text{bias}(\hat\theta)=\mathbb{E}[\hat\theta]-\theta\)
+            (nieobciążony, gdy
+            \(=0\)). <strong>MSE</strong> (mean squared error, błąd
+            średniokwadratowy):
+            \(\text{MSE}(\hat\theta)=\mathbb{E}[(\hat\theta-\theta)^2]=\text{Var}(\hat\theta)+\text{bias}(\hat\theta)^2\)
+            — rozkład błędu na wariancję i obciążenie.
+          </li>
+          <li>
+            <strong>Test statystyczny</strong> składa się z: pary hipotez
+            \(H_0\)
+            vs
+            \(H_1\), statystyki testowej
+            \(T\)
+            (o wartości zaobserwowanej
+            \(t_{\text{obs}}\)), poziomu istotności
+            \(\alpha=P(\text{odrzucenie }H_0\mid H_0\text{
+                      prawdziwa})\)
+            oraz <strong>p-value</strong> = prawdopodobieństwa statystyki co
+            najmniej tak skrajnej jak
+            \(t_{\text{obs}}\)
+            przy
+            \(H_0\): prawostronnie
+            \(P(T\geq t_{\text{obs}}\mid H_0)\), dwustronnie dla symetrycznej statystyki testowej
+            \(P(|T|\geq |t_{\text{obs}}|\mid H_0)\).
+          </li>
+          <li>
+            <strong>Złożoność asymptotyczna</strong>
+            \(O(g(n))\)
+            — tempo wzrostu kosztu ograniczone z góry przez
+            \(g(n)\)
+            z dokładnością do stałej; miara skalowalności algorytmu.
+          </li>
+        </ul>
+        <h2 id="2-big-data-model-5v">2. Big Data — model 5V</h2>
+        <p>
+          <strong>Big Data</strong> to dane, których właściwości uniemożliwiają
+          stosowanie klasycznych narzędzi (jednowęzłowy RDBMS — Relational
+          Database Management System, in-memory pandas/R). Charakteryzuje się
+          modelem 5V:
+        </p>
+        <ul>
+          <li>
+            <strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej
+            maszynie.
+          </li>
+          <li>
+            <strong>Velocity</strong> — tempo napływu (strumieniowe,
+            near-real-time).
+          </li>
+          <li>
+            <strong>Variety</strong> — różnorodność: ustrukturyzowane,
+            semi-strukturyzowane (JSON — JavaScript Object Notation, logi),
+            nieustrukturyzowane (tekst, obraz, audio).
+          </li>
+          <li>
+            <strong>Veracity</strong> — niepewność/jakość (szum, brakujące,
+            sprzeczne źródła).
+          </li>
+          <li>
+            <strong>Value</strong> — wartość biznesowa wydobyta z danych
+            (kryterium &quot;po co to robimy&quot;).
+          </li>
+        </ul>
+        <p>
+          Granica &quot;duże dane&quot; vs &quot;Big Data&quot; jest
+          <strong>mieszana</strong> — istnieją progi ilościowe (TB-PB, jeden vs
+          wiele węzłów), ale klasyfikacja zależy też od variety i velocity, nie
+          tylko volume: gdy musimy zmienić paradygmat (rozproszenie,
+          schema-on-read, aproksymacje) — to Big Data. Sam wzrost
+          \(n\)
+          to nadal klasyka.
+        </p>
+        <h2 id="3-paradygmat-klasyczny">3. Paradygmat klasyczny</h2>
+        <ul>
+          <li>
+            <strong>Próbka reprezentatywna</strong> z populacji +
+            <strong>wnioskowanie statystyczne</strong> o parametrach.
+          </li>
+          <li>
+            Fundament probabilistyczny (oznaczenia: <strong>i.i.d.</strong> —
+            independent and identically distributed, niezależne o jednakowym
+            rozkładzie;
+            \(\xrightarrow{P}\)
+            zbieżność według prawdopodobieństwa;
+            \(\xrightarrow{d}\)
+            zbieżność według rozkładu;
+            \(\mathcal{N}(0,1)\)
+            standardowy rozkład normalny):
+            <ul>
+              <li>
+                <strong>Słabe Prawo Wielkich Liczb (LLN)</strong>: dla
+                \(X_i\)
+                i.i.d. ze średnią
+                \(\mu\)
+                zachodzi
+                \(\bar X_n\xrightarrow{P}\mu\).
+              </li>
+              <li>
+                <strong>Centralne Twierdzenie Graniczne (CLT)</strong>: dla
+                \(X_i\)
+                i.i.d. ze skończoną wariancją
+                \(\sigma^2\),
+                \(\sqrt{n}(\bar
+                          X_n-\mu)/\sigma\xrightarrow{d}\mathcal{N}(0,1)\)
+                — stąd przedział ufności
+                \(\bar X_n\pm
+                          z_{1-\alpha/2}\,\sigma/\sqrt{n}\)
+                oraz testy.
+              </li>
+            </ul>
+          </li>
+          <li>
+            Skalowanie <strong>pionowe (scale-up)</strong>: większa pamięć/CPU
+            jednej maszyny.
+          </li>
+          <li>
+            <strong>ACID</strong> (Atomicity, Consistency, Isolation,
+            Durability) — gwarancje transakcyjne RDBMS.
+          </li>
+          <li>
+            <strong>ETL</strong> (Extract–Transform–Load) i
+            <strong>schema-on-write</strong>: schemat ustalony przed
+            załadowaniem do hurtowni.
+          </li>
+          <li>
+            Narzędzia: pandas, NumPy, scikit-learn, R, SAS, klasyczne hurtownie
+            (PostgreSQL, Oracle).
+          </li>
+        </ul>
+        <h2 id="4-paradygmat-big-data">4. Paradygmat Big Data</h2>
+        <ul>
+          <li>
+            <strong>N≈all</strong> (często dane administracyjne lub wyczerpujące
+            względem systemu, ale niekoniecznie prawdziwa populacja docelowa)
+            zamiast próby.
+          </li>
+          <li>
+            Przesunięcie celu: z <strong>inferencji</strong> (testy hipotez) na
+            <strong>predykcję</strong> (modele uczenia maszynowego).
+          </li>
+          <li>
+            Skalowanie <strong>poziome (scale-out)</strong>: klaster commodity
+            hardware; ekonomicznie i fizycznie nieuniknione przy TB–PB.
+          </li>
+          <li>
+            <strong>BASE</strong> (Basically Available, Soft state, Eventual
+            consistency) — łagodniejsze gwarancje, wymuszone przez systemy
+            rozproszone.
+          </li>
+          <li>
+            <strong>ELT</strong> + <strong>schema-on-read</strong>: surowe dane
+            do data lake, schemat dopiero przy odczycie (większa elastyczność,
+            ryzyko &quot;data swamp&quot;).
+          </li>
+          <li>
+            <strong>Batch vs streaming</strong>: przetwarzanie wsadowe
+            (Hadoop/Spark batch) vs strumieniowe (Kafka, Flink, Spark Structured
+            Streaming) z pojęciami event time / processing time / watermarks.
+          </li>
+          <li>
+            Architektury: data lake (HDFS — Hadoop Distributed File System, lub
+            S3) → <strong>lakehouse</strong> (Delta Lake, Iceberg, Hudi) łączący
+            elastyczność lake z transakcyjnością hurtowni (DWH — Data
+            Warehouse).
+          </li>
+        </ul>
+        <h2 id="5-twierdzenie-cap-i-mapreduce">
+          5. Twierdzenie CAP i MapReduce
+        </h2>
+        <p>
+          <strong>Twierdzenie CAP (Brewer)</strong>: w systemie rozproszonym
+          <strong>w obecności partycji sieciowej</strong> musisz wybrać C lub A
+          (Gilbert-Lynch 2002 — formalizacja przypuszczenia Brewera 2000); bez
+          partycji oba możliwe. Składowe: <strong>C</strong>onsistency
+          (wszystkie węzły widzą te same dane), <strong>A</strong>vailability
+          (każde żądanie dostaje odpowiedź), <strong>P</strong>artition
+          tolerance (system działa mimo zerwania połączeń). W praktyce
+          \(P\)
+          jest wymuszone (sieć zawodzi), więc wybór sprowadza się do
+          <strong>CP</strong> lub <strong>AP</strong>. Stąd dychotomia RDBMS
+          (CP, ACID) vs wiele NoSQL (AP, BASE).
+        </p>
+        <p>
+          <strong>Częsty mit</strong>: mapowanie ACID↔CP, BASE↔AP. To różne
+          wymiary: ACID dotyczy transakcji, CAP dotyczy replikacji w obecności
+          partycji. PostgreSQL na pojedynczym węźle nie podpada pod CAP. Część
+          systemów NoSQL (MongoDB ≥ 4.0, FoundationDB) obsługuje ACID, a bazy
+          NewSQL (CockroachDB) łączą rozproszenie z pełnym ACID.
+        </p>
+        <p><strong>MapReduce</strong> — model obliczeń rozproszonych:</p>
+        <div class="mathblock">
+          \[\text{Map}: (k_1, v_1) \to [(k_2, v_2)],\qquad
+                      \text{Reduce}: (k_2, [v_2]) \to [(k_3, v_3)].\]
+        </div>
+        <p>
+          Pozwala wyrazić wiele zadań przetwarzania jako kombinację dwóch
+          funkcji uruchamianych równolegle na klastrze (szczegóły w
+          <a href="07_mapreduce.html">MapReduce</a>). Spark uogólnia ten model
+          przez DAG (Directed Acyclic Graph, skierowany graf acykliczny)
+          operacji i in-memory caching (rzędy wielkości szybciej niż klasyczny
+          Hadoop MR).
+        </p>
+        <h2 id="6-pulapki-teoretyczne-duzej-skali">
+          6. Pułapki teoretyczne dużej skali
+        </h2>
+        <ul>
+          <li>
+            <strong
+              >Kryzys p-value przy
+              \(n\to\infty\)</strong
+            >: ponieważ moc testu rośnie z
+            \(n\), dla dowolnego prawdziwego efektu
+            \(\neq 0\)
+            mamy p-value
+            \(\xrightarrow{P}0\)
+            — dowolnie mały efekt staje się &quot;istotny&quot; przy
+            dostatecznie dużym
+            \(n\). <strong>Istotność statystyczna ≠ istotność praktyczna</strong> —
+            trzeba raportować wielkość efektu (effect size, np. Cohena
+            \(d=(\bar x_1-\bar x_2)/s_{\text{pooled}}\)), nie tylko p.
+          </li>
+          <li>
+            <strong>Big Data paradox</strong> (Meng 2018): błąd losowy maleje
+            jak
+            \(1/\sqrt{n}\), ale
+            <strong>błąd systematyczny (selection bias) nie znika</strong> z
+            większą próbą — duża próba nielosowa bywa mniej dokładna niż mała
+            reprezentatywna. &quot;Więcej danych&quot; nie zwalnia z myślenia o
+            tym, jak dane zebrano.
+          </li>
+          <li>
+            <strong>Curse of dimensionality</strong>: objętość kuli wpisanej w
+            \([0,1]^d\)
+            dąży do zera względem kostki przy
+            \(d\to\infty\), więc masa skupia się w narożnikach, a odległości się koncentrują
+            (\((\max_i\|x_i\|-\min_i\|x_i\|)/\min_i\|x_i\|\to
+                      0\)) — znika kontrast między bliskim a dalekim sąsiadem, przez co
+            \(k\)-NN i kernel density estimation tracą sens. Remedium: redukcja
+            wymiaru (PCA), regularyzacja, embeddingi.
+          </li>
+          <li>
+            <strong>Wielokrotne porównania</strong>: przy
+            \(m\)
+            niezależnych testach na poziomie
+            \(\alpha\)
+            prawdopodobieństwo choć jednego fałszywie dodatniego to
+            \(1-(1-\alpha)^m\)
+            — stąd poprawka Bonferroniego (\(\alpha/m\)) lub kontrola FDR metodą Benjamini–Hochberg.
+          </li>
+          <li>
+            <strong>Two cultures Breimana</strong>: modelowanie statystyczne
+            (rozkłady, interpretowalność) vs algorytmiczne (predykcja, czarne
+            skrzynki); Big Data sprzyja temu drugiemu, ale przyczynowość (causal
+            inference) pozostaje potrzebna.
+          </li>
+        </ul>
+        <h2 id="7-algorytmy-aproksymacyjne">7. Algorytmy aproksymacyjne</h2>
+        <p>
+          Gdy dokładny wynik jest zbyt drogi obliczeniowo, używa się estymatorów
+          probabilistycznych z gwarancją:
+        </p>
+        <div class="mathblock">
+          \[P(|\hat\theta -
+                      \theta|>\varepsilon)<\delta,\]
+        </div>
+        <p>
+          gdzie
+          \(\varepsilon\)
+          to tolerancja błędu, a
+          \(\delta\)
+          — dopuszczalne prawdopodobieństwo jej przekroczenia.
+        </p>
+        <ul>
+          <li>
+            <strong>HyperLogLog</strong> — count-distinct (liczba unikatów) przy
+            stałym rozmiarze rejestru
+            \(m\); pamięć
+            \(O(\log\log n)\)
+            na komórkę (nie liniowo od
+            \(n\)), błąd względny
+            \(\approx 1{,}04/\sqrt{m}\). Ściśle
+            \(O(1)\)
+            tylko jako inżynierskie przybliżenie stałego rejestru.
+          </li>
+          <li>
+            <strong>Count-Min Sketch</strong> — częstości elementów z błędem
+            addytywnym.
+          </li>
+          <li>
+            <strong>Bloom filter</strong> — test przynależności bez fałszywie
+            ujemnych (false positives kontrolowane).
+          </li>
+          <li>
+            <strong>Reservoir sampling</strong> — losowa próba o stałym
+            rozmiarze ze strumienia o nieznanej długości.
+          </li>
+        </ul>
+        <p>
+          To matematyczna konsekwencja połączenia dużego wolumenu (Volume) i
+          wysokiego tempa napływu (Velocity): rezygnacja z dokładności w zamian
+          za skalowalność.
+        </p>
+        <h2 id="8-stos-technologiczny-kiedy-co-stosowac">
+          8. Stos technologiczny — kiedy co stosować
+        </h2>
+        <p>Heurystyka skali (przybliżona):</p>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Skala danych</th>
+                <th>Narzędzia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&lt; 10 GB, single-node</td>
+                <td>pandas, NumPy, R, DuckDB, SQLite</td>
+              </tr>
+              <tr>
+                <td>10 GB – 1 TB, jeden mocny węzeł</td>
+                <td>
+                  Polars, Dask, Modin, single-node Spark, hurtownia chmurowa
+                </td>
+              </tr>
+              <tr>
+                <td>&gt; 1 TB albo stały streaming</td>
+                <td>
+                  Apache Spark (PySpark, MLlib), Flink, Kafka + lakehouse
+                  (Delta/Iceberg)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Formaty kolumnowe (<strong>Parquet</strong>, <strong>ORC</strong>) z
+          kompresją i predicate pushdown są standardem w Big Data — trzymanie TB
+          w CSV (Comma-Separated Values) to klasyczny błąd.
+        </p>
+        <p><strong>Pułapki praktyczne</strong>:</p>
+        <ul>
+          <li>
+            <strong>Premature Big Data</strong> — stawianie klastra Spark dla 10
+            GB, które DuckDB obsłuży na laptopie; narzut rozproszenia często
+            przewyższa korzyści.
+          </li>
+          <li>
+            <strong><code>collect()</code> / <code>toPandas()</code></strong> w
+            PySpark na dużym DataFrame → OOM (Out Of Memory, wyczerpanie
+            pamięci) w driverze.
+          </li>
+          <li>
+            <strong>Data skew</strong> — nierównomierny rozkład kluczy w
+            <code>groupBy</code>/<code>join</code> zabija wydajność (remedia:
+            salting, broadcast join).
+          </li>
+          <li>
+            <strong>Koszt operacyjny</strong> — w chmurze (BigQuery slots,
+            Snowflake credits) optymalizacja kosztów jest częścią inżynierii,
+            której klasyczna analiza nie ma.
+          </li>
+        </ul>
+        <h2 id="9-synteza-paradygmatow">9. Synteza paradygmatów</h2>
+        <figure class="viz" id="v06">
+          <div class="viz-head">
+            <p class="viz-title">
+              Klasyka vs Big Data: linijka skali i lustro paradygmatów
+            </p>
+            <p class="viz-sub">
+              Przesuń rozmiar danych (GB → PB). Wskaźnik na linijce mówi, po
+              której stronie progu jesteś, a tabela podświetla właściwą kolumnę.
+              Włącz streaming, by zobaczyć, że o Big Data decyduje nie tylko
+              Volume.
+            </p>
+          </div>
+          <div class="viz-body">
+            <svg
+              id="v06-svg"
+              viewBox="0 0 680 340"
+              role="img"
+              aria-label="Lustrzana tabela klasycznej analizy i Big Data z linijką rozmiaru danych"
+            ></svg>
+          </div>
+          <div class="viz-controls">
+            <label
+              >Rozmiar danych
+              <input
+                id="v06-r"
+                type="range"
+                min="0"
+                max="6"
+                step="0.01"
+                value="1.5"
+              />
+              <span class="val" id="v06-rv">30 GB</span>
+            </label>
+            <span
+              class="toggle"
+              id="v06-stream"
+              role="button"
+              tabindex="0"
+              aria-pressed="false"
+              >Streaming (Velocity)</span
+            >
+            <span
+              style="
+                font-family: var(--mono);
+                font-size: 12px;
+                color: var(--ink2);
+              "
+            >
+              werdykt: <b id="v06-verdict">–</b>
+            </span>
+          </div>
+          <figcaption>
+            <b>Sedno:</b> granica jest mieszana — próg ilościowy to ok.
+            <b>1 TB</b> (jeden vs wiele węzłów), ale gdy dochodzi wysoka
+            <i>Velocity</i> (streaming) albo <i>Variety</i>, zmiana paradygmatu
+            (rozproszenie, BASE, schema-on-read) bywa konieczna nawet przy
+            mniejszym wolumenie. Sam wzrost
+            \(n\)
+            to wciąż klasyka.
+          </figcaption>
+        </figure>
+        <script>
+          (function () {
+            "use strict";
+            var NS = "http://www.w3.org/2000/svg",
+              svg = document.getElementById("v06-svg");
+            var cvar = function (n) {
+              return getComputedStyle(document.documentElement)
+                .getPropertyValue(n)
+                .trim();
+            };
+            function E(n, a, t) {
+              var e = document.createElementNS(NS, n);
+              for (var k in a) e.setAttribute(k, a[k]);
+              if (t != null) e.textContent = t;
+              return e;
+            }
 
-  // ---- dane ilustracyjne (z tabeli synteza, sekcja 9) ----
-  var ROWS=[
-    ["Dane",         "próba reprezentatywna", "N≈all (wyczerpujące względem źródła)"],
-    ["Skalowanie",   "pionowe (scale-up)",    "poziome (scale-out)"],
-    ["Lokalizacja",  "w RAM jednej maszyny",  "rozproszone (klaster)"],
-    ["Spójność",     "ACID",                  "BASE (eventual)"],
-    ["Schemat",      "schema-on-write (ETL)", "schema-on-read (ELT)"],
-    ["Cel",          "wnioskowanie o param.", "predykcja / wzorce"],
-    ["Narzędzia",    "pandas · NumPy · R",    "Spark · Flink · Kafka"]
-  ];
-  // znaczniki linijki: log10(GB) -> etykieta
-  var TICKS=[[0,"1 GB"],[1,"10 GB"],[2,"100 GB"],[3,"1 TB"],[4,"10 TB"],[5,"100 TB"],[6,"1 PB"]];
+            // ---- dane ilustracyjne (z tabeli synteza, sekcja 9) ----
+            var ROWS = [
+              [
+                "Dane",
+                "próba reprezentatywna",
+                "N≈all (wyczerpujące względem źródła)",
+              ],
+              ["Skalowanie", "pionowe (scale-up)", "poziome (scale-out)"],
+              ["Lokalizacja", "w RAM jednej maszyny", "rozproszone (klaster)"],
+              ["Spójność", "ACID", "BASE (eventual)"],
+              ["Schemat", "schema-on-write (ETL)", "schema-on-read (ELT)"],
+              ["Cel", "wnioskowanie o param.", "predykcja / wzorce"],
+              ["Narzędzia", "pandas · NumPy · R", "Spark · Flink · Kafka"],
+            ];
+            // znaczniki linijki: log10(GB) -> etykieta
+            var TICKS = [
+              [0, "1 GB"],
+              [1, "10 GB"],
+              [2, "100 GB"],
+              [3, "1 TB"],
+              [4, "10 TB"],
+              [5, "100 TB"],
+              [6, "1 PB"],
+            ];
 
-  var W=680,H=340;
-  var RX0=40,RX1=640,RY=52;                 // linijka (track)
-  var xr=function(v){return RX0+(v/6)*(RX1-RX0);};
+            var W = 680,
+              H = 340;
+            var RX0 = 40,
+              RX1 = 640,
+              RY = 52; // linijka (track)
+            var xr = function (v) {
+              return RX0 + (v / 6) * (RX1 - RX0);
+            };
 
-  // geometria tabeli
-  var LX=36,LW=250, CX=286,CW=108, GX=394,GW=250;
-  var HY=92, RH=31, TY=HY+22;               // start wierszy pod nagłówkiem
+            // geometria tabeli
+            var LX = 36,
+              LW = 250,
+              CX = 286,
+              CW = 108,
+              GX = 394,
+              GW = 250;
+            var HY = 92,
+              RH = 31,
+              TY = HY + 22; // start wierszy pod nagłówkiem
 
-  function fmtSize(logv){
-    var gb=Math.pow(10,logv);
-    var v,u;
-    if(gb>=1e6){v=gb/1e6;u="PB";} else if(gb>=1000){v=gb/1000;u="TB";} else {v=gb;u="GB";}
-    var s = v>=100 ? String(Math.round(v)) : v>=10 ? String(Math.round(v)) : (Math.round(v*10)/10).toFixed(1);
-    return s+" "+u;
-  }
+            function fmtSize(logv) {
+              var gb = Math.pow(10, logv);
+              var v, u;
+              if (gb >= 1e6) {
+                v = gb / 1e6;
+                u = "PB";
+              } else if (gb >= 1000) {
+                v = gb / 1000;
+                u = "TB";
+              } else {
+                v = gb;
+                u = "GB";
+              }
+              var s =
+                v >= 100
+                  ? String(Math.round(v))
+                  : v >= 10
+                    ? String(Math.round(v))
+                    : (Math.round(v * 10) / 10).toFixed(1);
+              return s + " " + u;
+            }
 
-  function render(){
-    while(svg.firstChild)svg.removeChild(svg.firstChild);
-    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),
-        BG2=cvar("--bg2"),RULE=cvar("--rule"),
-        BL=cvar("--v-blue"),TE=cvar("--v-teal"),AM=cvar("--v-amber");
+            function render() {
+              while (svg.firstChild) svg.removeChild(svg.firstChild);
+              var INK = cvar("--ink"),
+                INK2 = cvar("--ink2"),
+                MUT = cvar("--muted"),
+                BG2 = cvar("--bg2"),
+                RULE = cvar("--rule"),
+                BL = cvar("--v-blue"),
+                TE = cvar("--v-teal"),
+                AM = cvar("--v-amber");
 
-    var val=parseFloat(document.getElementById("v06-r").value);
-    var stream=document.getElementById("v06-stream").getAttribute("aria-pressed")==="true";
+              var val = parseFloat(document.getElementById("v06-r").value);
+              var stream =
+                document
+                  .getElementById("v06-stream")
+                  .getAttribute("aria-pressed") === "true";
 
-    // strefa wg progów: <10GB klasyka, 10GB–1TB granica, >1TB Big Data; streaming wymusza Big Data
-    var zone = stream ? "big" : (val<1 ? "classic" : (val<3 ? "trans" : "big"));
-    var cLvl = zone==="classic" ? 1 : (zone==="trans" ? 0.5 : 0);
-    var gLvl = zone==="big" ? 1 : (zone==="trans" ? 0.5 : 0);
+              // strefa wg progów: <10GB klasyka, 10GB–1TB granica, >1TB Big Data; streaming wymusza Big Data
+              var zone = stream
+                ? "big"
+                : val < 1
+                  ? "classic"
+                  : val < 3
+                    ? "trans"
+                    : "big";
+              var cLvl = zone === "classic" ? 1 : zone === "trans" ? 0.5 : 0;
+              var gLvl = zone === "big" ? 1 : zone === "trans" ? 0.5 : 0;
 
-    // ===== LINIJKA: pasma stref =====
-    var bands=[[0,1,BL],[1,3,AM],[3,6,TE]];
-    for(var i=0;i<bands.length;i++){
-      var x=xr(bands[i][0]), w=xr(bands[i][1])-x;
-      svg.appendChild(E("rect",{x:x,y:RY-4,width:w,height:8,fill:bands[i][2],"fill-opacity":0.30}));
-    }
-    svg.appendChild(E("line",{x1:RX0,y1:RY,x2:RX1,y2:RY,stroke:cvar("--v-axis"),"stroke-width":1.4}));
-    // znaczniki + etykiety
-    for(i=0;i<TICKS.length;i++){
-      var tx=xr(TICKS[i][0]);
-      svg.appendChild(E("line",{x1:tx,y1:RY-5,x2:tx,y2:RY+5,stroke:MUT,"stroke-width":1}));
-      svg.appendChild(E("text",{x:tx,y:RY+18,"text-anchor":"middle","font-size":10,fill:MUT},TICKS[i][1]));
-    }
-    // próg Big Data (1 TB) — gdzie klasyka ustępuje
-    var pth=xr(3);
-    svg.appendChild(E("line",{x1:pth,y1:RY-18,x2:pth,y2:RY+6,stroke:INK,"stroke-width":1.3,"stroke-dasharray":"3 3"}));
-    svg.appendChild(E("text",{x:pth,y:RY-22,"text-anchor":"middle","font-size":10,"font-weight":700,fill:INK},"próg ≈ 1 TB"));
+              // ===== LINIJKA: pasma stref =====
+              var bands = [
+                [0, 1, BL],
+                [1, 3, AM],
+                [3, 6, TE],
+              ];
+              for (var i = 0; i < bands.length; i++) {
+                var x = xr(bands[i][0]),
+                  w = xr(bands[i][1]) - x;
+                svg.appendChild(
+                  E("rect", {
+                    x: x,
+                    y: RY - 4,
+                    width: w,
+                    height: 8,
+                    fill: bands[i][2],
+                    "fill-opacity": 0.3,
+                  }),
+                );
+              }
+              svg.appendChild(
+                E("line", {
+                  x1: RX0,
+                  y1: RY,
+                  x2: RX1,
+                  y2: RY,
+                  stroke: cvar("--v-axis"),
+                  "stroke-width": 1.4,
+                }),
+              );
+              // znaczniki + etykiety
+              for (i = 0; i < TICKS.length; i++) {
+                var tx = xr(TICKS[i][0]);
+                svg.appendChild(
+                  E("line", {
+                    x1: tx,
+                    y1: RY - 5,
+                    x2: tx,
+                    y2: RY + 5,
+                    stroke: MUT,
+                    "stroke-width": 1,
+                  }),
+                );
+                svg.appendChild(
+                  E(
+                    "text",
+                    {
+                      x: tx,
+                      y: RY + 18,
+                      "text-anchor": "middle",
+                      "font-size": 10,
+                      fill: MUT,
+                    },
+                    TICKS[i][1],
+                  ),
+                );
+              }
+              // próg Big Data (1 TB) — gdzie klasyka ustępuje
+              var pth = xr(3);
+              svg.appendChild(
+                E("line", {
+                  x1: pth,
+                  y1: RY - 18,
+                  x2: pth,
+                  y2: RY + 6,
+                  stroke: INK,
+                  "stroke-width": 1.3,
+                  "stroke-dasharray": "3 3",
+                }),
+              );
+              svg.appendChild(
+                E(
+                  "text",
+                  {
+                    x: pth,
+                    y: RY - 22,
+                    "text-anchor": "middle",
+                    "font-size": 10,
+                    "font-weight": 700,
+                    fill: INK,
+                  },
+                  "próg ≈ 1 TB",
+                ),
+              );
 
-    // wskaźnik pozycji
-    var px=xr(val);
-    svg.appendChild(E("path",{d:"M"+px+" "+(RY-6)+" l -6 -9 l 12 0 z",fill:INK}));
-    var lblCol = zone==="classic"?BL : (zone==="big"?TE:AM);
-    // etykieta rozmiaru nad wskaźnikiem (przycięta do krawędzi)
-    var lx=Math.max(RX0+26,Math.min(RX1-26,px));
-    svg.appendChild(E("text",{x:lx,y:RY-20,"text-anchor":"middle","font-size":11.5,"font-weight":700,fill:lblCol},fmtSize(val)));
+              // wskaźnik pozycji
+              var px = xr(val);
+              svg.appendChild(
+                E("path", {
+                  d: "M" + px + " " + (RY - 6) + " l -6 -9 l 12 0 z",
+                  fill: INK,
+                }),
+              );
+              var lblCol = zone === "classic" ? BL : zone === "big" ? TE : AM;
+              // etykieta rozmiaru nad wskaźnikiem (przycięta do krawędzi)
+              var lx = Math.max(RX0 + 26, Math.min(RX1 - 26, px));
+              svg.appendChild(
+                E(
+                  "text",
+                  {
+                    x: lx,
+                    y: RY - 20,
+                    "text-anchor": "middle",
+                    "font-size": 11.5,
+                    "font-weight": 700,
+                    fill: lblCol,
+                  },
+                  fmtSize(val),
+                ),
+              );
 
-    // ===== NAGŁÓWKI KOLUMN =====
-    function header(x,w,txt,col,lvl,anchor){
-      var t=E("text",{x:x,y:HY+6,"text-anchor":anchor,"font-size":12,"font-weight":700,fill:col,opacity:(0.5+0.5*lvl).toFixed(2)},txt);
-      svg.appendChild(t);
-    }
-    header(LX+LW-6, LW, "◄ Klasyczna analiza", BL, cLvl, "end");
-    header(GX+6,    GW, "Big Data ►",          TE, gLvl, "start");
+              // ===== NAGŁÓWKI KOLUMN =====
+              function header(x, w, txt, col, lvl, anchor) {
+                var t = E(
+                  "text",
+                  {
+                    x: x,
+                    y: HY + 6,
+                    "text-anchor": anchor,
+                    "font-size": 12,
+                    "font-weight": 700,
+                    fill: col,
+                    opacity: (0.5 + 0.5 * lvl).toFixed(2),
+                  },
+                  txt,
+                );
+                svg.appendChild(t);
+              }
+              header(LX + LW - 6, LW, "◄ Klasyczna analiza", BL, cLvl, "end");
+              header(GX + 6, GW, "Big Data ►", TE, gLvl, "start");
 
-    // ===== WIERSZE (lustro) =====
-    for(i=0;i<ROWS.length;i++){
-      var y=TY+i*RH;
-      var cOp=(0.42+0.58*cLvl), gOp=(0.42+0.58*gLvl);
-      // lewa komórka (klasyka)
-      svg.appendChild(E("rect",{x:LX,y:y,width:LW,height:RH-6,rx:5,
-        fill:BL,"fill-opacity":(0.05+0.14*cLvl).toFixed(3),
-        stroke:cLvl===1?BL:RULE,"stroke-width":cLvl===1?1.6:1}));
-      svg.appendChild(E("text",{x:LX+LW-10,y:y+(RH-6)/2+4,"text-anchor":"end","font-size":11.5,fill:INK,opacity:cOp.toFixed(2)},ROWS[i][1]));
-      // środek (wymiar)
-      svg.appendChild(E("rect",{x:CX,y:y,width:CW,height:RH-6,rx:5,fill:BG2,stroke:RULE,"stroke-width":1}));
-      svg.appendChild(E("text",{x:CX+CW/2,y:y+(RH-6)/2+4,"text-anchor":"middle","font-size":11,"font-weight":700,fill:INK2},ROWS[i][0]));
-      // prawa komórka (Big Data)
-      svg.appendChild(E("rect",{x:GX,y:y,width:GW,height:RH-6,rx:5,
-        fill:TE,"fill-opacity":(0.05+0.14*gLvl).toFixed(3),
-        stroke:gLvl===1?TE:RULE,"stroke-width":gLvl===1?1.6:1}));
-      svg.appendChild(E("text",{x:GX+10,y:y+(RH-6)/2+4,"text-anchor":"start","font-size":11.5,fill:INK,opacity:gOp.toFixed(2)},ROWS[i][2]));
-    }
+              // ===== WIERSZE (lustro) =====
+              for (i = 0; i < ROWS.length; i++) {
+                var y = TY + i * RH;
+                var cOp = 0.42 + 0.58 * cLvl,
+                  gOp = 0.42 + 0.58 * gLvl;
+                // lewa komórka (klasyka)
+                svg.appendChild(
+                  E("rect", {
+                    x: LX,
+                    y: y,
+                    width: LW,
+                    height: RH - 6,
+                    rx: 5,
+                    fill: BL,
+                    "fill-opacity": (0.05 + 0.14 * cLvl).toFixed(3),
+                    stroke: cLvl === 1 ? BL : RULE,
+                    "stroke-width": cLvl === 1 ? 1.6 : 1,
+                  }),
+                );
+                svg.appendChild(
+                  E(
+                    "text",
+                    {
+                      x: LX + LW - 10,
+                      y: y + (RH - 6) / 2 + 4,
+                      "text-anchor": "end",
+                      "font-size": 11.5,
+                      fill: INK,
+                      opacity: cOp.toFixed(2),
+                    },
+                    ROWS[i][1],
+                  ),
+                );
+                // środek (wymiar)
+                svg.appendChild(
+                  E("rect", {
+                    x: CX,
+                    y: y,
+                    width: CW,
+                    height: RH - 6,
+                    rx: 5,
+                    fill: BG2,
+                    stroke: RULE,
+                    "stroke-width": 1,
+                  }),
+                );
+                svg.appendChild(
+                  E(
+                    "text",
+                    {
+                      x: CX + CW / 2,
+                      y: y + (RH - 6) / 2 + 4,
+                      "text-anchor": "middle",
+                      "font-size": 11,
+                      "font-weight": 700,
+                      fill: INK2,
+                    },
+                    ROWS[i][0],
+                  ),
+                );
+                // prawa komórka (Big Data)
+                svg.appendChild(
+                  E("rect", {
+                    x: GX,
+                    y: y,
+                    width: GW,
+                    height: RH - 6,
+                    rx: 5,
+                    fill: TE,
+                    "fill-opacity": (0.05 + 0.14 * gLvl).toFixed(3),
+                    stroke: gLvl === 1 ? TE : RULE,
+                    "stroke-width": gLvl === 1 ? 1.6 : 1,
+                  }),
+                );
+                svg.appendChild(
+                  E(
+                    "text",
+                    {
+                      x: GX + 10,
+                      y: y + (RH - 6) / 2 + 4,
+                      "text-anchor": "start",
+                      "font-size": 11.5,
+                      fill: INK,
+                      opacity: gOp.toFixed(2),
+                    },
+                    ROWS[i][2],
+                  ),
+                );
+              }
 
-    // ===== odczyty na żywo =====
-    document.getElementById("v06-rv").textContent=fmtSize(val);
-    var vtxt = stream ? "Streaming (Velocity) → Big Data mimo Volume"
-             : zone==="classic" ? "klasyka wystarczy (pandas/R, jeden węzeł)"
-             : zone==="trans"   ? "strefa graniczna (Polars/Dask/DuckDB)"
-             : "potrzebny Big Data (Spark/Flink, klaster)";
-    var vel=document.getElementById("v06-verdict");
-    vel.textContent=vtxt;
-    vel.style.color = stream?cvar("--v-teal") : (zone==="classic"?cvar("--v-blue"):(zone==="big"?cvar("--v-teal"):cvar("--v-amber")));
-  }
+              // ===== odczyty na żywo =====
+              document.getElementById("v06-rv").textContent = fmtSize(val);
+              var vtxt = stream
+                ? "Streaming (Velocity) → Big Data mimo Volume"
+                : zone === "classic"
+                  ? "klasyka wystarczy (pandas/R, jeden węzeł)"
+                  : zone === "trans"
+                    ? "strefa graniczna (Polars/Dask/DuckDB)"
+                    : "potrzebny Big Data (Spark/Flink, klaster)";
+              var vel = document.getElementById("v06-verdict");
+              vel.textContent = vtxt;
+              vel.style.color = stream
+                ? cvar("--v-teal")
+                : zone === "classic"
+                  ? cvar("--v-blue")
+                  : zone === "big"
+                    ? cvar("--v-teal")
+                    : cvar("--v-amber");
+            }
 
-  document.getElementById("v06-r").addEventListener("input",render);
-  var st=document.getElementById("v06-stream");
-  function toggleStream(){st.setAttribute("aria-pressed",st.getAttribute("aria-pressed")==="true"?"false":"true");render();}
-  st.addEventListener("click",toggleStream);
-  st.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleStream();}});
-  document.addEventListener("themechange",render);
-  render();
-})();
-</script>
+            document.getElementById("v06-r").addEventListener("input", render);
+            var st = document.getElementById("v06-stream");
+            function toggleStream() {
+              st.setAttribute(
+                "aria-pressed",
+                st.getAttribute("aria-pressed") === "true" ? "false" : "true",
+              );
+              render();
+            }
+            st.addEventListener("click", toggleStream);
+            st.addEventListener("keydown", function (e) {
+              if (e.key === " " || e.key === "Enter") {
+                e.preventDefault();
+                toggleStream();
+              }
+            });
+            document.addEventListener("themechange", render);
+            render();
+          })();
+        </script>
 
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Wymiar</th>
-<th>Klasyczna analiza</th>
-<th>Big Data</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Dane</td>
-<td>próba reprezentatywna z populacji</td>
-<td>N≈all, dane administracyjne/wyczerpujące względem źródła</td>
-</tr>
-<tr>
-<td>Cel</td>
-<td>wnioskowanie o parametrach</td>
-<td>predykcja, wzorce</td>
-</tr>
-<tr>
-<td>Skalowanie</td>
-<td>pionowe (scale-up)</td>
-<td>poziome (scale-out)</td>
-</tr>
-<tr>
-<td>Spójność</td>
-<td>ACID</td>
-<td>BASE / eventual consistency</td>
-</tr>
-<tr>
-<td>Schemat</td>
-<td>schema-on-write (ETL, hurtownia)</td>
-<td>schema-on-read (ELT, lake/lakehouse)</td>
-</tr>
-<tr>
-<td>Obliczenia</td>
-<td>jeden węzeł, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> akceptowalne</td>
-<td>rozproszone, wymagane <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)/O(n\log n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> lub aproksymacje</td>
-</tr>
-<tr>
-<td>Metoda</td>
-<td>testy istotności, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span>-value</td>
-<td>metryki predykcyjne, walidacja krzyżowa</td>
-</tr>
-<tr>
-<td>Główny problem</td>
-<td>mała moc, brak danych</td>
-<td>jakość, bias, koszt, latencja</td>
-</tr>
-</tbody></table></div>
-<p>Dwa paradygmaty <strong>nie są wykluczające</strong> — w praktyce projekty łączą oba (np. Spark do agregacji + scikit-learn do modelu na zagregowanej próbie).</p>
-<h2 id="10-powiazania-z-innymi-zagadnieniami">10. Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong>Obliczenia i dane</strong>: <a href="07_mapreduce.html">MapReduce</a> — realizacja modelu rozproszonego; <a href="00_schematy_losowania.html">populacja, losowanie</a> — przy N≈all sampling staje się optymalizacją, ale błąd selekcji nie znika; <a href="01_estymatory_wartosci_sredniej.html">estymatory</a> — dekompozycja MSE + estymatory aproksymacyjne (HLL, CMS).</li>
-<li><strong>Modelowanie</strong>: <a href="10_klasyczne_ml.html">klasyczne ML</a> i <a href="11_sieci_neuronowe.html">sieci neuronowe</a> (emblemat Big Data) — wersje rozproszone (Spark MLlib) lub online; <a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a>/<a href="09_porownanie_modelowania.html">Porównanie modelowania</a> — two cultures, curse of dimensionality, skalowalne PCA.</li>
-<li><strong>Inżynieria danych</strong>: <a href="02_preprocessing.html">preprocessing</a> (ETL vs ELT), <a href="05_raportowanie.html">raportowanie</a> (BI, Business Intelligence, okresowe vs dashboardy real-time), <a href="13_text_mining.html">text mining</a> (Variety), <a href="08_porownanie_narzedzi.html">dobór stosu wg skali</a>.</li>
-</ul>
-
-  </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#1-definicje-fundamentalne-potrzebne-dalej">1. Definicje fundamentalne (potrzebne dalej)</a></li>
-<li><a href="#2-big-data-model-5v">2. Big Data — model 5V</a></li>
-<li><a href="#3-paradygmat-klasyczny">3. Paradygmat klasyczny</a></li>
-<li><a href="#4-paradygmat-big-data">4. Paradygmat Big Data</a></li>
-<li><a href="#5-twierdzenie-cap-i-mapreduce">5. Twierdzenie CAP i MapReduce</a></li>
-<li><a href="#6-pulapki-teoretyczne-duzej-skali">6. Pułapki teoretyczne dużej skali</a></li>
-<li><a href="#7-algorytmy-aproksymacyjne">7. Algorytmy aproksymacyjne</a></li>
-<li><a href="#8-stos-technologiczny-kiedy-co-stosowac">8. Stos technologiczny — kiedy co stosować</a></li>
-<li><a href="#9-synteza-paradygmatow">9. Synteza paradygmatów</a></li>
-<li><a href="#10-powiazania-z-innymi-zagadnieniami">10. Powiązania z innymi zagadnieniami</a></li></ol></nav>
-</div>
-<script src="../assets/notes.js"></script>
-</body></html>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Wymiar</th>
+                <th>Klasyczna analiza</th>
+                <th>Big Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dane</td>
+                <td>próba reprezentatywna z populacji</td>
+                <td>
+                  N≈all, dane administracyjne/wyczerpujące względem źródła
+                </td>
+              </tr>
+              <tr>
+                <td>Cel</td>
+                <td>wnioskowanie o parametrach</td>
+                <td>predykcja, wzorce</td>
+              </tr>
+              <tr>
+                <td>Skalowanie</td>
+                <td>pionowe (scale-up)</td>
+                <td>poziome (scale-out)</td>
+              </tr>
+              <tr>
+                <td>Spójność</td>
+                <td>ACID</td>
+                <td>BASE / eventual consistency</td>
+              </tr>
+              <tr>
+                <td>Schemat</td>
+                <td>schema-on-write (ETL, hurtownia)</td>
+                <td>schema-on-read (ELT, lake/lakehouse)</td>
+              </tr>
+              <tr>
+                <td>Obliczenia</td>
+                <td>
+                  jeden węzeł,
+                  \(O(n^2)\)
+                  akceptowalne
+                </td>
+                <td>
+                  rozproszone, wymagane
+                  \(O(n)/O(n\log n)\)
+                  lub aproksymacje
+                </td>
+              </tr>
+              <tr>
+                <td>Metoda</td>
+                <td>
+                  testy istotności,
+                  \(p\)-value
+                </td>
+                <td>metryki predykcyjne, walidacja krzyżowa</td>
+              </tr>
+              <tr>
+                <td>Główny problem</td>
+                <td>mała moc, brak danych</td>
+                <td>jakość, bias, koszt, latencja</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Dwa paradygmaty <strong>nie są wykluczające</strong> — w praktyce
+          projekty łączą oba (np. Spark do agregacji + scikit-learn do modelu na
+          zagregowanej próbie).
+        </p>
+        <h2 id="10-powiazania-z-innymi-zagadnieniami">
+          10. Powiązania z innymi zagadnieniami
+        </h2>
+        <ul>
+          <li>
+            <strong>Obliczenia i dane</strong>:
+            <a href="07_mapreduce.html">MapReduce</a> — realizacja modelu
+            rozproszonego;
+            <a href="00_schematy_losowania.html">populacja, losowanie</a> — przy
+            N≈all sampling staje się optymalizacją, ale błąd selekcji nie znika;
+            <a href="01_estymatory_wartosci_sredniej.html">estymatory</a> —
+            dekompozycja MSE + estymatory aproksymacyjne (HLL, CMS).
+          </li>
+          <li>
+            <strong>Modelowanie</strong>:
+            <a href="10_klasyczne_ml.html">klasyczne ML</a> i
+            <a href="11_sieci_neuronowe.html">sieci neuronowe</a> (emblemat Big
+            Data) — wersje rozproszone (Spark MLlib) lub online;
+            <a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a>/<a
+              href="09_porownanie_modelowania.html"
+              >Porównanie modelowania</a
+            >
+            — two cultures, curse of dimensionality, skalowalne PCA.
+          </li>
+          <li>
+            <strong>Inżynieria danych</strong>:
+            <a href="02_preprocessing.html">preprocessing</a> (ETL vs ELT),
+            <a href="05_raportowanie.html">raportowanie</a> (BI, Business
+            Intelligence, okresowe vs dashboardy real-time),
+            <a href="13_text_mining.html">text mining</a> (Variety),
+            <a href="08_porownanie_narzedzi.html">dobór stosu wg skali</a>.
+          </li>
+        </ul>
+      </main>
+      <nav class="toc" aria-label="Spis treści">
+        <h5>Na tej stronie</h5>
+        <ol>
+          <li>
+            <a href="#1-definicje-fundamentalne-potrzebne-dalej"
+              >1. Definicje fundamentalne (potrzebne dalej)</a
+            >
+          </li>
+          <li><a href="#2-big-data-model-5v">2. Big Data — model 5V</a></li>
+          <li><a href="#3-paradygmat-klasyczny">3. Paradygmat klasyczny</a></li>
+          <li><a href="#4-paradygmat-big-data">4. Paradygmat Big Data</a></li>
+          <li>
+            <a href="#5-twierdzenie-cap-i-mapreduce"
+              >5. Twierdzenie CAP i MapReduce</a
+            >
+          </li>
+          <li>
+            <a href="#6-pulapki-teoretyczne-duzej-skali"
+              >6. Pułapki teoretyczne dużej skali</a
+            >
+          </li>
+          <li>
+            <a href="#7-algorytmy-aproksymacyjne"
+              >7. Algorytmy aproksymacyjne</a
+            >
+          </li>
+          <li>
+            <a href="#8-stos-technologiczny-kiedy-co-stosowac"
+              >8. Stos technologiczny — kiedy co stosować</a
+            >
+          </li>
+          <li><a href="#9-synteza-paradygmatow">9. Synteza paradygmatów</a></li>
+          <li>
+            <a href="#10-powiazania-z-innymi-zagadnieniami"
+              >10. Powiązania z innymi zagadnieniami</a
+            >
+          </li>
+        </ol>
+      </nav>
+    </div>
+    <script src="../assets/notes.js"></script>
+  </body>
+</html>
