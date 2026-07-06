@@ -2,3 +2,7 @@
 .archive/
 .claude/
 .DS_Store
+
+# uv / Python dev env
+.venv/
+__pycache__/
