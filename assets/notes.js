@@ -189,8 +189,40 @@
     }).catch(function(){ /* manifest unavailable (e.g. file://) — leave the page as-is */ });
   }
 
+  // ---- viz partials: inject external figure+script blocks at runtime ----
+  //   <div class="viz-mount" data-viz="ID"></div>  ->  visual/<note>/ID.html
+  //   The partial holds the <figure> and its drawing <script>; innerHTML never
+  //   runs scripts, so we recreate each <script> element to execute it after
+  //   the figure is in the DOM (the IIFEs grab their SVG synchronously).
+  function loadViz(){
+    var mounts=[].slice.call(document.querySelectorAll(".viz-mount[data-viz]"));
+    if(!mounts.length) return;
+    var base=location.pathname.split("/").pop().replace(/\.html$/,"");
+    mounts.forEach(function(mount){
+      var id=mount.getAttribute("data-viz");
+      fetch("../visual/"+base+"/"+id+".html").then(function(r){
+        if(!r.ok) throw new Error(r.status); return r.text();
+      }).then(function(html){
+        var tpl=document.createElement("template"); tpl.innerHTML=html;
+        var scripts=[].slice.call(tpl.content.querySelectorAll("script"));
+        scripts.forEach(function(s){ s.parentNode.removeChild(s); });
+        mount.replaceWith(tpl.content);                 // figure(s) into the DOM
+        var fig=document.getElementById(id);
+        if(fig&&window.renderMathInElement){            // any math inside the viz
+          try{ renderMathInElement(fig,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false}); }catch(e){}
+        }
+        scripts.forEach(function(old){                  // execute drawing scripts
+          var sc=document.createElement("script");
+          if(old.src) sc.src=old.src; else sc.textContent=old.textContent;
+          document.body.appendChild(sc);
+        });
+      }).catch(function(){ /* file:// or missing partial — leave placeholder empty */ });
+    });
+  }
+
   document.addEventListener("DOMContentLoaded",function(){
     var p=notePath();
     if(p) initNote(p); else initIndex();
+    loadViz();
   });
 })();

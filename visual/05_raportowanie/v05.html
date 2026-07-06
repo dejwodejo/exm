@@ -1,0 +1,136 @@
+<figure class="viz" id="v05">
+  <div class="viz-head">
+    <p class="viz-title">Składalność agregatów przy rollup w hurtowni</p>
+    <p class="viz-sub">Wybierz typ agregatu i zobacz, czy wynik globalny da się złożyć z wyników cząstkowych — czyli czy pre-agregaty można cachować. Włącz pułapkę „średniej ze średnich”.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v05-svg" viewBox="0 0 680 340" role="img" aria-label="Trzy równoległe tory składalności agregatów: SUM/COUNT, AVG oraz MEDIAN/DISTINCT przy operacji rollup"></svg>
+  </div>
+  <div class="viz-controls">
+    <span class="toggle" id="v05-t-sum" role="button" tabindex="0" aria-pressed="true">SUM / COUNT</span>
+    <span class="toggle" id="v05-t-avg" role="button" tabindex="0" aria-pressed="false">AVG</span>
+    <span class="toggle" id="v05-t-med" role="button" tabindex="0" aria-pressed="false">MEDIAN / DISTINCT</span>
+    <span class="toggle" id="v05-trap" role="button" tabindex="0" aria-pressed="false">Błąd średniej ze średnich</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)" id="v05-read">–</span>
+  </div>
+  <figcaption><b>Sedno:</b> SUM/COUNT (distributive) składają się z cząstkowych — cache TAK; AVG (algebraic) tylko gdy trzymasz parę (Σ, n) — cache WARUNKOWO; MEDIAN/DISTINCT (holistic) wymagają surowych wartości — cache NIE. Uśrednianie gotowych średnich zawodzi przy nierównych licznościach grup: (20+80)/2 = 50 ≠ prawdziwe 35.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v05-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  var W=680, active="sum";
+  var order=["sum","avg","med"];
+  var D={
+    sum:{name:"SUM / COUNT", cls:"distributive", col:"--v-teal", ico:"✓", verdict:"cache TAK",
+         c1:"G1  Σ=60", c2:"G2  Σ=80",
+         roll:"60 + 80 = 140", sub:"pre-agreguj cząstkowe",
+         read:"SUM/COUNT · distributive · 60 + 80 = 140 — wynik dokładny z cząstkowych"},
+    avg:{name:"AVG", cls:"algebraic", col:"--v-amber", ico:"≈", verdict:"cache WARUNKOWO",
+         c1:"G1  (Σ60, n3)", c2:"G2  (Σ80, n1)",
+         roll:"140 / 4 = 35", sub:"trzymaj parę (Σ, n)",
+         read:"AVG · algebraic · z par (Σ,n): 140/4 = 35 — potrzeba stałej liczby agregatów pomocniczych"},
+    med:{name:"MEDIAN / DISTINCT", cls:"holistic", col:"--v-orange", ico:"✗", verdict:"cache NIE",
+         c1:"G1  [10,20,30]", c2:"G2  [80]",
+         roll:"med(10,20,30,80) = 25", sub:"potrzeba surowych wartości",
+         read:"MEDIAN/DISTINCT · holistic · med z median = 50 ≠ 25 — brak dokładnej pre-agregacji"}
+  };
+
+  function tri(x,y,col){ // arrowhead pointing right
+    return E("polygon",{points:(x)+","+y+" "+(x-7)+","+(y-4.5)+" "+(x-7)+","+(y+4.5),fill:col});
+  }
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),RULE=cvar("--rule"),
+        BG2=cvar("--bg2"),GRID=cvar("--v-grid");
+    var trap=document.getElementById("v05-trap").getAttribute("aria-pressed")==="true";
+
+    // column headers
+    svg.appendChild(E("text",{x:192,y:20,"text-anchor":"middle","font-size":10.5,fill:MUT},"grupy cząstkowe"));
+    svg.appendChild(E("text",{x:275,y:20,"text-anchor":"middle","font-size":10.5,"font-style":"italic",fill:MUT},"rollup →"));
+    svg.appendChild(E("text",{x:364,y:20,"text-anchor":"middle","font-size":10.5,fill:MUT},"wynik globalny"));
+    svg.appendChild(E("text",{x:567,y:20,"text-anchor":"middle","font-size":10.5,fill:MUT},"werdykt cache"));
+
+    order.forEach(function(key,i){
+      var d=D[key], col=cvar(d.col), on=(key===active), cy=74+i*88, op=on?1:0.34;
+
+      // active-lane background
+      if(on) svg.appendChild(E("rect",{x:6,y:cy-36,width:W-12,height:72,rx:9,fill:col,opacity:0.07}));
+      if(i<2) svg.appendChild(E("line",{x1:8,y1:cy+44,x2:W-8,y2:cy+44,stroke:RULE,"stroke-width":1,opacity:0.6}));
+
+      // left label: class badge + aggregate name
+      svg.appendChild(E("rect",{x:12,y:cy-24,width:116,height:16,rx:8,fill:"none",stroke:col,"stroke-width":1.3,opacity:op}));
+      svg.appendChild(E("text",{x:70,y:cy-12,"text-anchor":"middle","font-size":9.5,fill:col,opacity:op,"font-style":"italic"},d.cls));
+      svg.appendChild(E("text",{x:14,y:cy+12,"font-size":13,"font-weight":700,fill:INK,opacity:op},d.name));
+
+      // two group chips
+      [[d.c1,cy-15],[d.c2,cy+15]].forEach(function(ch){
+        svg.appendChild(E("rect",{x:134,y:ch[1]-12,width:118,height:24,rx:5,fill:BG2,stroke:col,"stroke-width":1.2,opacity:op}));
+        svg.appendChild(E("text",{x:143,y:ch[1]+4,"font-size":10.5,fill:INK,opacity:op,"font-family":cvar("--mono")||"monospace"},ch[0]));
+      });
+
+      // merge lines from chips -> rollup, + arrowhead
+      svg.appendChild(E("path",{d:"M252 "+(cy-15)+" C 278 "+(cy-15)+", 278 "+cy+", 298 "+cy,fill:"none",stroke:col,"stroke-width":1.6,opacity:op}));
+      svg.appendChild(E("path",{d:"M252 "+(cy+15)+" C 278 "+(cy+15)+", 278 "+cy+", 298 "+cy,fill:"none",stroke:col,"stroke-width":1.6,opacity:op}));
+      svg.appendChild(tri(300,cy,col)); svg.lastChild.setAttribute("opacity",op);
+
+      // rollup / global result box
+      var showTrapMed=(key==="med");
+      svg.appendChild(E("rect",{x:304,y:cy-16,width:132,height:32,rx:6,fill:BG2,stroke:col,"stroke-width":1.6,opacity:op}));
+      svg.appendChild(E("text",{x:370,y:cy+4,"text-anchor":"middle","font-size":10.5,fill:INK,opacity:op,"font-family":cvar("--mono")||"monospace"},d.roll));
+
+      // arrow to cache badge
+      svg.appendChild(E("line",{x1:438,y1:cy,x2:470,y2:cy,stroke:col,"stroke-width":1.6,opacity:op}));
+      svg.appendChild(tri(472,cy,col)); svg.lastChild.setAttribute("opacity",op);
+
+      // cache verdict badge
+      svg.appendChild(E("rect",{x:476,y:cy-18,width:190,height:36,rx:8,fill:col,opacity:on?0.16:0.06}));
+      svg.appendChild(E("rect",{x:476,y:cy-18,width:190,height:36,rx:8,fill:"none",stroke:col,"stroke-width":on?1.8:1,opacity:op}));
+      svg.appendChild(E("circle",{cx:496,cy:cy,r:9,fill:col,opacity:op}));
+      svg.appendChild(E("text",{x:496,y:cy+4,"text-anchor":"middle","font-size":12,"font-weight":700,fill:BG2,opacity:op},d.ico));
+      svg.appendChild(E("text",{x:512,y:cy-2,"font-size":11.5,"font-weight":700,fill:INK,opacity:op},d.verdict));
+      svg.appendChild(E("text",{x:512,y:cy+12,"font-size":9.5,fill:INK2,opacity:op},d.sub));
+    });
+
+    // ---- pułapka: średnia ze średnich (na torze AVG) ----
+    var avgCy=74+1*88, ERR=cvar("--v-orange");
+    if(trap){
+      // wrong path branching off the AVG chips: use partial means (20, 80)
+      svg.appendChild(E("rect",{x:134,y:avgCy+30,width:302,height:26,rx:6,fill:"none",stroke:ERR,"stroke-width":1.4,"stroke-dasharray":"4 3"}));
+      svg.appendChild(E("text",{x:143,y:avgCy+47,"font-size":10.5,fill:ERR,"font-family":cvar("--mono")||"monospace"},"śr. ze średnich: (20 + 80) / 2 = 50"));
+      svg.appendChild(E("text",{x:398,y:avgCy+47,"text-anchor":"end","font-size":12,"font-weight":700,fill:ERR},"✗ ≠ 35"));
+      svg.appendChild(E("text",{x:476,y:avgCy+47,"font-size":9.5,fill:MUT},"zawodzi przy nierównych n"));
+    }
+
+    // readout
+    var read=D[active].read;
+    if(trap) read="Pułapka: (20+80)/2 = 50 — uśrednianie gotowych średnich ignoruje liczności (n=3 vs n=1); poprawnie 140/4 = 35";
+    document.getElementById("v05-read").textContent=read;
+  }
+
+  function select(key){
+    active=key;
+    order.forEach(function(k){document.getElementById("v05-t-"+k).setAttribute("aria-pressed",k===key?"true":"false");});
+    render();
+  }
+  order.forEach(function(k){
+    var el=document.getElementById("v05-t-"+k);
+    el.addEventListener("click",function(){select(k);});
+    el.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();select(k);}});
+  });
+  var trap=document.getElementById("v05-trap");
+  function toggleTrap(){
+    trap.setAttribute("aria-pressed",trap.getAttribute("aria-pressed")==="true"?"false":"true");
+    if(trap.getAttribute("aria-pressed")==="true") select("avg"); else render();
+  }
+  trap.addEventListener("click",toggleTrap);
+  trap.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleTrap();}});
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

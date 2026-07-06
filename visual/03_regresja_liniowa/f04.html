@@ -1,0 +1,131 @@
+<figure class="viz" id="f04">
+  <div class="viz-head">
+    <p class="viz-title">Dekompozycja sumy kwadratów: SS_tot = SS_reg + SS_res</p>
+    <p class="viz-sub">Odchylenie każdego punktu od średniej ȳ rozkłada się na część wyjaśnioną przez model (ŷ−ȳ) i resztę (y−ŷ). Po zsumowaniu kwadratów po wszystkich punktach: SS_tot = SS_reg + SS_res, a R² = SS_reg/SS_tot to udział wariancji wyjaśnionej.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="f04-svg" viewBox="0 0 700 360" role="img" aria-label="Wykres rozrzutu z linią średniej ȳ i prostą regresji ŷ; dla wyróżnionego punktu trzy kolorowe pionowe odcinki: odchylenie całkowite, wyjaśnione i reszta; obok słupek skumulowany SS_tot rozbity na SS_reg i SS_res oraz R kwadrat"></svg>
+  </div>
+  <figcaption><b>Sedno:</b> całkowita zmienność y wokół średniej rozpada się na to, co model wyjaśnia (SS_reg), i to, co zostaje (SS_res); R² = SS_reg/SS_tot mówi, jaką część tej zmienności prosta przechwytuje.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("f04-svg");
+  if(!svg) return;
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  var W=700,H=360,T=24,B=40, xmax=11, ymax=11;
+  // panel wykresu rozrzutu (lewa strona)
+  var px0=42, px1=452, py0=H-B, py1=T;
+  var cx=function(x){return px0+x/xmax*(px1-px0);};
+  var cy=function(v){return py0-v/ymax*(py0-py1);};
+  // dane ilustracyjne: liniowe z jednym wyraźnie wyróżnionym punktem
+  var DX=[1,2,3,4,5,6,7,8,9,10];
+  var DY=[2.5,4.0,3.8,5.5,6.0,7.2,8.3,8.5,9.0,10.2];
+  var HL=6; // indeks wyróżnionego punktu (x=7)
+  function ols(){
+    var n=DX.length,sx=0,sy=0,sxy=0,sxx=0,i;
+    for(i=0;i<n;i++){sx+=DX[i];sy+=DY[i];sxy+=DX[i]*DY[i];sxx+=DX[i]*DX[i];}
+    var b=(sxy-sx*sy/n)/(sxx-sx*sx/n), a=sy/n-b*sx/n;
+    return {a:a,b:b,mean:sy/n};
+  }
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),GRID=cvar("--v-grid"),
+        AX=cvar("--v-axis"),BL=cvar("--v-blue"),TE=cvar("--v-teal"),OR=cvar("--v-orange"),
+        AM=cvar("--v-amber"),BG=cvar("--bg2");
+    var f=ols(), ybar=f.mean;
+
+    // sumy kwadratów
+    var SStot=0,SSreg=0,SSres=0,i,yh;
+    for(i=0;i<DX.length;i++){yh=f.a+f.b*DX[i];SStot+=(DY[i]-ybar)*(DY[i]-ybar);SSreg+=(yh-ybar)*(yh-ybar);SSres+=(DY[i]-yh)*(DY[i]-yh);}
+    var R2=SSreg/SStot;
+
+    // ── siatka + osie (panel rozrzutu) ──
+    var g;
+    for(g=0;g<=10;g+=2){svg.appendChild(E("line",{x1:px0,y1:cy(g),x2:px1,y2:cy(g),stroke:GRID,"stroke-width":1}));
+      svg.appendChild(E("text",{x:px0-7,y:cy(g)+3.5,"text-anchor":"end","font-size":9,fill:MUT},String(g)));}
+    for(g=0;g<=10;g+=2){svg.appendChild(E("text",{x:cx(g),y:py0+15,"text-anchor":"middle","font-size":9,fill:MUT},String(g)));}
+    svg.appendChild(E("line",{x1:px0,y1:py0,x2:px1,y2:py0,stroke:AX,"stroke-width":1.3}));
+    svg.appendChild(E("line",{x1:px0,y1:py0,x2:px0,y2:py1,stroke:AX,"stroke-width":1.3}));
+    svg.appendChild(E("text",{x:(px0+px1)/2,y:H-6,"text-anchor":"middle","font-size":11,fill:MUT},"x"));
+    svg.appendChild(E("text",{x:px0-30,y:(py0+py1)/2,"text-anchor":"middle","font-size":11,fill:MUT,transform:"rotate(-90 "+(px0-30)+" "+((py0+py1)/2)+")"},"y"));
+
+    // linia średniej ȳ (przerywana)
+    svg.appendChild(E("line",{x1:px0,y1:cy(ybar),x2:px1,y2:cy(ybar),stroke:MUT,"stroke-width":1.6,"stroke-dasharray":"6 4"}));
+    svg.appendChild(E("text",{x:px1-4,y:cy(ybar)+13,"text-anchor":"end","font-size":10,"font-weight":700,fill:MUT},"ȳ = "+ybar.toFixed(2)));
+
+    // prosta regresji ŷ
+    svg.appendChild(E("line",{x1:cx(0),y1:cy(f.a),x2:cx(xmax),y2:cy(f.a+f.b*xmax),stroke:INK,"stroke-width":2.6,"stroke-linecap":"round"}));
+    svg.appendChild(E("text",{x:cx(xmax)-2,y:cy(f.a+f.b*xmax)-8,"text-anchor":"end","font-size":10.5,"font-weight":700,fill:INK2},"ŷ = β₀ + β₁x"));
+
+    // punkty (poza wyróżnionym)
+    for(i=0;i<DX.length;i++){
+      if(i===HL)continue;
+      svg.appendChild(E("circle",{cx:cx(DX[i]),cy:cy(DY[i]),r:4.5,fill:BL,"fill-opacity":0.5,stroke:BG,"stroke-width":1.5}));
+    }
+
+    // ── wyróżniony punkt: trzy pionowe odcinki (rozsunięte poziomo) ──
+    var hx=DX[HL], hy=DY[HL], hyh=f.a+f.b*hx;
+    var xT=cx(hx)-16, xR=cx(hx), xS=cx(hx)+16;
+    // pomocnicza kreska łącząca poziom ŷ
+    svg.appendChild(E("line",{x1:xT-6,y1:cy(hyh),x2:xS+6,y2:cy(hyh),stroke:INK2,"stroke-width":0.8,"stroke-dasharray":"2 3",opacity:.6}));
+    // całkowite (teal): y − ȳ
+    svg.appendChild(E("line",{x1:xT,y1:cy(ybar),x2:xT,y2:cy(hy),stroke:TE,"stroke-width":3.4,"stroke-linecap":"round"}));
+    // wyjaśnione (orange): ŷ − ȳ
+    svg.appendChild(E("line",{x1:xR,y1:cy(ybar),x2:xR,y2:cy(hyh),stroke:OR,"stroke-width":3.4,"stroke-linecap":"round"}));
+    // reszta (amber): y − ŷ
+    svg.appendChild(E("line",{x1:xS,y1:cy(hyh),x2:xS,y2:cy(hy),stroke:AM,"stroke-width":3.4,"stroke-linecap":"round"}));
+    // podpis wyróżnionego punktu (kolory odcinków wyjaśnia legenda)
+    svg.appendChild(E("text",{x:cx(hx),y:cy(hy)-11,"text-anchor":"middle","font-size":9.5,"font-weight":700,fill:INK2},"punkt (xᵢ, yᵢ)"));
+    // wyróżniony punkt na wierzchu
+    svg.appendChild(E("circle",{cx:cx(hx),cy:cy(hy),r:6,fill:BL,stroke:BG,"stroke-width":2}));
+
+    // ── legenda (lewy górny róg panelu, obszar pusty) ──
+    var lx=px0+12, ly=py1+14, dyl=16;
+    var leg=[[TE,"całkowite  y−ȳ"],[OR,"wyjaśnione  ŷ−ȳ"],[AM,"reszta  y−ŷ"]];
+    for(i=0;i<leg.length;i++){
+      svg.appendChild(E("rect",{x:lx,y:ly+i*dyl-9,width:11,height:11,rx:2,fill:leg[i][0]}));
+      svg.appendChild(E("text",{x:lx+16,y:ly+i*dyl,"font-size":9.5,fill:INK2},leg[i][1]));
+    }
+
+    // ── panel R² (prawy górny róg) ──
+    var rbx=482, rby=30, rbw=204, rbh=66;
+    svg.appendChild(E("rect",{x:rbx,y:rby,width:rbw,height:rbh,rx:7,fill:BG,stroke:GRID,"stroke-width":1}));
+    svg.appendChild(E("text",{x:rbx+14,y:rby+22,"font-size":13,"font-weight":700,fill:INK},"R² = SS_reg / SS_tot"));
+    var t1=E("text",{x:rbx+14,y:rby+42,"font-size":12.5,"font-weight":700});
+    t1.appendChild(E("tspan",{fill:OR},SSreg.toFixed(1)));
+    t1.appendChild(E("tspan",{fill:INK}," / "));
+    t1.appendChild(E("tspan",{fill:TE},SStot.toFixed(1)));
+    t1.appendChild(E("tspan",{fill:INK}," = "));
+    t1.appendChild(E("tspan",{fill:INK,"font-size":14.5,"font-weight":800},R2.toFixed(3)));
+    // przesuń pierwszą część do wyrównania z etykietą wyżej
+    t1.setAttribute("x",rbx+14);
+    svg.appendChild(t1);
+    svg.appendChild(E("text",{x:rbx+14,y:rby+59,"font-size":9.5,fill:MUT},"udział wariancji wyjaśnionej"));
+
+    // ── słupek skumulowany SS_tot = SS_reg + SS_res ──
+    var bx=596, bw=50, byTop=124, byBot=py0-4, maxH=byBot-byTop;
+    var hReg=maxH*SSreg/SStot, hRes=maxH*SSres/SStot;
+    svg.appendChild(E("text",{x:bx+bw/2,y:byTop-12,"text-anchor":"middle","font-size":11,"font-weight":700,fill:INK2},"Suma kwadratów"));
+    // SS_reg (dół, orange)
+    svg.appendChild(E("rect",{x:bx,y:byBot-hReg,width:bw,height:hReg,fill:OR,"fill-opacity":0.85,stroke:OR,"stroke-width":1.2}));
+    svg.appendChild(E("text",{x:bx+bw/2,y:byBot-hReg/2+4,"text-anchor":"middle","font-size":11,"font-weight":700,fill:BG},"SS_reg"));
+    // SS_res (góra, amber) — cienki, etykieta z odnośnikiem
+    svg.appendChild(E("rect",{x:bx,y:byBot-hReg-hRes,width:bw,height:hRes,fill:AM,"fill-opacity":0.95,stroke:AM,"stroke-width":1.2}));
+    svg.appendChild(E("line",{x1:bx+bw,y1:byBot-hReg-hRes/2,x2:bx+bw+10,y2:byBot-hReg-hRes-6,stroke:AM,"stroke-width":1}));
+    svg.appendChild(E("text",{x:bx+bw+12,y:byBot-hReg-hRes-4,"text-anchor":"start","font-size":10,"font-weight":700,fill:AM},"SS_res"));
+    // klamra SS_tot (teal) po lewej stronie
+    var bracX=bx-10;
+    svg.appendChild(E("path",{d:"M"+bracX+" "+byBot+" q -6 0 -6 -6 L "+(bracX-6)+" "+(byTop+6)+" q 0 -6 6 -6",fill:"none",stroke:TE,"stroke-width":2}));
+    svg.appendChild(E("text",{x:bracX-11,y:(byTop+byBot)/2+4,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:TE,transform:"rotate(-90 "+(bracX-11)+" "+((byTop+byBot)/2)+")"},"SS_tot"));
+    // wartość SS_tot pod słupkiem
+    svg.appendChild(E("text",{x:bx+bw/2,y:byBot+16,"text-anchor":"middle","font-size":9.5,fill:MUT},"SS_tot = "+SStot.toFixed(1)));
+  }
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

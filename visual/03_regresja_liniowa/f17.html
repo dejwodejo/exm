@@ -1,0 +1,129 @@
+<figure class="viz" id="f17">
+  <div class="viz-head">
+    <p class="viz-title">Ścieżki współczynników: Ridge vs Lasso</p>
+    <p class="viz-sub">Te same dane, ta sama siła regularyzacji α — dwie kary. Ridge (L₂) ściska wszystkie βᵢ gładko w stronę zera, ale nigdy do zera. Lasso (L₁) zeruje słabe cechy dokładnie do zera, tworząc rzadki model (selekcja cech). Przesuń suwak α (skala logarytmiczna) i śledź pionowy znacznik.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="f17-svg" viewBox="0 0 700 350" role="img" aria-label="Dwa panele ścieżek współczynników w funkcji siły regularyzacji alfa; po lewej Ridge gładko kurczy współczynniki, po prawej Lasso zeruje słabsze współczynniki"></svg>
+  </div>
+  <div class="viz-controls">
+    <label>Siła regularyzacji α (log)
+      <input id="f17-a" type="range" min="-2" max="3" step="0.02" value="-0.4">
+      <span class="val" id="f17-av">0.40</span>
+    </label>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      Ridge: aktywne <b id="f17-kr">5/5</b> · Lasso: aktywne <b id="f17-kl">–</b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> L₂ (Ridge) daje <i>gładkie kurczenie</i> — wszystkie współczynniki maleją, ale zostają niezerowe (stabilizacja przy współliniowości); L₁ (Lasso) daje <i>zerowanie</i> — narożniki rombu ‖β‖₁ powodują, że słabe cechy wypadają do zera, więc regularyzacja pełni rolę selekcji cech.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("f17-svg");
+  if(!svg) return;
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  var W=700,H=350,T=54,B=42;
+  var bmin=-2.3, bmax=3.3;
+  // współczynniki OLS (przy α→0): 3 istotne + 2 słabe (szumowe)
+  var COEF=[
+    {b0: 3.00, col:"--v-blue",  n:"β₁"},
+    {b0:-1.85, col:"--v-orange",n:"β₂"},
+    {b0: 1.50, col:"--v-teal",  n:"β₃"},
+    {b0: 0.70, col:"--v-amber", n:"β₄"},
+    {b0:-0.50, col:"--muted",   n:"β₅"}
+  ];
+  // e = log10(alpha). Ridge: gładkie kurczenie 1/(1+α/c). Lasso: soft-threshold.
+  var RC=80, LK=2.0;
+  function ridge(b0,al){return b0/(1+al/RC);}
+  function lasso(b0,al){var m=Math.abs(b0)-LK*al; return m>0?(b0<0?-m:m):0;}
+  var slider=document.getElementById("f17-a");
+
+  function panel(ox0,ox1,mode,title,sub){
+    var ytop=T, ybot=H-B;
+    var cx=function(e){return ox0+(e+2)/5*(ox1-ox0);};
+    var cy=function(b){return ybot-(b-bmin)/(bmax-bmin)*(ybot-ytop);};
+    var GRID=cvar("--v-grid"),AX=cvar("--v-axis"),MUT=cvar("--muted"),INK=cvar("--ink"),INK2=cvar("--ink2");
+    var e,i,c;
+    // siatka pozioma + etykiety β
+    for(var b=-2;b<=3;b++){
+      svg.appendChild(E("line",{x1:ox0,y1:cy(b),x2:ox1,y2:cy(b),stroke:GRID,"stroke-width":1}));
+      svg.appendChild(E("text",{x:ox0-6,y:cy(b)+3.4,"text-anchor":"end","font-size":9,fill:MUT},String(b)));
+    }
+    // etykiety osi x: 10^k
+    var sup=["⁻²","⁻¹","⁰","¹","²","³"];
+    for(i=0;i<6;i++){
+      var ee=-2+i;
+      svg.appendChild(E("line",{x1:cx(ee),y1:ytop,x2:cx(ee),y2:ybot,stroke:GRID,"stroke-width":1,opacity:.5}));
+      svg.appendChild(E("text",{x:cx(ee),y:ybot+15,"text-anchor":"middle","font-size":9,fill:MUT},"10"+sup[i]));
+    }
+    // linia zera (β=0) — pogrubiona
+    svg.appendChild(E("line",{x1:ox0,y1:cy(0),x2:ox1,y2:cy(0),stroke:AX,"stroke-width":1.5}));
+    // osie
+    svg.appendChild(E("line",{x1:ox0,y1:ybot,x2:ox1,y2:ybot,stroke:AX,"stroke-width":1.3}));
+    svg.appendChild(E("line",{x1:ox0,y1:ytop,x2:ox0,y2:ybot,stroke:AX,"stroke-width":1.3}));
+
+    // ścieżki współczynników
+    var N=120;
+    for(i=0;i<COEF.length;i++){
+      c=cvar(COEF[i].col);
+      var d="";
+      for(var s=0;s<=N;s++){
+        e=-2+s/N*5; var al=Math.pow(10,e);
+        var bv=(mode==="lasso")?lasso(COEF[i].b0,al):ridge(COEF[i].b0,al);
+        d+=(s?"L":"M")+cx(e).toFixed(1)+" "+cy(bv).toFixed(1);
+      }
+      var weak=Math.abs(COEF[i].b0)<1;
+      svg.appendChild(E("path",{d:d,fill:"none",stroke:c,"stroke-width":weak?1.8:2.8,
+        "stroke-linecap":"round","stroke-linejoin":"round","stroke-opacity":weak?0.9:1}));
+      // etykieta na lewym końcu (α min, tam gdzie krzywe rozdzielone)
+      svg.appendChild(E("text",{x:cx(-2)+4,y:cy(COEF[i].b0)+(COEF[i].b0>=0?-3.5:9),
+        "font-size":9.5,"font-weight":700,fill:c},COEF[i].n));
+    }
+
+    // znacznik bieżącego α
+    var ecur=parseFloat(slider.value), alc=Math.pow(10,ecur);
+    svg.appendChild(E("line",{x1:cx(ecur),y1:ytop,x2:cx(ecur),y2:ybot,
+      stroke:INK,"stroke-width":1.4,"stroke-dasharray":"4 3",opacity:.75}));
+    // kropki na przecięciu ścieżek ze znacznikiem
+    for(i=0;i<COEF.length;i++){
+      c=cvar(COEF[i].col);
+      var bc=(mode==="lasso")?lasso(COEF[i].b0,alc):ridge(COEF[i].b0,alc);
+      var zeroed=(mode==="lasso"&&Math.abs(bc)<1e-9);
+      svg.appendChild(E("circle",{cx:cx(ecur),cy:cy(bc),r:zeroed?3:3.6,
+        fill:zeroed?cvar("--bg2"):c,stroke:zeroed?MUT:cvar("--bg2"),"stroke-width":1.6}));
+    }
+
+    // tytuł panelu + opis
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:T-30,"text-anchor":"middle","font-size":12.5,"font-weight":700,fill:INK2},title));
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:T-15,"text-anchor":"middle","font-size":10,fill:MUT},sub));
+    // podpis osi x
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:H-4,"text-anchor":"middle","font-size":10,fill:MUT},"α (siła regularyzacji)"));
+  }
+
+  function fmt(a){ if(a<0.1)return a.toFixed(3); if(a<1)return a.toFixed(2); if(a<10)return a.toFixed(2); if(a<100)return a.toFixed(1); return Math.round(a).toString(); }
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    // podpis osi Y (wspólny)
+    var MUT=cvar("--muted");
+    panel(44,336,"ridge","Ridge (L₂)","gładkie kurczenie — β nigdy do zera");
+    panel(392,684,"lasso","Lasso (L₁)","zerowanie β → selekcja cech");
+    var g=E("text",{x:12,y:(T+(H-B))/2,"text-anchor":"middle","font-size":11,fill:MUT,
+      transform:"rotate(-90 12 "+((T+(H-B))/2)+")"},"β̂ᵢ  (współczynniki)");
+    svg.appendChild(g);
+    // odczyty
+    var ecur=parseFloat(slider.value), alc=Math.pow(10,ecur);
+    document.getElementById("f17-av").textContent=fmt(alc);
+    var kl=0,i;
+    for(i=0;i<COEF.length;i++){ if(Math.abs(lasso(COEF[i].b0,alc))>1e-9) kl++; }
+    document.getElementById("f17-kr").textContent="5/5";
+    document.getElementById("f17-kl").textContent=kl+"/5";
+  }
+
+  slider.addEventListener("input",render);
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

@@ -1,0 +1,159 @@
+<figure class="viz" id="v01">
+  <div class="viz-head">
+    <p class="viz-title">Prosty vs. ważony: reważenie próby do składu populacji</p>
+    <p class="viz-sub">Próba przecenia bogatych. Przesuń ich udział w próbie — estymator prosty dryfuje ku 8000 zł, a ważony (wagi <span style="font-family:var(--mono)">w=N<sub>h</sub>/n<sub>h</sub></span>) trzyma się prawdy 3200 zł. Dolny pasek pokazuje, jak bias zasila MSE.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v01-svg" viewBox="0 0 680 390" role="img" aria-label="Porównanie składu populacji i próby z reważeniem oraz osią dochodu z estymatorem prostym i ważonym"></svg>
+  </div>
+  <div class="viz-controls">
+    <label>Udział bogatych w próbie
+      <input id="v01-share" type="range" min="1" max="99" step="1" value="80">
+      <span class="val" id="v01-sharev">80%</span>
+    </label>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      prosty=<b id="v01-simple">–</b> zł · obciążenie=<b id="v01-bias">–</b> zł · <b>ważony=<span id="v01-w">3200</span> zł</b> · w<sub>bied</sub>=<b id="v01-wb">–</b> · w<sub>bog</sub>=<b id="v01-wr">–</b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> gdy prawdopodobieństwa inkluzji różnią się między warstwami, prosta średnia z próby jest obciążona ku nadreprezentowanej warstwie; wagi <span style="font-family:var(--mono)">w<sub>i</sub>=N<sub>h</sub>/n<sub>h</sub></span> (odpowiednik <span style="font-family:var(--mono)">1/π<sub>i</sub></span> Horvitza–Thompsona) przywracają skład populacji i usuwają obciążenie.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v01-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  function fmt(x){return String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
+  function fmt1(x){return (Math.round(x*10)/10).toString();}
+
+  // stałe populacyjne (przykład z notatki)
+  var Nb=800, Nr=200, N=1000, n=100;          // biedni / bogaci
+  var yb=2000, yr=8000;                         // średnie dochody warstw
+  var WAZONY=(Nb/N)*yb+(Nr/N)*yr;               // = 3200 (stałe, warstwowy)
+
+  // geometria
+  var x0=150, x1=604, Wb=x1-x0;
+  var popY=34, samY=112, barH=30;
+  // oś dochodu
+  var axY=252, incMin=1500, incMax=8500;
+  function xI(v){return x0+(v-incMin)/(incMax-incMin)*Wb;}
+
+  function brace(a,b,y,h){var m=(a+b)/2,ym=y+h/2;
+    return "M"+a+" "+y+"Q"+a+" "+ym+" "+((a+m)/2)+" "+ym+"Q"+m+" "+ym+" "+m+" "+(y+h)+
+           "Q"+m+" "+ym+" "+((m+b)/2)+" "+ym+"Q"+b+" "+ym+" "+b+" "+y;}
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),
+        BL=cvar("--v-blue"),OR=cvar("--v-orange"),TE=cvar("--v-teal"),AM=cvar("--v-amber"),
+        GRID=cvar("--v-grid"),AX=cvar("--v-axis"),BG2=cvar("--bg2"),RULE=cvar("--rule");
+
+    var nr=parseInt(document.getElementById("v01-share").value,10); // % = liczba bogatych w próbie
+    var nb=n-nr;
+    var fbSam=nb/n;                    // udział biednych w próbie
+    var simple=(nb*yb+nr*yr)/n;        // estymator prosty
+    var bias=simple-WAZONY;            // obciążenie
+    var wb=Nb/nb, wr=Nr/nr;           // wagi reważenia
+
+    // ---- legenda ----
+    svg.appendChild(E("rect",{x:x0,y:12,width:12,height:12,rx:2,fill:BL}));
+    svg.appendChild(E("text",{x:x0+18,y:22,"font-size":11,fill:INK2},"biedni · 2000 zł"));
+    svg.appendChild(E("rect",{x:x0+120,y:12,width:12,height:12,rx:2,fill:OR}));
+    svg.appendChild(E("text",{x:x0+138,y:22,"font-size":11,fill:INK2},"bogaci · 8000 zł"));
+
+    // ---- pasek POPULACJA (80/20) ----
+    drawBar(popY, 0.8, Nb, Nr, "POPULACJA","N=1000", true, INK,MUT,BL,OR,BG2);
+    // ---- pasek PRÓBA (odwrócony) ----
+    drawBar(samY, fbSam, nb, nr, "PRÓBA","n=100", false, INK,MUT,BL,OR,BG2, nb,nr);
+
+    // ---- strzałki reważenia (próba -> populacja) ----
+    var pBc=x0+Wb*0.8/2, pRc=x0+Wb*(0.8+0.2/2);      // centra segmentów populacji
+    var sBc=x0+Wb*fbSam/2, sRc=x0+Wb*(fbSam+(1-fbSam)/2);
+    reArrow(sBc, samY, pBc, popY+barH, BL, "×"+fmt1(wb), BG2);
+    reArrow(sRc, samY, pRc, popY+barH, OR, "×"+fmt1(wr), BG2);
+    svg.appendChild(E("text",{x:x1,y:samY-6,"text-anchor":"end","font-size":10.5,fill:MUT,"font-style":"italic"},"reważenie w = N_h / n_h"));
+
+    // ---- oś dochodu ----
+    svg.appendChild(E("line",{x1:x0,y1:axY,x2:x1,y2:axY,stroke:AX,"stroke-width":1.4}));
+    var ticks=[2000,4000,6000,8000];
+    for(var i=0;i<ticks.length;i++){var tv=ticks[i],tx=xI(tv);
+      svg.appendChild(E("line",{x1:tx,y1:axY,x2:tx,y2:axY+5,stroke:AX,"stroke-width":1}));
+      svg.appendChild(E("text",{x:tx,y:axY+18,"text-anchor":"middle","font-size":10.5,fill:MUT},fmt(tv)));
+    }
+    svg.appendChild(E("text",{x:xI(2000),y:axY+31,"text-anchor":"middle","font-size":10,fill:BL},"śr. biednych"));
+    svg.appendChild(E("text",{x:xI(8000),y:axY+31,"text-anchor":"middle","font-size":10,fill:OR},"śr. bogatych"));
+    svg.appendChild(E("text",{x:(x0+x1)/2,y:axY+46,"text-anchor":"middle","font-size":11,fill:MUT},"dochód (zł) →"));
+
+    // ---- marker WAŻONY = PRAWDA (stały 3200) ----
+    marker(xI(WAZONY), TE, BG2);
+    svg.appendChild(E("text",{x:xI(WAZONY),y:234,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:TE},"WAŻONY = PRAWDA · 3200 zł"));
+    // ---- marker PROSTY (ruchomy) ----
+    marker(xI(simple), OR, BG2);
+    svg.appendChild(E("text",{x:xI(simple),y:220,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:OR},"PROSTY · "+fmt(simple)+" zł"));
+
+    // ---- klamra obciążenia ----
+    if(Math.abs(bias)>=80){
+      var a=Math.min(xI(WAZONY),xI(simple)), b=Math.max(xI(WAZONY),xI(simple));
+      svg.appendChild(E("path",{d:brace(a,b,206,-14),fill:"none",stroke:AM,"stroke-width":1.6,"stroke-linecap":"round"}));
+      svg.appendChild(E("text",{x:(a+b)/2,y:186,"text-anchor":"middle","font-size":11,"font-weight":700,fill:AM},
+        "obciążenie = "+(bias>0?"+":"")+fmt(bias)+" zł"));
+    }
+
+    // ---- mini-dekompozycja MSE: widoczny składnik bias² ----
+    var my=324, ml=x0, labW=116, maxBW=182;
+    var absBias=Math.abs(bias), bwidth=Math.min(maxBW, absBias/4800*maxBW);
+    svg.appendChild(E("line",{x1:x0,y1:307,x2:x1,y2:307,stroke:GRID,"stroke-width":1}));
+    svg.appendChild(E("text",{x:ml,y:my-3,"font-size":11.5,"font-weight":700,fill:INK},"MSE = Var + bias²"));
+    svg.appendChild(E("text",{x:ml+158,y:my-3,"font-size":10.5,fill:MUT},"na tym rysunku widzisz składnik bias²"));
+    mseRow(my+15,"PROSTY","|bias| = "+fmt(absBias)+" zł",OR,bwidth);
+    mseRow(my+42,"WAŻONY","bias = 0 zł",TE,0);
+
+    // ---- odczyty ----
+    document.getElementById("v01-sharev").textContent=nr+"%";
+    document.getElementById("v01-simple").textContent=fmt(simple);
+    document.getElementById("v01-bias").textContent=(bias>0?"+":"")+fmt(bias);
+    document.getElementById("v01-wb").textContent=fmt1(wb);
+    document.getElementById("v01-wr").textContent=fmt1(wr);
+
+    // --- funkcje pomocnicze (domknięcie na svg) ---
+    function drawBar(by, biedniFrac, cb, cr, name, sub, above, INK,MUT,BL,OR,BG2, ncb, ncr){
+      var wBied=Wb*biedniFrac;
+      svg.appendChild(E("rect",{x:x0,y:by,width:wBied,height:barH,fill:BL}));
+      svg.appendChild(E("rect",{x:x0+wBied,y:by,width:Wb-wBied,height:barH,fill:OR}));
+      svg.appendChild(E("rect",{x:x0,y:by,width:Wb,height:barH,fill:"none",stroke:BG2,"stroke-width":2}));
+      svg.appendChild(E("line",{x1:x0+wBied,y1:by,x2:x0+wBied,y2:by+barH,stroke:BG2,"stroke-width":2}));
+      // etykieta wiersza po lewej
+      svg.appendChild(E("text",{x:x0-14,y:by+13,"text-anchor":"end","font-size":11.5,"font-weight":700,fill:INK},name));
+      svg.appendChild(E("text",{x:x0-14,y:by+26,"text-anchor":"end","font-size":10,fill:MUT},sub));
+      // etykiety składu (nad/pod paskiem — pewny kontrast na tle)
+      var ly=above?by-6:by+barH+13;
+      var pctB=Math.round(biedniFrac*100), pctR=100-pctB;
+      var txtB=above?("biedni · "+pctB+"%"):("biedni "+ncb+" · "+pctB+"%");
+      var txtR=above?("bogaci · "+pctR+"%"):("bogaci "+ncr+" · "+pctR+"%");
+      svg.appendChild(E("text",{x:x0+wBied/2,y:ly,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:BL},txtB));
+      svg.appendChild(E("text",{x:x0+wBied+(Wb-wBied)/2,y:ly,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:OR},txtR));
+    }
+    function reArrow(xf,yf,xt,yt,col,lab,BG2){
+      svg.appendChild(E("line",{x1:xf,y1:yf,x2:xt,y2:yt+7,stroke:col,"stroke-width":1.8,opacity:.9}));
+      svg.appendChild(E("polygon",{points:xt+","+yt+" "+(xt-4.5)+","+(yt+7)+" "+(xt+4.5)+","+(yt+7),fill:col}));
+      var mx=(xf+xt)/2, my=(yf+yt)/2;
+      svg.appendChild(E("rect",{x:mx-15,y:my-8,width:30,height:15,rx:3,fill:BG2,opacity:.85}));
+      svg.appendChild(E("text",{x:mx,y:my+3.5,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:col,"font-family":cvar("--mono")},lab));
+    }
+    function marker(mx,col,BG2){
+      svg.appendChild(E("line",{x1:mx,y1:axY,x2:mx,y2:238,stroke:col,"stroke-width":1.3,"stroke-dasharray":"3 3",opacity:.7}));
+      svg.appendChild(E("polygon",{points:mx+","+(axY-9)+" "+(mx-6)+","+(axY)+" "+(mx+6)+","+(axY),fill:col,stroke:BG2,"stroke-width":1.5}));
+    }
+    function mseRow(y,label,value,col,width){
+      svg.appendChild(E("text",{x:ml,y:y+13,"font-size":10.5,"font-weight":700,fill:INK2},label));
+      svg.appendChild(E("rect",{x:ml+labW,y:y,width:maxBW,height:16,rx:3,fill:GRID,opacity:.55}));
+      if(width>0)svg.appendChild(E("rect",{x:ml+labW,y:y,width:Math.max(3,width),height:16,rx:3,fill:col,opacity:.78}));
+      svg.appendChild(E("text",{x:ml+labW+maxBW+10,y:y+12,"font-size":10.5,fill:col,"font-weight":700},value));
+    }
+  }
+
+  document.getElementById("v01-share").addEventListener("input",render);
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

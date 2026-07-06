@@ -1,0 +1,53 @@
+<figure class="viz" id="v06">
+  <div class="viz-head">
+    <p class="viz-title">Homoskedastyczność vs heteroskedastyczność</p>
+    <p class="viz-sub">Wariancja reszt: Var(ε|X)=σ² (stała) kontra Var(ε|X)=f(X) — rozrzut rośnie z x („lejek"). Prosta OLS jest w obu przypadkach ta sama; różni się tylko rozkład reszt wokół niej.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v06-svg" viewBox="0 0 700 310" role="img" aria-label="Dwa wykresy rozrzutu z prostą regresji i pasmem ±2σ: po lewej stały rozrzut (homoskedastyczność), po prawej rozrzut rosnący z x (heteroskedastyczność)"></svg>
+  </div>
+  <figcaption><b>Sedno:</b> heteroskedastyczność nie obciąża estymatorów β (OLS wciąż nieobciążony), ale psuje błędy standardowe — testy t/F i przedziały ufności przestają być wiarygodne. Wykrycie: „lejek" na wykresie reszt; naprawa: błędy odporne (HC), WLS lub transformacja log(y).</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v06-svg");
+  if(!svg) return;
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  var W=700,H=310,T=44,B=40, xmax=10, ymax=32, a0=2, b0=2.1, N=55;
+  function mul(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+  function gauss(r){var u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(6.283185307*v);}
+  function panel(ox0,ox1,accent,hetero,title,seed){
+    var y0=H-B,y1=T;
+    var cx=function(x){return ox0+x/xmax*(ox1-ox0);};
+    var cy=function(v){return y0-v/ymax*(y0-y1);};
+    var GRID=cvar("--v-grid"),AX=cvar("--v-axis"),MUT=cvar("--muted"),INK=cvar("--ink"),INK2=cvar("--ink2"),AC=cvar(accent);
+    var g,i,xx;
+    for(g=0;g<=ymax;g+=8){svg.appendChild(E("line",{x1:ox0,y1:cy(g),x2:ox1,y2:cy(g),stroke:GRID,"stroke-width":1}));
+      svg.appendChild(E("text",{x:ox0-6,y:cy(g)+3.5,"text-anchor":"end","font-size":9,fill:MUT},String(g)));}
+    for(g=0;g<=xmax;g+=2){svg.appendChild(E("text",{x:cx(g),y:y0+15,"text-anchor":"middle","font-size":9,fill:MUT},String(g)));}
+    var sig=function(x){return hetero?0.42*x:2.1;};
+    var up="",dn="";
+    for(i=0;i<=40;i++){xx=i/40*xmax; up+=(i?"L":"M")+cx(xx).toFixed(1)+" "+cy(Math.min(ymax,a0+b0*xx+2*sig(xx))).toFixed(1);}
+    for(i=40;i>=0;i--){xx=i/40*xmax; dn+="L"+cx(xx).toFixed(1)+" "+cy(Math.max(0,a0+b0*xx-2*sig(xx))).toFixed(1);}
+    svg.appendChild(E("path",{d:up+dn+"Z",fill:AC,"fill-opacity":0.13,stroke:"none"}));
+    var r=mul(seed);
+    for(i=0;i<N;i++){var x=1+r()*9, y=a0+b0*x+gauss(r)*sig(x); if(y<0)y=0; if(y>ymax)y=ymax;
+      svg.appendChild(E("circle",{cx:cx(x).toFixed(1),cy:cy(y).toFixed(1),r:3,fill:AC,"fill-opacity":0.72}));}
+    svg.appendChild(E("line",{x1:cx(0),y1:cy(a0),x2:cx(xmax),y2:cy(a0+b0*xmax),stroke:INK,"stroke-width":2.4,"stroke-linecap":"round"}));
+    svg.appendChild(E("line",{x1:ox0,y1:y0,x2:ox1,y2:y0,stroke:AX,"stroke-width":1.3}));
+    svg.appendChild(E("line",{x1:ox0,y1:y0,x2:ox0,y2:y1,stroke:AX,"stroke-width":1.3}));
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:T-26,"text-anchor":"middle","font-size":12,"font-weight":700,fill:INK2},title));
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:T-12,"text-anchor":"middle","font-size":10,fill:MUT},hetero?"rozrzut rośnie z x — „lejek”":"stały rozrzut wokół prostej"));
+    svg.appendChild(E("text",{x:(ox0+ox1)/2,y:H-4,"text-anchor":"middle","font-size":10,fill:MUT},"x"));
+  }
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    panel(42,338,"--v-blue",false,"Homoskedastyczność",12345);
+    panel(390,686,"--v-orange",true,"Heteroskedastyczność",67890);
+  }
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

@@ -12,6 +12,7 @@ from livereload import Server
 WATCH_GLOBS = [
     "index.html",
     "html/*.html",
+    "visual/*/*.html",
     "assets/*.css",
     "assets/*.js",
     "assets/*.json",

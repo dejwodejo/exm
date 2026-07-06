@@ -1,0 +1,133 @@
+<figure class="viz" id="v09">
+  <div class="viz-head">
+    <p class="viz-title">Profile metod na osiach-dychotomiach</p>
+    <p class="viz-sub">Każda metoda to polilinia przez 6 dychotomii (góra = lewy biegun, dół = prawy). Najedź lub kliknij nazwę, aby wyróżnić jeden profil — bez tego to plątanina.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v09-svg" viewBox="0 0 680 340" role="img" aria-label="Współrzędne równoległe: profile pięciu metod modelowania na sześciu osiach-dychotomiach"></svg>
+  </div>
+  <div class="viz-controls">
+    <span style="font-size:12px;color:var(--ink2)">Metoda:</span>
+    <span class="toggle v09-chip" id="v09-m0" role="button" tabindex="0" aria-pressed="false"><span class="v09-sw" style="background:var(--v-blue)"></span>OLS</span>
+    <span class="toggle v09-chip" id="v09-m1" role="button" tabindex="0" aria-pressed="false"><span class="v09-sw" style="background:var(--v-teal)"></span>PCA</span>
+    <span class="toggle v09-chip" id="v09-m2" role="button" tabindex="0" aria-pressed="false"><span class="v09-sw" style="background:var(--v-orange)"></span>LDA</span>
+    <span class="toggle v09-chip" id="v09-m3" role="button" tabindex="0" aria-pressed="false"><span class="v09-sw" style="background:var(--v-amber)"></span>GMM</span>
+    <span class="toggle v09-chip" id="v09-m4" role="button" tabindex="0" aria-pressed="false"><span class="v09-sw" style="background:var(--ink)"></span>Sieć / DL</span>
+    <span id="v09-read" style="flex-basis:100%;font-family:var(--mono);font-size:12px;color:var(--ink2);margin-top:4px">Najedź na metodę, aby odczytać jej profil.</span>
+  </div>
+  <figcaption><b>Sedno:</b> paradygmaty modelowania nie leżą na jednej skali „prosty–złożony", lecz w wielowymiarowej przestrzeni dychotomii — OLS jest skrajnie „lewy" (nadzorowany, liniowy, parametryczny, interpretowalny), a sieć DL skrajnie „prawy"; PCA i GMM łamią schemat, mieszając bieguny.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v09-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  var W=680,H=340, xL=82, xR=612, yT=84, yB=258;
+  var axes=[
+    {top:"nadzorowane",     bot:"nienadzorowane"},
+    {top:"liniowe",         bot:"nieliniowe"},
+    {top:"dyskryminacyjne", bot:"generatywne"},
+    {top:"parametryczne",   bot:"nieparametryczne"},
+    {top:"interpretowalne", bot:"czarna skrzynka"},
+    {top:"stat. klasyczna", bot:"algorytm. (ML)"}
+  ];
+  var N=axes.length;
+  var methods=[
+    {name:"Regresja liniowa (OLS)", col:"--v-blue",   v:[0.00,0.00,0.15,0.00,0.05,0.00]},
+    {name:"PCA",                    col:"--v-teal",   v:[1.00,0.00,0.50,0.30,0.25,0.40]},
+    {name:"LDA",                    col:"--v-orange", v:[0.00,0.00,1.00,0.00,0.15,0.20]},
+    {name:"GMM",                    col:"--v-amber",  v:[1.00,0.60,1.00,0.35,0.40,0.50]},
+    {name:"Sieć neuronowa (DL)",    col:"--ink",      v:[0.20,1.00,0.20,0.70,1.00,1.00]}
+  ];
+  var shorts=["OLS","PCA","LDA","GMM","Sieć / DL"];
+
+  var pinned=-1, hovered=-1;
+  function eff(){return hovered>=0?hovered:pinned;}
+
+  var xi=function(i){return xL + i*(xR-xL)/(N-1);};
+  var yv=function(v){return yT + v*(yB-yT);};
+  function pathd(v){var d="";for(var i=0;i<N;i++){d+=(i?"L":"M")+xi(i).toFixed(1)+" "+yv(v[i]).toFixed(1);}return d;}
+
+  function poleWord(v,ax){
+    if(v<=0.34) return ax.top;
+    if(v>=0.66) return ax.bot;
+    return "pośrednio";
+  }
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),
+        GRID=cvar("--v-grid"),AX=cvar("--v-axis"),BG=cvar("--bg2");
+    var e=eff();
+
+    // osie pionowe + etykiety biegunów
+    for(var i=0;i<N;i++){
+      var x=xi(i);
+      svg.appendChild(E("line",{x1:x,y1:yT,x2:x,y2:yB,stroke:AX,"stroke-width":1.4}));
+      // ticki 0 / 0.5 / 1
+      [0,0.5,1].forEach(function(t){
+        svg.appendChild(E("line",{x1:x-3,y1:yv(t),x2:x+3,y2:yv(t),stroke:GRID,"stroke-width":1}));
+      });
+      var an=(i===0)?"start":(i===N-1)?"end":"middle";
+      var lx=(i===0)?x-4:(i===N-1)?x+4:x;
+      svg.appendChild(E("text",{x:lx,y:yT-24,"text-anchor":an,"font-size":9.5,"font-weight":700,fill:INK2},axes[i].top));
+      svg.appendChild(E("text",{x:lx,y:yT-13,"text-anchor":an,"font-size":8.5,fill:MUT},"◤ lewy"));
+      svg.appendChild(E("text",{x:lx,y:yB+16,"text-anchor":an,"font-size":9.5,"font-weight":700,fill:INK2},axes[i].bot));
+      svg.appendChild(E("text",{x:lx,y:yB+27,"text-anchor":an,"font-size":8.5,fill:MUT},"prawy ◢"));
+    }
+
+    // polilinie
+    for(var m=0;m<methods.length;m++){
+      var col=cvar(methods[m].col), d=pathd(methods[m].v);
+      var hi=(m===e), dim=(e>=0 && !hi);
+      svg.appendChild(E("path",{d:d,fill:"none",
+        stroke:dim?MUT:col,
+        "stroke-width":hi?3.4:(e<0?2.2:1.4),
+        "stroke-linejoin":"round","stroke-linecap":"round",
+        opacity:dim?0.18:(e<0?0.82:1)}));
+    }
+    // wierzchołki + etykieta wyróżnionej na końcu
+    if(e>=0){
+      var col2=cvar(methods[e].col);
+      for(var j=0;j<N;j++){
+        svg.appendChild(E("circle",{cx:xi(j),cy:yv(methods[e].v[j]),r:3.6,fill:col2,stroke:BG,"stroke-width":1.6}));
+      }
+      var lastY=yv(methods[e].v[N-1]);
+      svg.appendChild(E("text",{x:xi(N-1)+6,y:lastY-6,"text-anchor":"end","font-size":10.5,"font-weight":700,fill:col2},shorts[e]));
+    }
+
+    // odczyt na żywo
+    var read=document.getElementById("v09-read");
+    if(e>=0){
+      var parts=[];
+      for(var a=0;a<N;a++) parts.push(poleWord(methods[e].v[a],axes[a]));
+      read.textContent=methods[e].name+": "+parts.join(" · ");
+    } else {
+      read.textContent="Najedź na metodę, aby odczytać jej profil.";
+    }
+    // stan chipów
+    for(var c=0;c<methods.length;c++){
+      document.getElementById("v09-m"+c).setAttribute("aria-pressed", c===pinned?"true":"false");
+    }
+  }
+
+  // interakcje na chipach
+  methods.forEach(function(_,idx){
+    var chip=document.getElementById("v09-m"+idx);
+    chip.addEventListener("mouseenter",function(){hovered=idx;render();});
+    chip.addEventListener("mouseleave",function(){hovered=-1;render();});
+    chip.addEventListener("focus",function(){hovered=idx;render();});
+    chip.addEventListener("blur",function(){hovered=-1;render();});
+    function toggle(){pinned=(pinned===idx)?-1:idx;render();}
+    chip.addEventListener("click",toggle);
+    chip.addEventListener("keydown",function(ev){
+      if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();toggle();}
+    });
+  });
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>
