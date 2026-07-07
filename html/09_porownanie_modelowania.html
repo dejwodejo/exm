@@ -20,158 +20,43 @@
     <p class="eyebrow">Modele wielowymiarowe</p>
     <h1>Porównanie koncepcji modelowania</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Dane wielowymiarowe to wektor losowy \(X = (X_1, \ldots, X_p)^T \in \mathbb{R}^p\) z rozkładem łącznym \(P(X)\) (i opcjonalnie \(Y\) — zmienna celu). <strong>Modelowanie</strong> to wybór rodziny opisującej \(X\), \(Y|X\) lub \(X,Y\) pod kątem określonego celu (wyjaśnienie, predykcja, redukcja, klasyfikacja). Różne paradygmaty różnią się postacią rodziny, założeniami i miarą sukcesu.</p>
-<h2 id="dwie-kultury-i-pojecia-bazowe">Dwie kultury i pojęcia bazowe</h2>
-<p><strong>Model statystyczny</strong> to rodzina rozkładów \(\mathcal{P} = \{P_\theta : \theta \in \Theta\}\) na przestrzeni próby. <strong>Funkcja ryzyka</strong> \(R(f) = \mathbb{E}[L(Y, f(X))]\) (oczekiwana strata \(L\)); <strong>ryzyko empiryczne</strong> \(R_n(f) = \tfrac{1}{n}\sum L(y_i, f(x_i))\). <strong>ERM (Empirical Risk Minimization)</strong> — minimalizacja \(R_n\) po klasie hipotez — wspólny język ML i statystyki.</p>
-<p>Breimanowskie <strong>two cultures</strong> dzieli paradygmat na:</p>
-<ul>
-<li><strong>Data modeling culture (statystyka klasyczna)</strong> — zakłada model generujący dane (np. \(Y = X\beta + \varepsilon\), \(\varepsilon \sim \mathcal{N}(0, \sigma^2)\)), celuje w <strong>inferencję</strong> parametrów (\(\hat\beta\), p-value, przedział ufności).</li>
-<li><strong>Algorithmic modeling culture (ML — Machine Learning)</strong> — traktuje mechanizm generujący jako nieznany, optymalizuje <strong>predykcję</strong> out-of-sample (CV — Cross-Validation, błąd holdout, krzywe uczenia).</li>
-</ul>
-<p><strong>Inferencja vs predykcja</strong>: model o niskim błędzie predykcji może mieć nieidentyfikowalne parametry (np. LASSO — Least Absolute Shrinkage and Selection Operator — przy współliniowości); model dobry inferencyjnie (OLS — Ordinary Least Squares — z założeniami Gaussa-Markowa) bywa bity predykcyjnie przez modele regularyzowane.</p>
-<h2 id="nadzorowane-vs-nienadzorowane">Nadzorowane vs nienadzorowane</h2>
-<p><strong>Nadzorowane</strong>: dany jest zbiór \(\{(x_i, y_i)\}_{i=1}^n\), cel — minimalizacja \(\mathbb{E}[L(Y, f(X))]\) (regresja, klasyfikacja). <strong>Nienadzorowane</strong>: tylko \(\{x_i\}\), cel — opis \(P(X)\) lub jego struktury (klasteryzacja, redukcja wymiarów, estymacja gęstości). <strong>Półnadzorowane</strong> korzystają z małej etykietowanej próbki + dużej nieetykietowanej; <strong>samonadzorowane</strong> generują pseudo-etykiety z samych \(X\) (kontrastowe uczenie reprezentacji).</p>
-<h2 id="eksploracyjne-vs-konfirmacyjne">Eksploracyjne vs konfirmacyjne</h2>
-<p><strong>Metody eksploracyjne</strong> szukają struktury <strong>bez wstępnej hipotezy</strong>:</p>
-<ul>
-<li><strong>PCA (Principal Component Analysis)</strong> — rzutowanie \(Z = XW\), gdzie kolumny \(W \in \mathbb{R}^{p\times k}\) to unormowane wektory własne macierzy kowariancji \(\Sigma = \tfrac{1}{n}X^TX\) (dane wycentrowane, \(\bar X = 0\)), posortowane wg malejących wartości własnych \(\lambda_1 \geq \ldots \geq \lambda_p\). Pierwsza składowa rozwiązuje \(\max_{\|w\|=1} w^T\Sigma w\) (kierunek największej wariancji), kolejne — ten sam problem w podprzestrzeni ortogonalnej do poprzednich. Dekoreluje cechy.</li>
-<li><strong>FA (Factor Analysis)</strong> — model \(X = \Lambda F + \varepsilon\) z latentnymi czynnikami \(F \sim \mathcal{N}(0, I)\) i błędem \(\varepsilon\); ładunki \(\Lambda\) szacowane z macierzy kowariancji.</li>
-<li><strong>ICA (Independent Component Analysis)</strong> — \(X = AS\) z \(S\) <strong>niezależnymi</strong> i nie-gaussowskimi (ostrzejsze niż dekorelacja FA).</li>
-</ul>
-<p><strong>Metody konfirmacyjne</strong> testują <strong>z góry zadany model</strong> w oparciu o teorię:</p>
-<ul>
-<li><strong>CFA (Confirmatory Factor Analysis)</strong> — strukturę ładunków \(\Lambda\) ustala badacz (które wskaźniki ładują się na które czynniki), test dopasowania porównuje implikowaną macierz kowariancji \(\Sigma(\theta)\) z obserwowaną \(S\).</li>
-<li><strong>SEM (Structural Equation Modeling)</strong> — łączy CFA (model pomiarowy) z modelem ścieżek między zmiennymi latentnymi (model strukturalny). Estymacja przez <strong>MLE (Maximum Likelihood Estimation)</strong> lub <strong>WLS (Weighted Least Squares)</strong>.</li>
-<li><strong>Wskaźniki dopasowania</strong>:<ul>
-<li>test \(\chi^2\) — <strong>wysoki</strong> p-value (np. \(> 0.05\)) oznacza brak podstaw do odrzucenia modelu, nie dowód idealnego dopasowania; test jest bardzo wrażliwy na liczebność próby (w SEM/CFA \(H_0\) = model pasuje); <strong>niski</strong> p-value odrzuca model,</li>
-<li><strong>RMSEA (Root Mean Square Error of Approximation)</strong> \(< 0.06\) — dobre dopasowanie,</li>
-<li><strong>CFI (Comparative Fit Index)</strong> \(> 0.95\) — dobre dopasowanie,</li>
-<li><strong>SRMR (Standardized Root Mean Square Residual)</strong> \(< 0.08\).</li>
-</ul>
-</li>
-</ul>
-<p>Różnica formalna: eksploracyjne są <strong>data-driven</strong> (struktura wynika z danych), konfirmacyjne są <strong>theory-driven</strong> (struktura testowana, nie odkrywana).</p>
-<h2 id="parametryczne-vs-nieparametryczne">Parametryczne vs nieparametryczne</h2>
-<p><strong>Parametryczne</strong>: \(\Theta \subset \mathbb{R}^d\) ze stałym, skończonym \(d\) niezależnym od \(n\) (regresja liniowa, GLM — Generalized Linear Model, LDA — Linear Discriminant Analysis, Naive Bayes z gaussem). Niska wariancja, wysokie obciążenie przy złej specyfikacji.</p>
-<p><strong>Nieparametryczne</strong>: liczba efektywnych parametrów rośnie z \(n\) (k-NN — k-Nearest Neighbors, KDE — Kernel Density Estimation, drzewa, RF — Random Forest, GP — Gaussian Processes). Niskie obciążenie, wysoka wariancja; wymagają znacznie większych prób w wysokich wymiarach (klątwa wymiarowości).</p>
-<h2 id="czestosciowe-vs-bayesowskie">Częstościowe vs bayesowskie</h2>
-<p><strong>Twierdzenie Bayesa</strong>: \(P(\theta | D) = \frac{P(D|\theta) P(\theta)}{P(D)}\).</p>
-<ul>
-<li><strong>Frequentist (częstościowe)</strong> — \(\theta\) to stała nieznana, losowość w danych. Estymacja: <strong>MLE (Maximum Likelihood Estimation)</strong> \(\hat\theta = \arg\max_\theta P(D|\theta)\). <strong>Przedział ufności 95%</strong> = &quot;95% takich przedziałów (przy powtarzanym eksperymencie) pokryje prawdziwe \(\theta\)&quot;.</li>
-<li><strong>Bayesian (bayesowskie)</strong> — \(\theta\) to zmienna losowa z <strong>priorem</strong> \(P(\theta)\) i <strong>posteriorem</strong> \(P(\theta|D)\). <strong>MAP (Maximum A Posteriori)</strong>: \(\hat\theta = \arg\max_\theta P(\theta|D)\) (punkt); pełna analiza używa całego posteriora (próbkowanie MCMC — Markov Chain Monte Carlo). <strong>Przedział wiarygodności (credible interval) 95%</strong> = &quot;z prawdopodobieństwem 95% \(\theta\) leży w tym przedziale przy danych \(D\)&quot;.</li>
-</ul>
-<p>Częsta pomyłka: interpretowanie przedziału ufności jako wiarygodnościowego — pierwsze mówi o procedurze, drugie o parametrze.</p>
-<h2 id="liniowe-vs-nieliniowe">Liniowe vs nieliniowe</h2>
-<p><strong>Model liniowy</strong> \(\mathbb{E}[Y|X] = X\beta\); <strong>GLM</strong>: \(\mathbb{E}[Y|X] = g^{-1}(X\beta)\) z funkcją linkującą \(g\) i rozkładem \(Y\) z rodziny wykładniczej (regresja logistyczna, Poissona, gamma).</p>
-<p>Modele nieliniowe:</p>
-<ul>
-<li><strong>Jądrowe</strong> — twierdzenie o reprezentacji + warunek Mercera: \(\hat f(x) = \sum_i \alpha_i K(x_i, x)\) z jądrem \(K\) pozytywnie określonym, gdzie współczynniki \(\alpha_i\) (po jednym na obserwację uczącą) wynikają z twierdzenia o reprezentacji (SVM — Support Vector Machine z jądrem RBF — Radial Basis Function).</li>
-<li><strong>Drzewa decyzyjne</strong> — rekurencyjny podział przestrzeni cech minimalizujący nieczystość węzła, gdzie \(p_k\) to udział obserwacji klasy \(k\) w danym węźle (\(\sum_k p_k = 1\)): Gini \(1-\sum_k p_k^2\), entropia \(H = -\sum_k p_k \log p_k\).</li>
-<li><strong>Sieci neuronowe</strong> — twierdzenie Cybenko/Hornika o uniwersalnej aproksymacji: każda funkcja ciągła na zbiorze zwartym jest aproksymowalna z dowolną dokładnością przez jednowarstwową sieć z odpowiednią aktywacją (gwarancja istnienia, nie efektywności uczenia).</li>
-</ul>
-<h2 id="dyskryminacyjne-vs-generatywne">Dyskryminacyjne vs generatywne</h2>
-<ul>
-<li><strong>Dyskryminacyjne</strong> modelują \(P(Y|X)\) lub bezpośrednio \(f: X \to Y\) (regresja logistyczna, SVM, drzewa, RF, GBM — Gradient Boosting Machine, sieci neuronowe).</li>
-<li><strong>Generatywne</strong> modelują wspólny rozkład \(P(X, Y) = P(X|Y) P(Y)\), klasyfikacja przez wzór Bayesa \(P(Y|X) \propto P(X|Y)P(Y)\) (LDA, QDA — Quadratic Discriminant Analysis, Naive Bayes, GMM — Gaussian Mixture Model z EM — Expectation-Maximization, VAE — Variational AutoEncoder, GAN — Generative Adversarial Network).</li>
-</ul>
-<p>Wynik Ng &amp; Jordan (2002) dla pary Gaussian NB (generatywny) vs regresja logistyczna (dyskryminacyjny): (1) NB ma <strong>wyższy błąd asymptotyczny</strong> (gorszy pułap przy \(n\to\infty\)), ale (2) <strong>zbiega do swojego pułapu szybciej</strong> — potrzebuje \(\sim O(\log p)\) obserwacji zamiast \(\sim O(p)\). Stąd: generatywny bywa lepszy przy <strong>małym</strong> \(n\), dyskryminacyjny wygrywa przy <strong>dużym</strong> \(n\). Zastrzeżenie: przewaga generatywnego przy małym \(n\) zależy od poprawnej specyfikacji rozkładu \(P(X\mid Y)\). Generatywne potrafią dodatkowo: generować nowe \(x\), obsłużyć brakujące cechy, detekcję anomalii.</p>
-<h2 id="bias-variance-klatwa-wymiarowosci-no-free-lunch">Bias-variance, klątwa wymiarowości, No Free Lunch</h2>
-<p><strong>Dekompozycja bias-variance</strong>: \(\mathbb{E}[(Y - \hat f(X))^2] = \underbrace{\text{Bias}^2(\hat f)}_{\text{błąd systematyczny}} + \underbrace{\text{Var}(\hat f)}_{\text{wrażliwość na próbkę}} + \underbrace{\sigma^2}_{\text{szum nieredukowalny}}\), gdzie \(\sigma^2 = \text{Var}(Y\mid X)\) — wariancja szumu, której żaden model nie usunie. Modele proste — wysokie obciążenie, niska wariancja; elastyczne — odwrotnie. <strong>Double descent</strong>: w reżimie nadparametryzowanym (DL — Deep Learning) błąd testowy ponownie spada po klasycznym U-kształcie, łamiąc tradeoff w klasycznej formie.</p>
-<p><strong>Klątwa wymiarowości</strong>: dla rozkładu jednostajnego w \([0,1]^p\) promień kuli zawierającej ułamek \(r\) obserwacji rośnie jak \(r^{1/p}\). Konsekwencje: (i) wszystkie pary punktów stają się porównywalnie odległe, k-NN i KDE degradują się; (ii) objętość koncentruje się przy brzegu hiperkostki; (iii) gęstość gaussa skupia się w cienkiej powłoce wokół promienia \(\sqrt{p}\sigma\). Stąd potrzeba redukcji wymiarów lub modeli rzadkich (LASSO).</p>
-<p><strong>Twierdzenie No Free Lunch (Wolpert)</strong>: uśredniony błąd dwóch dowolnych algorytmów po wszystkich rozkładach jest równy — wybór paradygmatu zależy od <strong>założeń</strong> o \(P(X,Y)\), nie od uniwersalnej wyższości. Kryteria informacyjne <strong>AIC (Akaike Information Criterion)</strong> \(= -2\log\hat{\mathcal{L}} + 2k\) i <strong>BIC (Bayesian Information Criterion)</strong> \(= -2\log\hat{\mathcal{L}} + k\log n\), gdzie \(\hat{\mathcal{L}}\) to zmaksymalizowana wiarygodność modelu (odrębny obiekt od funkcji straty \(L\)), \(k\) — liczba parametrów, \(n\) — liczność próby, dają wspólny język porównywania modeli o różnym \(k\).</p>
-<h2 id="tabela-porownawcza-paradygmatow">Tabela porównawcza paradygmatów</h2>
-<div class="viz-mount" data-viz="v09"></div>
 
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Paradygmat</th>
-<th>Wejście</th>
-<th>Założenia</th>
-<th>Wynik</th>
-<th>Typowe zastosowanie</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Statystyka klasyczna (OLS, GLM)</td>
-<td>małe/średnie \(n\), tabularne</td>
-<td>rozkład reszt, niezależność, homoskedastyczność</td>
-<td>estymatory parametrów , p-value, CI (Confidence Interval), AIC/BIC</td>
-<td>inferencja, ekonometria, biostatystyka</td>
-</tr>
-<tr>
-<td>Bayesian (PyMC, Stan)</td>
-<td>małe \(n\), wiedza domenowa</td>
-<td>wybór priora, model probabilistyczny</td>
-<td>posterior, credible interval</td>
-<td>hierarchiczne modele, A/B testy z priorytetami</td>
-</tr>
-<tr>
-<td>Eksploracyjna analiza (PCA/FA/ICA)</td>
-<td>dane bez etykiet</td>
-<td>liniowość, zmaksymalizowana wariancja/niezależność</td>
-<td>komponenty, ładunki</td>
-<td>redukcja wymiarów, dekorelacja przed modelem</td>
-</tr>
-<tr>
-<td>Konfirmacyjna (CFA/SEM)</td>
-<td>tabularne, model teoretyczny</td>
-<td>model strukturalny zadany a priori</td>
-<td>dopasowanie (\(\chi^2\), RMSEA, CFI)</td>
-<td>psychometria, socjologia, marketing</td>
-</tr>
-<tr>
-<td>Klasyczne ML (RF, GBM, SVM)</td>
-<td>tabularne, \(n=10^3\)– <code>10^6+</code></td>
-<td>mało założeń o rozkładzie</td>
-<td>predykcja, feature importance, SHAP (SHapley Additive exPlanations)</td>
-<td>scoring, churn, ranking</td>
-</tr>
-<tr>
-<td>Deep Learning (CNN — Convolutional Neural Network, RNN — Recurrent Neural Network, Transformer)</td>
-<td>nieustrukturyzowane (obraz, tekst, audio),  duże <code>n</code></td>
-<td>hierarchiczna struktura w danych</td>
-<td>predykcja, embedding</td>
-<td>NLP (Natural Language Processing), vision, mowa</td>
-</tr>
-<tr>
-<td>Klasteryzacja (k-means, GMM, DBSCAN — Density-Based Spatial Clustering of Applications with Noise)</td>
-<td>dane bez etykiet</td>
-<td>metryka odległości, separowalność klas</td>
-<td>przypisanie do klastrów</td>
-<td>segmentacja, anomaly detection</td>
-</tr>
-<tr>
-<td>Hurtownia / OLAP (Online Analytical Processing)</td>
-<td>tabela faktów + wymiary</td>
-<td>model wymiarowy (gwiazda)</td>
-<td>agregaty, kostka</td>
-<td>raportowanie BI (Business Intelligence) — szczegóły w <a href="12_modele_wielowymiarowe.html">modelach wielowymiarowych</a></td>
-</tr>
-</tbody></table></div>
-<p>GBDT (Gradient Boosting Decision Trees — XGBoost, LightGBM, CatBoost) systematycznie wygrywa na danych tabularnych nad DL — powody: niewrażliwość na skalę i monotoniczne transformacje, obsługa nieregularnych nieliniowych interakcji, sample efficiency na średnich próbach.</p>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe w prognozowaniu</a></strong> — konkretne realizacje paradygmatów wielowymiarowych (PCA, FA, dyskryminacyjna, klasteryzacja); to porównanie stawia je w kontekście porównawczym.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong> — większość algorytmów dyskryminacyjnych i nieparametrycznych z tej tabeli (drzewa, RF, GBM, SVM) jest tematem <a href="10_klasyczne_ml.html">klasycznego ML</a>.</li>
-<li><strong><a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong> — głębokie modele jako paradygmat z twierdzeniem Cybenko, double descent, dominacja w danych nieustrukturyzowanych.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory wartości średniej</a></strong> — własności estymatorów (nieobciążoność, zgodność, MSE) są podstawą frequentist; rozszerzenie do MAP w Bayesian.</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja liniowa</a></strong> — model liniowy jako referencyjny przedstawiciel statystyki klasycznej, GLM jako jego uogólnienie.</li>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data</a> / <a href="07_mapreduce.html">MapReduce</a></strong> — skala wymusza rozproszone implementacje (Spark MLlib, distributed XGBoost) i denormalizację, faworyzując algorithmic culture nad inferencją.</li>
-<li><strong><a href="04_wizualizacja.html">Wizualizacja danych</a></strong> — t-SNE (t-distributed Stochastic Neighbor Embedding) i UMAP (Uniform Manifold Approximation and Projection) jako narzędzia do wizualizacji 2D/3D wyników redukcji wymiarów (uwaga: <strong>tylko</strong> do wizualizacji, odległości globalne zniekształcone).</li>
-</ul>
+    <p>Dane wielowymiarowe to wektor cech \(X = (X_1, \ldots, X_p)\), często z dołączoną zmienną celu \(Y\). <strong>Modelowanie</strong> to wybór rodziny opisującej \(X\), zależność \(Y|X\) albo rozkład łączny \(X,Y\). Kluczowe jest to, że o wyborze paradygmatu decyduje <em>cel</em>, a nie moda: inaczej modeluje się, gdy chcemy coś <strong>wyjaśnić</strong>, inaczej gdy <strong>przewidzieć</strong>, a jeszcze inaczej gdy <strong>zredukować wymiar</strong>, <strong>sklasyfikować</strong> czy <strong>posegmentować</strong>. Dopiero mając cel, dobieramy rodzinę modeli, jej założenia i miarę sukcesu.</p>
+
+    <h2 id="dwie-kultury">Statystyka klasyczna a uczenie maszynowe</h2>
+    <p>Breiman opisał to jako <strong>dwie kultury</strong>. Kultura modelowania danych (statystyka klasyczna) zakłada znany mechanizm generujący dane — np. \(Y = X\beta + \varepsilon\) — i dąży do <strong>inferencji</strong>: estymatory, wartości p, przedziały ufności, czyli wyjaśnienie zależności. Kultura algorytmiczna (ML) traktuje mechanizm jako nieznaną czarną skrzynkę i optymalizuje <strong>predykcję</strong> na nowych danych, mierzoną walidacją krzyżową. Wspólnym językiem obu jest minimalizacja ryzyka empirycznego, czyli średniej straty na próbie. Napięcie jest rzeczywiste: model wygodny inferencyjnie bywa predykcyjnie pokonywany przez modele regularyzowane.</p>
+
+    <h2 id="osie-podzialu">Główne osie podziału</h2>
+    <ul>
+      <li><strong>Nadzorowane a nienadzorowane</strong> — mamy etykiety \(y_i\) czy tylko \(x_i\); predykcja celu kontra odkrywanie struktury (klasteryzacja, redukcja wymiaru).</li>
+      <li><strong>Eksploracyjne a konfirmacyjne</strong> — PCA i analiza czynnikowa szukają struktury bez hipotezy (data-driven); modele konfirmacyjne, jak SEM, testują z góry zadany model teoretyczny (theory-driven).</li>
+      <li><strong>Parametryczne a nieparametryczne</strong> — skończona, stała liczba parametrów (regresja, GLM) kontra liczba rosnąca z próbą (k-NN, drzewa, lasy losowe). Pierwsze mają niską wariancję, lecz ryzyko obciążenia przy złej specyfikacji; drugie odwrotnie i wymagają dużych zbiorów danych.</li>
+      <li><strong>Liniowe a nieliniowe</strong> — model liniowy i GLM kontra metody jądrowe, drzewa i sieci neuronowe.</li>
+      <li><strong>Dyskryminacyjne a generatywne</strong> — dyskryminacyjne modelują \(P(Y|X)\) wprost (regresja logistyczna, lasy, boosting); generatywne modelują rozkład łączny \(P(X,Y)\) i klasyfikują przez wzór Bayesa (LDA, naiwny Bayes, modele mieszanin), dzięki czemu potrafią też generować dane i radzić sobie z brakami.</li>
+    </ul>
+
+    <h2 id="czestosciowe-vs-bayesowskie">Częstościowe a bayesowskie</h2>
+    <p>Twierdzenie Bayesa \(P(\theta|D) \propto P(D|\theta)\,P(\theta)\) dzieli statystykę na dwa obozy. Dla <strong>częstościowca</strong> \(\theta\) to nieznana stała, estymowana metodą największej wiarygodności; dla <strong>bayesowca</strong> \(\theta\) jest zmienną losową z priorem i posteriorem. Kluczowy kontrast: przedział ufności mówi o <em>procedurze</em> (95% takich przedziałów pokryje \(\theta\)), a przedział wiarygodności wprost o <em>parametrze</em> — i mylenie ich to częsta pułapka.</p>
+
+    <h2 id="bias-variance">Bias-variance jako wspólny język</h2>
+    <p>Wszystkie te paradygmaty spina jeden rachunek — rozkład błędu na obciążenie, wariancję i szum nieredukowalny:</p>
+    <div class="mathblock">\[\mathbb{E}[(Y - \hat f(X))^2] = \text{Bias}^2(\hat f) + \text{Var}(\hat f) + \sigma^2.\]</div>
+    <p>Modele proste mają wysokie obciążenie i niską wariancję, elastyczne — odwrotnie; sztuką jest trafić w minimum sumy. W wysokich wymiarach dokłada się <strong>klątwa wymiarowości</strong>: punkty stają się porównywalnie odległe, więc metody odległościowe zawodzą — stąd potrzeba redukcji wymiaru albo modeli rzadkich. A twierdzenie <strong>No Free Lunch</strong> przypomina, że żaden algorytm nie jest uniwersalnie najlepszy: wybór zawsze zależy od założeń o danych.</p>
+
+    <h2 id="synteza">Synteza</h2>
+    <div class="viz-mount" data-viz="v09"></div>
+    <p><strong>Przykład</strong>: te same dane o klientach można modelować zupełnie różnie — regresją logistyczną, gdy chcemy zinterpretować wpływ cech na odejście klienta, albo gradient boostingiem, gdy liczy się wyłącznie trafność scoringu.</p>
+    <p><strong>Pułapka</strong>: paradygmaty nie są rankingiem. Sięganie po głęboką sieć tam, gdzie dane są tabularne i nieliczne, zwykle przegrywa z prostszym boostingiem drzew — odpornym na skalę cech i skutecznym już na średnich próbach.</p>
+    <p><strong>Zdanie zamykające</strong>: konkretne realizacje tych paradygmatów — PCA, analizę czynnikową, klasyfikację, klasteryzację — rozwijam w notatce o <a href="12_modele_wielowymiarowe.html">modelach wielowymiarowych w prognozowaniu</a>.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#dwie-kultury-i-pojecia-bazowe">Dwie kultury i pojęcia bazowe</a></li>
-<li><a href="#nadzorowane-vs-nienadzorowane">Nadzorowane vs nienadzorowane</a></li>
-<li><a href="#eksploracyjne-vs-konfirmacyjne">Eksploracyjne vs konfirmacyjne</a></li>
-<li><a href="#parametryczne-vs-nieparametryczne">Parametryczne vs nieparametryczne</a></li>
-<li><a href="#czestosciowe-vs-bayesowskie">Częstościowe vs bayesowskie</a></li>
-<li><a href="#liniowe-vs-nieliniowe">Liniowe vs nieliniowe</a></li>
-<li><a href="#dyskryminacyjne-vs-generatywne">Dyskryminacyjne vs generatywne</a></li>
-<li><a href="#bias-variance-klatwa-wymiarowosci-no-free-lunch">Bias-variance, klątwa wymiarowości, No Free Lunch</a></li>
-<li><a href="#tabela-porownawcza-paradygmatow">Tabela porównawcza paradygmatów</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#dwie-kultury">Statystyka klasyczna a ML</a></li>
+    <li><a href="#osie-podzialu">Główne osie podziału</a></li>
+    <li><a href="#czestosciowe-vs-bayesowskie">Częstościowe a bayesowskie</a></li>
+    <li><a href="#bias-variance">Bias-variance jako wspólny język</a></li>
+    <li><a href="#synteza">Synteza</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

@@ -20,121 +20,40 @@
     <p class="eyebrow">Bezpieczeństwo IT</p>
     <h1>Bezpieczeństwo systemów i aplikacji</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Bezpieczeństwo IT to ochrona aktywów informacyjnych przed zagrożeniami przy zachowaniu funkcjonalności systemu. Projektowanie zaczyna się od <strong>modelu zagrożenia</strong> (threat model): co chronimy, przed kim, jakie są ścieżki ataku. Bez tego mechanizmy obronne są dobierane losowo.</p>
-<h2 id="triada-cia-i-model-dostepu">Triada CIA i model dostępu</h2>
-<p><strong>Triada CIA</strong> (Confidentiality, Integrity, Availability):</p>
-<ul>
-<li><strong>Poufność (Confidentiality)</strong> — dane widoczne tylko dla uprawnionych (szyfrowanie, kontrola dostępu).</li>
-<li><strong>Integralność (Integrity)</strong> — wykrywanie nieautoryzowanych modyfikacji (skróty, podpisy, MAC — Message Authentication Code).</li>
-<li><strong>Dostępność (Availability)</strong> — system odpowiada na żądania (redundancja, anty-DDoS, backup).</li>
-</ul>
-<p>Często rozszerzane o <strong>autentyczność</strong> (potwierdzenie tożsamości) i <strong>niezaprzeczalność</strong> (nadawca nie może zaprzeczyć podpisu — <a href="17_autoryzacja_podpis.html">Autoryzacja i podpis</a>).</p>
-<p><strong>Macierz kontroli dostępu Lampsona</strong> \(M: S \times O \to 2^{R}\) — formalny model: dla podmiotu \(s\in S\) (subject) i obiektu \(o\in O\) (object) komórka \(M(s,o)\subseteq R\) przechowuje <strong>podzbiór</strong> zbioru wszystkich praw \(R=\{\text{read},\text{write},\text{execute},\dots\}\) (\(2^R\) = zbiór potęgowy, czyli wszystkie podzbiory \(R\)). Implementacje: ACL (Access Control List — kolumna macierzy, przechowywana przy obiekcie) vs capabilities (wiersz macierzy, przy podmiocie).</p>
-<h2 id="kryptografia-fundament">Kryptografia — fundament</h2>
-<p><strong>Funkcja skrótu kryptograficznego</strong> \(h:\{0,1\}^*\to\{0,1\}^n\), gdzie \(n\) = długość skrótu w bitach, ma trzy własności: <strong>preimage</strong> — z \(y\) trudno odzyskać dowolne \(x\) z \(h(x)=y\) (koszt \(\approx 2^n\)); <strong>second-preimage</strong> — dla danego \(x\) trudno znaleźć \(x'\neq x\) z \(h(x')=h(x)\) (koszt \(\approx 2^n\)); <strong>kolizja</strong> — trudno znaleźć dowolną parę \(x\neq x'\) o tym samym skrócie. <strong>Paradoks urodzin</strong> obniża koszt kolizji do \(\approx 2^{n/2}\) (efektywny poziom bezpieczeństwa \(=n/2\) bitów), więc SHA-1 (Secure Hash Algorithm, \(n=160\), kolizja \(\approx 2^{80}\)) jest złamany, a SHA-256 (\(n=256\), \(\approx 2^{128}\)) zostaje bezpieczny.</p>
-<p><strong>Szyfr symetryczny</strong> — trójka \((\text{Gen}, \text{Enc}, \text{Dec})\) (generacja klucza / szyfrowanie / deszyfrowanie) z jednym kluczem; szybki, AES (Advanced Encryption Standard) — standard. <strong>Szyfr asymetryczny</strong> — para \((pk, sk)\) klucz publiczny/prywatny, oparty o problem trudny (faktoryzacja w RSA — Rivest-Shamir-Adleman; logarytm dyskretny w ECC — Elliptic Curve Cryptography); wolny, używany do wymiany kluczy i podpisów.</p>
-<p><strong>MAC (Message Authentication Code)</strong> — funkcja \(\text{MAC}_k(m)\) zapewnia integralność + autentyczność z kluczem symetrycznym. <strong>HMAC (Hash-based MAC)</strong> = standardowa konstrukcja MAC z funkcji skrótu. Zwykły skrót integralności bez klucza nie autentykuje (atakujący może zmienić wiadomość i przeliczyć hash).</p>
-<p><strong>KDF (Key Derivation Function)</strong> — przekształca hasło w klucz: \(f(\text{password}, \text{salt}, \text{iter}) \to k\). <strong>PBKDF2</strong> (Password-Based KDF 2), <strong>bcrypt</strong>, <strong>scrypt</strong>, <strong>Argon2id</strong> (zwycięzca Password Hashing Competition, memory-hard). <strong>Sól</strong> (per-user, przechowywana z hashem) blokuje rainbow tables; <strong>pieprz</strong> (globalny sekret poza bazą) chroni gdy wycieknie tylko baza. Hashowanie haseł SHA-256 z solą jest zbyt szybkie — GPU robi miliardy hashów/s.</p>
-<p>Częsta pomyłka: szyfrowanie (odwracalne z kluczem) ≠ hashowanie (jednokierunkowe) ≠ kodowanie (Base64 — odwracalne bez klucza, nie chroni nic).</p>
-<h2 id="szyfrowanie-at-rest-in-transit-in-use">Szyfrowanie at rest / in transit / in use</h2>
-<ul>
-<li><strong>At rest</strong> — dane na dysku: LUKS (Linux Unified Key Setup), BitLocker, szyfrowanie kolumn w bazie (TDE — Transparent Data Encryption).</li>
-<li><strong>In transit</strong> — w sieci: TLS 1.3 (Transport Layer Security), IPsec (Internet Protocol Security), VPN (Virtual Private Network).</li>
-<li><strong>In use</strong> — w pamięci: trusted execution environment (Intel SGX — Software Guard Extensions, AMD SEV — Secure Encrypted Virtualization), MPC (Multi-Party Computation), FHE (Fully Homomorphic Encryption). SGX podważone przez ataki side-channel (Foreshadow).</li>
-</ul>
-<h2 id="bezpieczenstwo-systemu-operacyjnego">Bezpieczeństwo systemu operacyjnego</h2>
-<p><strong>Pierścienie ochrony (rings)</strong>: formalna architektura x86 definiuje tylko Ring 0 (kernel mode — pełny dostęp do sprzętu) oraz Ring 3 (user mode — wymaga syscalla). Nieformalnie mówi się też o &quot;ujemnych pierścieniach&quot; (rozszerzenie popularnonaukowe, nie część specyfikacji sprzętowej): Ring -1 (hypervisor), Ring -2 (SMM — System Management Mode), Ring -3 (Intel ME — Management Engine). Atak na niższy pierścień kompromituje wszystkie wyższe.</p>
-<p><strong>Kontrola dostępu w OS</strong>: <strong>DAC (Discretionary Access Control)</strong> — uprawnienia POSIX <code>rwx</code>, właściciel decyduje, podatny na trojany (proces dziedziczy uprawnienia użytkownika). <strong>MAC (Mandatory Access Control</strong> — uwaga: inny skrót niż kryptograficzny MAC = Message Authentication Code) — SELinux, AppArmor; polityka systemowa nadpisuje wolę właściciela. (Modele DAC/MAC/RBAC/ABAC szczegółowo w <a href="17_autoryzacja_podpis.html">Autoryzacji i podpisie</a>.)</p>
-<p><strong>Izolacja procesów</strong> — rosnące poziomy:</p>
-<ul>
-<li><strong>Sandbox</strong> (seccomp-bpf — filtrowanie syscalli, AppArmor) — w tym samym kernelu.</li>
-<li><strong>Kontener</strong> (Docker, podman; namespaces + cgroups) — dzieli kernel z hostem; <em>nie</em> jest granicą bezpieczeństwa multi-tenant.</li>
-<li><strong>Maszyna wirtualna</strong> (VM, KVM — Kernel-based Virtual Machine / Xen) — własny kernel, izolacja na poziomie hypervisora; najsilniejsza, ale podatna na VM escape (Venom).</li>
-</ul>
-<p><strong>Hardening pamięci</strong>:</p>
-<ul>
-<li><strong>ASLR (Address Space Layout Randomization)</strong> — randomizuje adresy, blokuje stałe offsety w eksploitach.</li>
-<li><strong>DEP/NX (Data Execution Prevention / No-eXecute)</strong>, zasada <strong>W ⊕ X</strong> (write XOR execute) — strona albo zapisywalna, albo wykonywalna; blokuje shellcode w buforze.</li>
-<li><strong>Stack canaries</strong> — wartość kontrolna przed adresem powrotu, wykrywa stack overflow.</li>
-<li><strong>CFI (Control Flow Integrity)</strong> — weryfikuje legalność celów wywołań pośrednich; razem z ASLR blokuje ROP (Return-Oriented Programming — łańcuchy istniejących gadgetów omijających DEP).</li>
-</ul>
-<p><strong>Zasada najmniejszych przywilejów</strong> (Saltzer-Schroeder) — proces ma tylko uprawnienia niezbędne do zadania. <strong>SUID (Set User ID)</strong> — bit pozwalający binarce działać z uprawnieniami właściciela pliku; wektor lokalnej eskalacji (GTFOBins). Linux <strong>capabilities</strong> (CAP_NET_BIND_SERVICE itd.) drobnoziarniście zastępują roota.</p>
-<p><strong>TCB (Trusted Computing Base)</strong> — minimalny zbiór komponentów (kernel, firmware, sterowniki) których kompromitacja łamie politykę bezpieczeństwa. <strong>Secure Boot</strong> weryfikuje podpisy bootloadera; <strong>TPM (Trusted Platform Module)</strong> mierzy hashe komponentów do PCR (Platform Configuration Register) i służy jako root of trust dla attestation.</p>
-<p>Aktualizacje i łatanie — wektor odpowiedzialny za większość udanych ataków masowych (WannaCry przez nieparowaną SMB — Server Message Block).</p>
-<h2 id="bezpieczenstwo-aplikacji-owasp-top-10-2025">Bezpieczeństwo aplikacji — OWASP Top 10 (2025; 2021 wciąż często w sylabusach)</h2>
-<p>OWASP (Open Worldwide Application Security Project) — niekomercyjna organizacja publikująca standardy bezpieczeństwa aplikacji webowych. Top 10 2025 jest aktualnym wydaniem; lista 2021 nadal bywa spotykana w sylabusach, więc traktuj ją jako historyczną bazę i porównuj z aktualizacją 2025:</p>
-<ol>
-<li><strong>A01 Broken Access Control</strong> — IDOR (Insecure Direct Object Reference), brak weryfikacji uprawnień.</li>
-<li><strong>A02 Cryptographic Failures</strong> — słaba kryptografia, brak szyfrowania.</li>
-<li><strong>A03 Injection</strong> — SQLi (SQL Injection), command injection, LDAP (Lightweight Directory Access Protocol) injection.</li>
-<li><strong>A04 Insecure Design</strong> — brak modelu zagrożenia w fazie projektu.</li>
-<li><strong>A05 Security Misconfiguration</strong> — domyślne hasła, otwarte porty.</li>
-<li><strong>A06 Vulnerable &amp; Outdated Components</strong> — biblioteki z CVE (Common Vulnerabilities and Exposures).</li>
-<li><strong>A07 Authentication Failures</strong> — słabe hasła, brak rate limiting.</li>
-<li><strong>A08 Software &amp; Data Integrity Failures</strong> — supply chain.</li>
-<li><strong>A09 Logging &amp; Monitoring Failures</strong> — niewykryte włamania.</li>
-<li><strong>A10 SSRF (Server-Side Request Forgery)</strong> — serwer pobiera URL podany przez atakującego.</li>
-</ol>
-<h2 id="klasyczne-ataki-aplikacyjne">Klasyczne ataki aplikacyjne</h2>
-<ul>
-<li><strong>SQL Injection</strong> — wstrzyknięcie SQL (Structured Query Language) przez nieoczyszczone wejście (<code>' OR 1=1 --</code>). Obrona: <strong>prepared statements</strong> / parametryzowane zapytania (nie konkatenacja stringów), ORM, najmniejsze uprawnienia konta DB.</li>
-<li><strong>XSS (Cross-Site Scripting)</strong> — wariant stored / reflected / DOM-based (Document Object Model); wstrzyknięcie JS (JavaScript) w stronę ofiary. Obrona: escape kontekstowy (HTML/JS/URL), <strong>CSP (Content Security Policy)</strong>, flagi <code>HttpOnly</code>/<code>Secure</code> na ciasteczkach. SQLi atakuje serwer, XSS przeglądarkę ofiary.</li>
-<li><strong>CSRF (Cross-Site Request Forgery)</strong> — wykorzystanie aktywnej sesji ofiary do akcji bez jej wiedzy. Obrona: tokeny anty-CSRF, ciasteczka <code>SameSite</code>, weryfikacja <code>Origin</code>/<code>Referer</code>.</li>
-<li><strong>Buffer overflow</strong> — stack overflow nadpisuje return address (kontrola przepływu od razu); heap overflow nadpisuje metadane alokatora (eksploatacja pośrednia). Obrona: stack canaries, DEP, ASLR, CFI, języki memory-safe (Rust, Go).</li>
-<li><strong>TOCTOU (Time-Of-Check Time-Of-Use)</strong> — race condition między sprawdzeniem warunku a użyciem zasobu (<code>access()</code> → <code>open()</code> z podmianą symlinka). Obrona: atomowe operacje (<code>O_CREAT|O_EXCL</code>, <code>openat</code>).</li>
-<li><strong>Supply chain</strong> — typosquatting w npm/PyPI, kompromitacja CI/CD (Continuous Integration / Continuous Deployment) (SolarWinds 2020, xz-utils backdoor 2024). Obrona: SBOM (Software Bill of Materials), lockfiles, podpisywanie artefaktów (Sigstore), skanery zależności.</li>
-</ul>
-<h2 id="malware-phishing-ddos">Malware, phishing, DDoS</h2>
-<p><strong>Taksonomia malware</strong>:</p>
-<ul>
-<li><strong>Wirus</strong> — wymaga nosiciela (infekuje pliki).</li>
-<li><strong>Robak</strong> — propaguje się autonomicznie przez sieć (Morris, WannaCry).</li>
-<li><strong>Trojan</strong> — udaje legalny program.</li>
-<li><strong>Rootkit</strong> — ukrywa obecność modyfikując kernel/syscalle (kernel rootkit — Ring 0, niewidoczny dla AV — Antivirus w userspace).</li>
-<li><strong>Ransomware</strong> — szyfruje dane i żąda okupu (CryptoLocker; NotPetya był w istocie wiperem podszywającym się pod ransomware — szyfrował bezpowrotnie, okup to fasada).</li>
-<li><strong>RAT (Remote Access Trojan)</strong>, <strong>keylogger</strong>, <strong>cryptojacker</strong>, <strong>fileless malware</strong> (living-off-the-land przez PowerShell/WMI — Windows Management Instrumentation).</li>
-</ul>
-<p><strong>Phishing</strong> — spear phishing (celowany), <strong>BEC (Business Email Compromise)</strong>, smishing (SMS — Short Message Service), vishing (głos). Obrona: szkolenia, MFA (Multi-Factor Authentication) odporne na phishing (FIDO2 — Fast IDentity Online 2 / WebAuthn), filtry mailowe (DMARC — Domain-based Message Authentication, Reporting &amp; Conformance; SPF — Sender Policy Framework; DKIM — DomainKeys Identified Mail).</p>
-<p><strong>DDoS (Distributed Denial of Service)</strong> — typy: volumetric (zalanie pasma), protocol (SYN flood — wykorzystuje 3-way handshake TCP), application-layer (HTTP flood). Obrona: CDN (Content Delivery Network), anty-DDoS, rate limiting, scrubbing center.</p>
-<h2 id="backup-i-disaster-recovery">Backup i disaster recovery</h2>
-<ul>
-<li><strong>Strategia 3-2-1</strong> — 3 kopie danych, 2 różne nośniki, 1 kopia offsite.</li>
-<li><strong>RTO (Recovery Time Objective)</strong> — maksymalny dopuszczalny czas niedostępności po incydencie.</li>
-<li><strong>RPO (Recovery Point Objective)</strong> — maksymalna dopuszczalna utrata danych mierzona w czasie (np. RPO=1h ⇒ backup co godzinę).</li>
-<li>Testowanie restore&#39;ów (backup nieprzetestowany = brak backupu).</li>
-<li>Przeciwko ransomware: kopie <strong>immutable</strong> / <strong>air-gapped</strong> / WORM (Write Once Read Many).</li>
-</ul>
-<h2 id="narzedzia-obronne-i-standardy">Narzędzia obronne i standardy</h2>
-<div class="viz-mount" data-viz="v16"></div>
 
-<ul>
-<li><strong>Firewall</strong> sieciowy (iptables/nftables, pf) i <strong>WAF (Web Application Firewall)</strong> — ModSecurity dla aplikacji webowych.</li>
-<li><strong>IDS/IPS (Intrusion Detection/Prevention System)</strong> — Snort, Suricata.</li>
-<li><strong>SIEM (Security Information and Event Management)</strong> — Splunk, ELK (Elasticsearch + Logstash + Kibana); agregacja logów i korelacja zdarzeń.</li>
-<li><strong>EDR (Endpoint Detection and Response)</strong> — monitoring stacji końcowych.</li>
-<li>IC11  — blokowanie IP po powtórzonych próbach logowania.</li>
-<li><strong>CVE</strong> — globalny katalog podatności; <strong>CVSS (Common Vulnerability Scoring System)</strong> — punktacja krytyczności 0–10.</li>
-<li><strong>MITRE ATT&amp;CK</strong> (Adversarial Tactics, Techniques &amp; Common Knowledge) — taksonomia taktyk i technik atakujących.</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="17_autoryzacja_podpis.html">Autoryzacja, podpis</a></strong> — bezpośrednia kontynuacja: modele DAC/MAC/RBAC/ABAC, MFA, PKI (Public Key Infrastructure), podpis cyfrowy, eIDAS.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong> — anonimizacja, pseudonimizacja, maskowanie danych wrażliwych (RODO / GDPR) realizują wymóg poufności.</li>
-<li><strong><a href="10_klasyczne_ml.html">ML</a> / <a href="11_sieci_neuronowe.html">sieci neuronowe</a></strong> — ataki adversarialne, model poisoning, model stealing, membership inference; specyfika bezpieczeństwa ML.</li>
-<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong> — wybór narzędzi determinowany przez wymagania bezpieczeństwa i certyfikacje (ISO 27001, SOC 2 — Service Organization Control 2).</li>
-</ul>
+    <p>Bezpieczeństwo IT to ochrona aktywów informacyjnych przy zachowaniu funkcjonalności systemu. Projektowanie zaczyna się od <strong>modelu zagrożeń</strong>: co chronimy, przed kim i jakimi ścieżkami. Dopiero znany przeciwnik mówi, które warstwy warto wzmocnić.</p>
+
+    <h2 id="triada-cia">Triada CIA</h2>
+    <p>Trzy podstawowe cele bezpieczeństwa to <strong>poufność</strong> (dane widoczne tylko dla uprawnionych — szyfrowanie, kontrola dostępu), <strong>integralność</strong> (wykrywanie nieautoryzowanych zmian — skróty, podpisy, MAC) i <strong>dostępność</strong> (system odpowiada na żądania — redundancja, backup). Często dokłada się <strong>autentyczność</strong> i <strong>niezaprzeczalność</strong>. Wartość triady jest porządkująca: każdy mechanizm obronny da się przypisać do jednego z tych celów.</p>
+
+    <h2 id="kryptografia">Kryptografia — fundament</h2>
+    <p><strong>Funkcja skrótu</strong> jest jednokierunkowa — ze skrótu nie odtworzysz wejścia i trudno o kolizję; dlatego SHA-256 nadaje się do integralności, a złamany SHA-1 już nie. <strong>Szyfr symetryczny</strong> (jeden klucz, szybki, AES) szyfruje masowo, <strong>asymetryczny</strong> (klucz publiczny/prywatny, wolny, RSA/ECC) służy do wymiany kluczy i podpisów. Hasła przechowuje się przez celowo wolną funkcję <strong>KDF</strong> (bcrypt, Argon2) z <strong>solą</strong> — zwykły szybki skrót GPU łamie miliardami prób na sekundę.</p>
+    <p>Uwaga: szyfrowanie jest odwracalne kluczem, skrót jednokierunkowy, a kodowanie (Base64) nie chroni niczego. Dane szyfruje się w dwóch stanach: <strong>at rest</strong> (dysk) i <strong>in transit</strong> (sieć — TLS).</p>
+
+    <h2 id="os">Bezpieczeństwo systemu operacyjnego</h2>
+    <p>System operacyjny egzekwuje bezpieczeństwo przez separację uprawnień: jądro (Ring 0) ma pełny dostęp do sprzętu, procesy użytkownika (Ring 3) proszą o niego przez wywołania systemowe. Kontrola dostępu bywa <strong>uznaniowa</strong> (DAC — właściciel decyduje, uprawnienia <code>rwx</code>) albo <strong>obowiązkowa</strong> (MAC — SELinux; polityka systemowa nadpisuje wolę właściciela). Procesy izoluje się na coraz wyższych poziomach: sandbox (to samo jądro), kontener (dzieli jądro z hostem, więc nie jest twardą granicą multi-tenant) i maszyna wirtualna (własne jądro — izolacja hypervisora, najsilniejsza). Kod chroni dodatkowo <strong>hardening pamięci</strong> (ASLR, DEP/NX, stack canaries), a regułą nadrzędną jest <strong>najmniejszy przywilej</strong> — proces dostaje tylko to, czego potrzebuje.</p>
+
+    <h2 id="aplikacje">Bezpieczeństwo aplikacji</h2>
+    <p>Lista <strong>OWASP Top 10</strong> porządkuje najczęstsze klasy ryzyk aplikacji webowych — m.in. wadliwą kontrolę dostępu, wstrzyknięcia (injection) i błędną konfigurację. Trzy klasyczne ataki: <strong>SQL injection</strong> (nieoczyszczone wejście trafia do zapytania — obrona: zapytania parametryzowane), <strong>XSS</strong> (wstrzyknięty JavaScript wykonuje się w przeglądarce ofiary — obrona: escapowanie i CSP) oraz <strong>CSRF</strong> (cudza strona wykorzystuje aktywną sesję ofiary — obrona: tokeny i <code>SameSite</code>). SQLi uderza w serwer, XSS w przeglądarkę ofiary. Rośnie też waga ataków <strong>supply chain</strong> — przejęcia (naruszenia) CI/CD lub zależności (xz-utils).</p>
+
+    <h2 id="malware">Malware, phishing, DDoS</h2>
+    <p>Malware różni się sposobem działania: <strong>robak</strong> propaguje się sam przez sieć (WannaCry), <strong>trojan</strong> udaje legalny program, <strong>rootkit</strong> ukrywa się w jądrze, a <strong>ransomware</strong> szyfruje dane i żąda okupu. <strong>Phishing</strong> to atak na człowieka, nie na system — obrona to szkolenia i MFA odporne na phishing (FIDO2). <strong>DDoS</strong> zalewa usługę ruchem z wielu źródeł; broni się CDN i rate limitingiem.</p>
+
+    <h2 id="backup-narzedzia">Backup, DR i narzędzia obronne</h2>
+    <div class="viz-mount" data-viz="v16"></div>
+    <p>Reguła <strong>3-2-1</strong>: trzy kopie, dwa nośniki, jedna offsite. Przeciw ransomware kluczowe są kopie <strong>immutable</strong> lub <strong>air-gapped</strong>, a backup nieprzetestowany to brak backupu. Obronę bieżącą budują firewall i WAF, IDS/IPS, agregacja logów w SIEM oraz <strong>fail2ban</strong> blokujący adresy IP po serii nieudanych logowań.</p>
+    <p><strong>Pułapka</strong>: bezpieczeństwo to nie recytowanie listy narzędzi, lecz warstwy obrony (defense in depth) dobrane do modelu zagrożeń — pojedynczy mechanizm zawsze da się obejść, a najczęstszym wektorem masowych ataków pozostają zresztą niezałatane systemy.</p>
+    <p><strong>Zdanie zamykające</strong>: naturalną kontynuacją jest <a href="17_autoryzacja_podpis.html">autoryzacja i podpis cyfrowy</a> — modele kontroli dostępu, MFA i PKI rozwijają wątek poufności i niezaprzeczalności z triady CIA.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#triada-cia-i-model-dostepu">Triada CIA i model dostępu</a></li>
-<li><a href="#kryptografia-fundament">Kryptografia — fundament</a></li>
-<li><a href="#szyfrowanie-at-rest-in-transit-in-use">Szyfrowanie at rest / in transit / in use</a></li>
-<li><a href="#bezpieczenstwo-systemu-operacyjnego">Bezpieczeństwo systemu operacyjnego</a></li>
-<li><a href="#bezpieczenstwo-aplikacji-owasp-top-10-2025">Bezpieczeństwo aplikacji — OWASP Top 10 (2025/2021)</a></li>
-<li><a href="#klasyczne-ataki-aplikacyjne">Klasyczne ataki aplikacyjne</a></li>
-<li><a href="#malware-phishing-ddos">Malware, phishing, DDoS</a></li>
-<li><a href="#backup-i-disaster-recovery">Backup i disaster recovery</a></li>
-<li><a href="#narzedzia-obronne-i-standardy">Narzędzia obronne i standardy</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#triada-cia">Triada CIA</a></li>
+    <li><a href="#kryptografia">Kryptografia — fundament</a></li>
+    <li><a href="#os">Bezpieczeństwo systemu operacyjnego</a></li>
+    <li><a href="#aplikacje">Bezpieczeństwo aplikacji</a></li>
+    <li><a href="#malware">Malware, phishing, DDoS</a></li>
+    <li><a href="#backup-narzedzia">Backup, DR i narzędzia obronne</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

@@ -20,96 +20,41 @@
     <p class="eyebrow">Big Data i systemy rozproszone</p>
     <h1>Wydobywanie informacji z tekstu</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Text mining to wydobywanie wzorców i wiedzy z dużych korpusów dokumentów; NLP (<em>Natural Language Processing</em>) to przetwarzanie języka naturalnego (analiza morfologiczna, składniowa, semantyczna). Text mining korzysta z NLP jako narzędzia, ale jego cel jest analityczno-eksploracyjny i z definicji operuje na zbiorze dokumentów.</p>
-<h2 id="definicje-fundamentalne">Definicje fundamentalne</h2>
-<ul>
-<li><strong>Korpus</strong> - zbiór dokumentów. <strong>Dokument</strong> - pojedyncza jednostka tekstu. <strong>Słownik</strong> \(V\) - zbiór wszystkich termów występujących w korpusie.</li>
-<li><strong>Tokenizacja</strong> - podział tekstu na tokeny (słowa, podsłowa, znaki). <strong>Segmentacja zdań</strong> - osobny krok poprzedzający tokenizację (problem: skróty z kropką).</li>
-<li><strong>Stemming</strong> - heurystyczne obcinanie końcówek (Porter, Snowball); produkuje formy nieistniejące (&quot;studi&quot; z &quot;studies&quot;). <strong>Lematyzacja</strong> - sprowadzenie do formy podstawowej z użyciem słownika morfologicznego i POS (<em>Part Of Speech</em>) tagu (&quot;better&quot; → &quot;good&quot;). Dla fleksyjnego polskiego stemming niszczy znaczenie - lematyzacja (Morfeusz2, spaCy <code>pl_core_news</code>) jest standardem.</li>
-</ul>
-<h2 id="reprezentacje-tekstu">Reprezentacje tekstu</h2>
-<p><strong>BoW (<em>Bag of Words</em>)</strong> - dokument \(d\) jako wektor liczności termów \(d \in \mathbb{N}^{|V|}\). Ignoruje kolejność: &quot;pies ugryzł człowieka&quot; i &quot;człowiek ugryzł psa&quot; mają identyczną reprezentację.</p>
-<p><strong>n-gram</strong> - ciąg \(n\) kolejnych tokenów. Wprowadza częściowo kolejność (bigramy &quot;nie dobry&quot; vs &quot;bardzo dobry&quot;).</p>
-<p><strong>TF-IDF (<em>Term Frequency – Inverse Document Frequency</em>)</strong> - waga termu \(t\) w dokumencie \(d\):</p>
-<div class="mathblock">\[\text{tf}(t,d) = c(t,d), \quad \text{df}(t) = |\{d: t \in d\}|, \quad \text{idf}(t) = \log\frac{N}{\text{df}(t)}\]</div>
-<p>gdzie \(c(t,d)\) to liczba wystąpień termu \(t\) w dokumencie \(d\), \(\text{df}(t)\) to liczba dokumentów zawierających \(t\).</p>
-<div class="mathblock">\[\text{tfidf}(t,d) = \text{tf}(t,d) \cdot \text{idf}(t)\]</div>
-<p>gdzie \(N\) to liczba dokumentów. IDF tłumi termy częste w całym korpusie (stop-words), wzmacnia rzadkie i informatywne. To heurystyka, nie rozkład prawdopodobieństwa.</p>
-<p><strong>Embedding słowa</strong> - funkcja \(e: V \to \mathbb{R}^k\), gęsty wektor niskowymiarowy (\(k \approx 100\)–\(1024\)), gdzie podobieństwo semantyczne odpowiada bliskości geometrycznej. Opiera się na <strong>hipotezie dystrybucyjnej Harrisa</strong>: znaczenie słowa wynika z jego kontekstów.</p>
-<ul>
-<li><strong>word2vec / GloVe (<em>Global Vectors</em>)</strong> - embeddingi <strong>statyczne</strong> (jedno słowo = jeden wektor). word2vec uczy się z lokalnego okna kontekstu (skip-gram, CBOW - <em>Continuous Bag of Words</em>); GloVe faktoryzuje globalną macierz współwystąpień.</li>
-<li><strong>BERT (<em>Bidirectional Encoder Representations from Transformers</em>)</strong> - embeddingi <strong>kontekstowe</strong> (wektor zależy od całego zdania), więc rozróżnia homonimy (&quot;zamek królewski&quot; vs &quot;zamek błyskawiczny&quot;).</li>
-<li><strong>OOV (<em>Out Of Vocabulary</em>)</strong> - słowa spoza słownika; rozwiązanie: tokenizacja podsłowna BPE (<em>Byte-Pair Encoding</em>), WordPiece, SentencePiece.</li>
-</ul>
-<p><strong>Klątwa wymiarowości</strong>: słownik korpusu ma typowo \(10^4\)–\(10^6\) wymiarów, dokument używa &lt;1% słów - reprezentacje BoW są skrajnie rzadkie. <strong>Prawo Zipfa</strong>: częstość \(k\)-tego słowa \(\propto 1/k\) - kilka słów dominuje (stop-words), długi ogon ma 1-2 wystąpienia.</p>
-<h2 id="miary-podobienstwa">Miary podobieństwa</h2>
-<div class="viz-mount" data-viz="v13"></div>
 
-<p><strong>Metryka</strong> \(d(x,y)\) spełnia: nieujemność, identyczność (\(d(x,y)=0 \iff x=y\)), symetrię, nierówność trójkąta.</p>
-<ul>
-<li><strong>Podobieństwo kosinusowe</strong>: \(\cos(x,y) = \frac{\langle x,y \rangle}{\|x\|\cdot\|y\|}\). Niezależne od długości dokumentu (kluczowe dla BoW/TF-IDF). Kosinus to miara podobieństwa, nie odległość — sama koncepcja nierówności trójkąta nie ma zastosowania do podobieństwa. Odpowiednia odległość: \(1-\cos\) jest semi-metryką — łamie nierówność trójkąta nawet dla wektorów jednostkowych (kontrprzykład: kąty 0°, 60°, 120° dają \(d(0°,120°)=1.5>0.5+0.5\)). Pełną metryką jest <strong>odległość kątowa</strong> \(\arccos(\cos(x,y))\) albo \(\sqrt{2(1-\cos)}\) (odległość euklidesowa wektorów znormalizowanych).</li>
-<li><strong>Współczynnik Jaccarda</strong> dla zbiorów: \(J(A,B) = \frac{|A \cap B|}{|A \cup B|}\), odległość \(1-J\) jest metryką.</li>
-<li><strong>Odległość Levenshteina</strong> - minimalna liczba operacji (insert/delete/substitute) między ciągami; obliczana DP (<em>Dynamic Programming</em>): warunki brzegowe \(D[i,0]=i,\ D[0,j]=j\), a dla \(i,j\ge 1\): \(D[i,j] = \min\big(D[i-1,j]+1,\ D[i,j-1]+1,\ D[i-1,j-1]+\mathbb{1}[s_i \neq t_j]\big)\), gdzie \(\mathbb{1}[\cdot]\) to indykator (koszt substytucji 0 lub 1). Podstawa fuzzy matchingu i korekty pisowni.</li>
-</ul>
-<h2 id="probabilistyczne-modele-jezykowe">Probabilistyczne modele językowe</h2>
-<p>Rozkład prawdopodobieństwa nad ciągami tokenów: \(P(w_1,\dots,w_T) = \prod_i P(w_i \mid w_1,\dots,w_{i-1})\). Założenie Markowa rzędu \(n-1\) daje model <strong>n-gramowy</strong>: \(P(w_i \mid w_{i-n+1},\dots,w_{i-1})\).</p>
-<p><strong>MLE (<em>Maximum Likelihood Estimation</em>)</strong>: \(P(w_i \mid w_{i-1}) = \frac{c(w_{i-1}, w_i)}{c(w_{i-1})}\). Problem: zerowe zliczenia → zerowe prawdopodobieństwa całych zdań. <strong>Wygładzanie Laplace&#39;a</strong> (add-one): \(P(w_i\mid w_{i-1}) = \frac{c(w_{i-1},w_i)+1}{c(w_{i-1})+|V|}\); lepsze: Kneser-Ney.</p>
-<p><strong>Entropia Shannona</strong>: \(H(p) = -\sum p(x) \log p(x)\). <strong>Entropia krzyżowa</strong>: \(H(p,q) = -\sum p(x) \log q(x)\). <strong>Perplexity</strong> (PPL): \(\text{PPL}(W) = P(W)^{-1/T} = \exp\left(-\frac{1}{T}\sum \log P(w_i \mid \text{kontekst})\right)\). Standardowa miara modeli językowych - im niższe, tym lepsze przewidywanie.</p>
-<h2 id="klasyfikacja-tekstu">Klasyfikacja tekstu</h2>
-<p><strong>Macierz pomyłek</strong> dla klasy \(c\): TP (True Positive — poprawnie zaklasyfikowane jako \(c\)), FP (False Positive — błędnie zaklasyfikowane jako \(c\)), FN (False Negative — należące do \(c\), błędnie odrzucone), TN (True Negative — poprawnie odrzucone). <strong>Precyzja</strong> \(P = \frac{TP}{TP+FP}\), <strong>czułość</strong> \(R = \frac{TP}{TP+FN}\), <strong>F1</strong> = \(\frac{2PR}{P+R}\) (średnia harmoniczna). Dla wielu klas: makro (średnia po klasach, równe wagi), mikro (pula wszystkich predykcji), ważone (po liczności klas).</p>
-<p><strong>Naive Bayes</strong> - klasyfikator generatywny z reguły Bayesa: \(P(c \mid d) \propto P(c)\prod_i P(w_i \mid c)\), z założeniem warunkowej niezależności słów przy danej klasie. Założenie rażąco nieprawdziwe dla tekstu, ale klasyfikator działa zaskakująco dobrze jako baseline.</p>
-<p><strong>Modele dyskryminatywne</strong> modelują \(P(y \mid x)\) bezpośrednio (regresja logistyczna, SVM - <em>Support Vector Machine</em>, BERT z głowicą klasyfikacyjną); <strong>generatywne</strong> modelują \(P(x,y)\) (Naive Bayes, HMM - <em>Hidden Markov Model</em>, LDA - <em>Latent Dirichlet Allocation</em>, opisana niżej). Uwaga: GPT (<em>Generative Pretrained Transformer</em>) i autoregresyjne LLM modelują \(P(x)\) (samplowanie tokenów), nie wspólny \(P(x,y)\) jak Naive Bayes/LDA.</p>
-<p><strong>Klasteryzacja</strong> (unsupervised): k-means, hierarchiczna, DBSCAN (<em>Density-Based Spatial Clustering of Applications with Noise</em>) nad TF-IDF lub embeddingami. Brak etykiet - jakość: silhouette (wewnętrzna), ARI (<em>Adjusted Rand Index</em>) jeśli są etykiety odniesienia.</p>
-<h2 id="modele-tematyczne-i-redukcja-wymiaru">Modele tematyczne i redukcja wymiaru</h2>
-<p><strong>LSA (<em>Latent Semantic Analysis</em>)</strong>, znana też jako LSI (<em>Latent Semantic Indexing</em>) - SVD (<em>Singular Value Decomposition</em>) macierzy term-document; składowe liniowe, mogą być ujemne, brak interpretacji probabilistycznej.</p>
-<p><strong>LDA (<em>Latent Dirichlet Allocation</em>)</strong> - model generatywny: dokument to mieszanina tematów \(\theta_d \sim \text{Dir}(\alpha)\), temat to mieszanina słów \(\varphi_k \sim \text{Dir}(\beta)\), gdzie \(\text{Dir}\) to rozkład Dirichleta — rozkład prawdopodobieństwa nad sympleksem (wektory nieujemne sumujące się do 1), a \(\alpha,\beta\) to hiperparametry koncentracji. Dirichlet jest sprzężony a priori dla rozkładu wielomianowego (a posteriori też jest Dirichletem), co umożliwia wnioskowanie (Gibbs sampling, variational inference). Wynik: interpretowalne rozkłady prawdopodobieństwa nad tematami; jakość tematów ocenia się miarą spójności (topic coherence).</p>
-<h2 id="information-extraction-ie-i-information-retrieval-ir">Information Extraction (IE) i Information Retrieval (IR)</h2>
-<p><strong>IR (<em>Information Retrieval</em>)</strong> zwraca ranking dokumentów istotnych dla zapytania (wyszukiwarki, BM25 - <em>Best Matching 25</em>, dense retrieval). <strong>IE (<em>Information Extraction</em>)</strong> wydobywa strukturalne fakty: encje, relacje, krotki (&quot;Firma X przejęła Y w roku Z&quot;). IR pyta &quot;który dokument&quot;, IE - &quot;co dokument mówi&quot;.</p>
-<p><strong>NER (<em>Named Entity Recognition</em>)</strong> - tagowanie sekwencyjne: każdy token dostaje etykietę typu encji lub <code>O</code> (<em>Outside</em>) w schemacie <strong>BIO</strong> (<em>Begin-Inside-Outside</em>). To nie klasyfikacja całego dokumentu - stąd modele sekwencyjne: CRF (<em>Conditional Random Fields</em>) z globalną normalizacją \(P(y \mid x) = \frac{1}{Z(x)}\exp\!\big(\sum_{i}\sum_k \lambda_k\, f_k(y_{i-1}, y_i, x, i)\big)\), gdzie \(f_k\) to funkcje cech zależne od pary sąsiednich etykiet \(y_{i-1},y_i\) i obserwacji \(x\) na pozycji \(i\), \(\lambda_k\) to uczone wagi, a \(Z(x)=\sum_{y'}\exp(\dots)\) to funkcja partycji sumująca po wszystkich sekwencjach etykiet. BiLSTM-CRF, BERT-NER.</p>
-<p><strong>Regex vs parser vs ML</strong>: regex obsługuje wzorce regularne - daty, NIP, PESEL, kody pocztowe, e-maile w przybliżeniu. Parsery dla struktury składniowej. ML/CRF/BERT toleruje szum i generalizuje, ale wymaga adnotowanego korpusu.</p>
-<h2 id="pipeline-praktyczny-i-ekstrakcja-z-formatow">Pipeline praktyczny i ekstrakcja z formatów</h2>
-<p>Kolejność: detekcja kodowania (<code>chardet</code>) → normalizacja Unicode (NFC - <em>Normalization Form Canonical Composition</em>, NFKC - <em>Compatibility</em>) → segmentacja zdań → tokenizacja → lowercase (ostrożnie - psuje sygnał NER) → stop-words → lematyzacja. <strong>Pułapka</strong>: dopasowanie <code>TfidfVectorizer</code> na całym datasecie przed splitem - leakage; rozwiązanie: <code>Pipeline</code> z scikit-learn, <code>fit</code> tylko na treningu.</p>
-<ul>
-<li><strong>HTML (<em>HyperText Markup Language</em>)</strong>: BeautifulSoup, lxml, trafilatura. Nie używać regex do HTML.</li>
-<li><strong>PDF (<em>Portable Document Format</em>)</strong>: pdfplumber, PyMuPDF dla tekstowych; pdf2image + Tesseract dla skanów. PDF nie zna pojęcia akapitu; gubi kolejność czytania w wielokolumnowych układach.</li>
-<li><strong>CSV (<em>Comma-Separated Values</em>) / JSON (<em>JavaScript Object Notation</em>) / XML (<em>eXtensible Markup Language</em>)</strong>: pandas (<code>read_csv</code>), <code>json</code>, <code>lxml</code>/<code>xml.etree</code>.</li>
-<li><strong>OCR (<em>Optical Character Recognition</em>)</strong> - Tesseract; preprocessing obrazu (binaryzacja, deskew) podnosi skuteczność bardziej niż zmiana modelu. Generuje noisy text - błędy w polskich diakrytykach (ł→l, ż→z).</li>
-<li><strong>Web scraping</strong>: Scrapy (frameworkowe), BeautifulSoup (parsing). Dla treści renderowanej przez JavaScript - Playwright/Selenium.</li>
-<li><strong>Regex w Pythonie</strong>: walidacja NIP (<em>Numer Identyfikacji Podatkowej</em>), PESEL (<em>Powszechny Elektroniczny System Ewidencji Ludności</em>), e-maili, dat. <strong>Pandas <code>.str</code> methods</strong>: <code>df['col'].str.contains/extract/replace/lower/split</code> - wektoryzowana ekstrakcja na DataFrame&#39;ie bez pętli.</li>
-<li><strong>Kodowanie</strong>: konwersja CP1250 / ISO-8859-2 → UTF-8 (<em>Unicode Transformation Format 8-bit</em>); BOM (<em>Byte Order Mark</em>) z plików Windows.</li>
-</ul>
-<h2 id="narzedzia-python">Narzędzia Python</h2>
-<ul>
-<li><strong>NLTK (<em>Natural Language Toolkit</em>)</strong> - klasyczna biblioteka edukacyjna (tokenizacja, Porter, WordNet); wolna, słabe wsparcie poza angielskim.</li>
-<li><strong>spaCy</strong> - produkcyjny pipeline (tokenizer, lematyzer, POS tagger, parser zależnościowy, NER); modele <code>pl_core_news_sm/md/lg</code>.</li>
-<li><strong>scikit-learn</strong> - <code>CountVectorizer</code>, <code>TfidfVectorizer</code>, <code>HashingVectorizer</code> + Naive Bayes, regresja logistyczna, Linear SVM.</li>
-<li><strong>gensim</strong> - LDA, LSI, Word2Vec, FastText; streaming corpus dla danych spoza RAM (<em>Random Access Memory</em>).</li>
-<li><strong>transformers / HuggingFace</strong> - BERT, RoBERTa, <strong>HerBERT</strong> (polski, fine-tuning na PolEmo 2.0, benchmark KLEJ - <em>Kompleksowa Lista Ewaluacji Językowych</em>), XLM-R (<em>Cross-lingual Language Model RoBERTa</em>); pipeline&#39;y <code>text-classification</code>, <code>ner</code>, <code>summarization</code>.</li>
-</ul>
-<p><strong>Pułapki</strong>: limit 512 tokenów BERT (strategie: truncation, sliding window, Longformer); polska odmiana imion (&quot;Janowi&quot;, &quot;Kowalskiemu&quot;) wymaga lematyzacji przed deduplikacją; tokenizer musi rozumieć &quot;Sp. z o.o.&quot;, &quot;ul.&quot;.</p>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="02_preprocessing.html">preprocessing</a></strong> - text mining specjalizuje preprocessing pod dane nieustrukturyzowane.</li>
-<li><strong><a href="10_klasyczne_ml.html">klasyczne ML</a></strong> - Naive Bayes, regresja logistyczna, SVM jako baseline na BoW/TF-IDF.</li>
-<li><strong><a href="11_sieci_neuronowe.html">sieci neuronowe</a></strong> - RNN (<em>Recurrent Neural Network</em>), LSTM (<em>Long Short-Term Memory</em>), Transformer, BERT, mechanizm uwagi (attention).</li>
-<li><strong><a href="07_mapreduce.html">MapReduce</a></strong> - word count to kanoniczny &quot;hello world&quot; MapReduce; indeksowanie odwrócone.</li>
-<li><strong><a href="12_modele_wielowymiarowe.html">modele wielowymiarowe</a></strong> - reprezentacje wektorowe tekstu są wysokowymiarowe; redukcja przez LSA/SVD, LDA, PCA (<em>Principal Component Analysis</em>), t-SNE (<em>t-distributed Stochastic Neighbor Embedding</em>).</li>
-<li><strong><a href="03_regresja_liniowa.html">regresja w zastosowaniach</a></strong> - regresja logistyczna jako klasyfikator, regresja liniowa do predykcji ciągłych z cech tekstowych.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">estymatory</a></strong> - prawdopodobieństwa w modelach językowych to estymatory; wygładzanie Laplace&#39;a / Gooda-Turinga radzi sobie z obciążeniem MLE dla rzadkich zdarzeń.</li>
-<li><strong><a href="09_porownanie_modelowania.html">porównanie modelowania</a></strong> - text mining stoi w kontrze do modelowania na danych tabelarycznych: rzadkie macierze TF-IDF vs gęste tabele, podobieństwo kosinusowe vs euklidesowe.</li>
-</ul>
+    <p><strong>Text mining</strong> to wydobywanie wzorców i wiedzy z dużych korpusów dokumentów; <strong>NLP</strong> (przetwarzanie języka naturalnego) dostarcza mu narzędzi analizy morfologicznej, składniowej i semantycznej. Różnica celu: NLP rozumie pojedynczy tekst, text mining eksploruje cały zbiór.</p>
+
+    <h2 id="reprezentacje">Reprezentacje tekstu</h2>
+    <p>Podstawowe pojęcia: <strong>korpus</strong> to zbiór dokumentów, <strong>dokument</strong> to jednostka tekstu, słownik \(V\) to zbiór wszystkich termów. Surowy tekst trzeba najpierw <strong>stokenizować</strong> (podzielić na słowa) i sprowadzić do formy podstawowej. Dla fleksyjnego języka polskiego <strong>stemming</strong> (heurystyczne obcinanie końcówek) niszczy znaczenie, więc standardem jest <strong>lematyzacja</strong> z użyciem słownika morfologicznego (Morfeusz2, spaCy).</p>
+    <p>Aby prowadzić obliczenia na tekście, trzeba go zamienić w wektory. <strong>BoW</strong> (<em>bag of words</em>) reprezentuje dokument jako wektor liczności termów, ignorując kolejność — „pies ugryzł człowieka” i „człowiek ugryzł psa” dają identyczne wektory. <strong>TF-IDF</strong> waży term jego rzadkością w korpusie:</p>
+    <div class="mathblock">\[\text{idf}(t)=\log\frac{N}{\text{df}(t)},\qquad \text{tfidf}(t,d)=\text{tf}(t,d)\cdot\text{idf}(t)\]</div>
+    <p>gdzie \(N\) to liczba dokumentów, a \(\text{df}(t)\) — liczba tych, które zawierają term. IDF tłumi słowa częste (stop-words), a wzmacnia rzadkie i informatywne. <strong>Embeddingi</strong> (word2vec, BERT) idą o krok dalej: to gęste wektory, w których bliskość geometryczna oddaje podobieństwo znaczeń, bo — zgodnie z hipotezą dystrybucyjną — znaczenie słowa wynika z jego kontekstów.</p>
+
+    <h2 id="miary-podobienstwa">Miary podobieństwa</h2>
+    <div class="viz-mount" data-viz="v13"></div>
+    <p>Dokumenty porównujemy <strong>podobieństwem kosinusowym</strong>:</p>
+    <div class="mathblock">\[\cos(x,y)=\frac{\langle x,y\rangle}{\|x\|\,\|y\|}\]</div>
+    <p>Jest ono niezależne od długości dokumentu, co jest kluczowe dla rzadkich wektorów BoW/TF-IDF — liczy się kierunek, nie skala. Do porównywania zbiorów słów służy współczynnik Jaccarda, a do bliskości napisów (korekta pisowni, dopasowanie przybliżone) — odległość edycyjna.</p>
+
+    <h2 id="klasyfikacja">Klasyfikacja i modele tematyczne</h2>
+    <p>Mając wektory, uczymy klasyfikatory. <strong>Naive Bayes</strong> to szybki punkt odniesienia (baseline) generatywny: zakłada niezależność słów w klasie — założenie fałszywe, a mimo to działa zaskakująco dobrze. Silniejsze są modele dyskryminacyjne (regresja logistyczna, SVM, BERT z głowicą klasyfikacyjną). Jakość mierzymy precyzją, czułością i F1. Bez etykiet zostaje <strong>klasteryzacja</strong> (k-means, DBSCAN) na wektorach TF-IDF lub embeddingach.</p>
+    <p>Osobno stoją <strong>modele tematyczne</strong>, odkrywające ukryte tematy w korpusie: <strong>LSA</strong> to algebraiczna redukcja wymiaru macierzy term-dokument, a <strong>LDA</strong> modeluje dokument jako mieszaninę tematów, a temat jako rozkład na słowach — daje interpretowalne, probabilistyczne tematy.</p>
+
+    <h2 id="ie-ir">Information Extraction i Information Retrieval</h2>
+    <p>Dwa zadania łatwo pomylić. <strong>IR</strong> (<em>information retrieval</em>) zwraca ranking dokumentów istotnych dla zapytania — to robi wyszukiwarka. <strong>IE</strong> (<em>information extraction</em>) wydobywa z tekstu ustrukturyzowane fakty: encje i relacje („Firma X przejęła Y w roku Z”). IR pyta „który dokument”, IE — „co dokument mówi”. Sztandarowe zadanie IE to <strong>NER</strong> (rozpoznawanie nazw własnych), realizowane jako tagowanie sekwencyjne każdego tokenu.</p>
+
+    <h2 id="pipeline">Pipeline praktyczny i narzędzia</h2>
+    <p>Praktyczny pipeline jest zawsze podobny: ekstrakcja tekstu ze źródła (BeautifulSoup dla HTML, pdfplumber dla PDF, Tesseract-OCR dla skanów, pandas dla CSV/JSON) → normalizacja kodowania do UTF-8 → segmentacja zdań i tokenizacja → lematyzacja i usunięcie słów nieznaczących (stop-words) → wektoryzacja TF-IDF lub embedding → klasyfikacja, NER albo wyszukiwanie. W Pythonie: <strong>spaCy</strong> do pipeline'u językowego, <strong>scikit-learn</strong> do wektoryzacji i klasycznych modeli, <strong>gensim</strong> do LDA, <strong>HuggingFace transformers</strong> do modeli BERT (dla polskiego HerBERT).</p>
+    <p><strong>Pułapka</strong>: dopasowanie <code>TfidfVectorizer</code> na całym zbiorze przed podziałem na train/test to wyciek danych (leakage) — statystyki IDF muszą pochodzić tylko z treningu; rozwiązaniem jest <code>Pipeline</code> scikit-learn z <code>fit</code> wyłącznie na treningu.</p>
+    <p><strong>Zdanie zamykające</strong>: text mining to specjalizacja klasycznego preprocessingu i ML pod dane nieustrukturyzowane — rzadkie macierze TF-IDF i podobieństwo kosinusowe zastępują gęste tabele i odległość euklidesową znaną z danych tabelarycznych.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#definicje-fundamentalne">Definicje fundamentalne</a></li>
-<li><a href="#reprezentacje-tekstu">Reprezentacje tekstu</a></li>
-<li><a href="#miary-podobienstwa">Miary podobieństwa</a></li>
-<li><a href="#probabilistyczne-modele-jezykowe">Probabilistyczne modele językowe</a></li>
-<li><a href="#klasyfikacja-tekstu">Klasyfikacja tekstu</a></li>
-<li><a href="#modele-tematyczne-i-redukcja-wymiaru">Modele tematyczne i redukcja wymiaru</a></li>
-<li><a href="#information-extraction-ie-i-information-retrieval-ir">Information Extraction (IE) i Information Retrieval (IR)</a></li>
-<li><a href="#pipeline-praktyczny-i-ekstrakcja-z-formatow">Pipeline praktyczny i ekstrakcja z formatów</a></li>
-<li><a href="#narzedzia-python">Narzędzia Python</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#reprezentacje">Reprezentacje tekstu</a></li>
+    <li><a href="#miary-podobienstwa">Miary podobieństwa</a></li>
+    <li><a href="#klasyfikacja">Klasyfikacja i modele tematyczne</a></li>
+    <li><a href="#ie-ir">Information Extraction i Retrieval</a></li>
+    <li><a href="#pipeline">Pipeline praktyczny i narzędzia</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

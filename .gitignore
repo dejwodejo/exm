@@ -6,3 +6,6 @@
 # uv / Python dev env
 .venv/
 __pycache__/
+
+# Scratch: PDF page renders
+tmp/

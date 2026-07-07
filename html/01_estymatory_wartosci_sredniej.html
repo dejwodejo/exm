@@ -20,104 +20,50 @@
     <p class="eyebrow">Próbkowanie i estymacja</p>
     <h1>Estymatory wartości średniej</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="obciazenie-i-wariancja-estymatorow">Obciążenie i wariancja estymatorów</h2>
-<p>Niech \(\hat\theta\) będzie estymatorem parametru \(\theta\)</p>
-<ul>
-<li><p><strong>Obciążenie</strong> (bias): \(B(\hat\theta)=E(\hat\theta)-\theta\),</p>
-</li>
-<li><p><strong>Wariancja</strong>: \(Var(\hat\theta)=E\left[(\hat\theta-E(\hat\theta))^2\right]\),</p>
-</li>
-<li><p><strong>Błąd średniokwadratowy</strong> (MSE):</p>
-</li>
-</ul>
-<div class="mathblock">\[\text{MSE}(\hat{\theta}) = E\left[(\hat{\theta} - \theta)^2\right] = \text{Var}(\hat{\theta}) + B(\hat{\theta})^2\]</div>
-<ul>
-<li><strong>Względny pierwiastek MSE</strong> (RRMSE — Relative Root MSE):</li>
-</ul>
-<div class="mathblock">\[\text{RRMSE}(\hat{\theta}) = \frac{\sqrt{\text{MSE}(\hat{\theta})}}{\theta}\]</div>
-<p>  Klasyczny <strong>RMSE</strong> (Root Mean Square Error) \(= \sqrt{\text{MSE}}\) bez dzielenia przez \(\theta\) — używany gdy skala parametru ustalona; RRMSE pozwala porównywać estymatory różnych wielkości.</p>
-<p>Obciążenie to systematyczny błąd - estymator <em>celuje</em> w zły punkt. W wielu estymatorach projektowych obciążenie skończonopróbkowe może jednak maleć i zanikać asymptotycznie. Można je zredukować przez poprawny schemat losowania lub kalibrację. <strong>Wariancja</strong> mierzy niestabilność estymatora między różnymi realizacjami próby i maleje gdy \(n \rightarrow \infty\). \(MSE\) jest kompromisem , można mieć obciążony estymator o bardzo małej wariancji, który mimo to ma mniejszy \(MSE\)  niż nieobciążony o dużej wariancji. </p>
-<h2 id="estymator-horvitza-thompsona">Estymator Horvitza-Thompsona</h2>
-<p>Niech \(U={1,2,...,N}\) będzie populacją skończoną a \(s\subseteq U\) próbą losową wybraną zgodnie z pewnym schematem losowania \(p(\cdot)\). Prawdopodobieństwo włączenia pierwszego rzędu jednostki \(i\) definiujemy jako</p>
-<div class="mathblock">\[\pi_i=P(i\in s)=\sum_{s\,:\,i\in s}p(s)\]</div>
-<p>Estymator HT łącznej wartości cechy \(Y=\sum_{i\in U} y_i\) ma postać</p>
-<div class="mathblock">\[\hat Y_{HT}=\sum_{i\in s}\frac{y_i}{\pi_i}=\sum_{i\in s}w_iy_i\]</div>
-<p>gdzie \(w_i=\pi_i^{-1}\) jest wagą projektową jednostki \(i\). Dla średniej populacyjnej \(\bar Y=\dfrac{Y}{N}\)</p>
-<div class="mathblock">\[\bar Y_{HT}=\dfrac{1}{N}\sum_{i\in s}\dfrac{y_i}{\pi_i},\]</div>
-<p>Każda jednostka z próby reprezentuje \(\pi_i^{-1}\) jednostek w populacji - tyle, ile ważałaby, gdyby “mówiła w imieniu” wszystkich podobnych do siebie. Jednostka z małym \(\pi_i\) (mała szansa na wylosowanie) dostaje dużą wagę, bo reprezentuje wiele jednostek, które nie znalazłyby się w próbie.</p>
-<p><strong>Nieobciążoność.</strong> Zapisując estymator przez wskaźnik przynależności do próby, \(\hat Y_{HT}=\sum_{i\in U}\frac{y_i}{\pi_i}\,\mathbb{1}[i\in s]\), i korzystając z \(E\big(\mathbb{1}[i\in s]\big)=\pi_i\):</p>
-<div class="mathblock">\[E(\hat Y_{HT})=\sum_{i\in U}\frac{y_i}{\pi_i}\,\pi_i=\sum_{i\in U}y_i=Y,\]</div>
-<p>przy założeniu \(\pi_i>0\) dla każdego \(i\in U\) (każda jednostka musi mieć dodatnią szansę wejścia do próby).</p>
-<p>Populacja \(N=4\) firm o przychodach \(y=(10,50,20,80)\) mln zł. Schemat losowania \(\pi=(0.1,0.5,0.2,0.8)\). Wylosowano próbę \(s=\{2,4\}\).</p>
-<div class="mathblock">\[\hat Y_{HT}=\dfrac{50}{0.5}+\dfrac{80}{0.8} = 100+100 =200 
-\text{ mln zł}.\]</div>
-<p>Prawdziwa suma \(Y=10+50+20+80=160\) mln zł. W tej realizacji próby estymator dał zawyżony wynik. Nieobciążoność oznacza poprawność <strong>w średniej po wszystkich możliwych próbach</strong>.</p>
-<h2 id="estymator-ilorazowy-i-regresyjny">Estymator ilorazowy i regresyjny</h2>
-<p>Zakładamy, że dla każdej jednostki \(i\) znana jest zmienna pomocnicza \(x_i\) i znana jest też łączna wartość populacyjna \(X=\sum_{i\in U}x_i\) (lub średnia \(\bar X\)),</p>
-<p>Estymator ilorazowy </p>
-<div class="mathblock">\[\hat Y_R=\dfrac{\hat Y}{\hat X}\cdot X=\hat R\cdot X\]</div>
-<p>gdzie \(\hat Y,\hat X\) to zwykłe estymatory (np. Horvitza-Thompsona) totali \(Y,X\) z próby, a \(\hat R=\dfrac{\bar y}{\bar x}=\dfrac{\sum_{i\in s}y_i/n}{\sum_{i\in s}x_i/n}\) </p>
-<p>Estymator ilorazowy zakłada, że stosunek \(\dfrac{Y}{X}\) jest w przybliżeniu stały w populacji, \(y_i≈R\cdot x_i\). Koryguje szacunek, wykorzystując fakt, że wiemy, ile powinniśmy zaobserwować dla \(x\). Estymator regresyjny jest bardziej elastyczny, zakłada liniową zależność \(y_i≈\alpha+\beta x_i\) i koryguje szacunek o odchylenie obserwowanej średniej \(\bar x\) od populacyjnej \(\bar X\).</p>
-<p><strong>Uwaga projektowa</strong>: przy nierównych prawdopodobieństwach losowania wersje ilorazowe i regresyjne powinny bazować na estymatorach ważonych/HT, np. <code>Y_HT / X_HT</code>, a nie na zwykłych średnich, chyba że schemat jest samoważący.</p>
-<p><strong>Estymator regresyjny</strong> (jednowymiarowy): \(\hat{\bar Y}_{reg} = \bar y + \hat\beta(\bar X - \bar x)\), gdzie \(\hat\beta = \sum (x_i - \bar x)(y_i - \bar y)/\sum(x_i - \bar x)^2\) z metody najmniejszych kwadratów (OLS — Ordinary Least Squares) na próbie. Asymptotycznie nieobciążony, w skończonej próbie obciążony rzędu \(O(1/n)\). Wariancja niższa niż HT, gdy \(y_i\) silnie koreluje z \(x_i\). <strong>Estymator ilorazowy</strong> \(\hat{\bar Y}_{rat} = \bar y \cdot \bar X / \bar x\) jest specjalnym przypadkiem regresyjnego z \(\hat\beta = R\) (też obciążony rzędu \(O(1/n)\)).</p>
-<h2 id="estymator-prosty-vs-wazony">Estymator prosty vs. ważony</h2>
-<div class="viz-mount" data-viz="v01"></div>
 
-<p><strong>Estymator prosty (naiwny)</strong> średniej to zwykła średnia arytmetyczna z próby, traktująca wszystkie obserwacje jednakowo</p>
-<div class="mathblock">\[\bar Y_{s}=\bar y=\dfrac{1}{n}\sum_{i\in s}y_i\]</div>
-<p><strong>Estymator ważony</strong> </p>
-<div class="mathblock">\[\bar Y_w=\dfrac{\sum_{i\in s} w_iy_i}{\sum_{i\in s} w_i}\]</div>
-<p>Estymator prosty zakłada, że każda jednostka w próbie ma identyczne prawdopodobieństwo inkluzji. Gdy schemat losowania jest złożony, ignorowanie wag prowadzi do systematycznego błędu. Estymator ważony przywraca reprezentatywność populacyjną, przypisując każdej jednostce ciężar.</p>
-<p>W losowaniu warstwowym waga jednostki z warstwy \(h\) to \(w_i=N_h/n_h\), więc \(\bar Y_w\) redukuje się do estymatora warstwowego \(\hat{\bar Y}_{st}=\dfrac{1}{N}\sum_h N_h\bar y_h=\sum_h W_h\bar y_h\), gdzie \(W_h=N_h/N\) — dokładnie wzór z przykładu poniżej.</p>
-<p>Uwaga: estymator średniej HT (\(\bar Y_{HT}=\frac{1}{N}\sum_{i\in s}y_i/\pi_i\)) dzieli przez znane \(N\), a \(\bar Y_w\) z wagami \(w_i=\pi_i^{-1}\) — przez wylosowaną sumę wag \(\sum_i w_i=\hat N\) (to estymator Hájka). Pokrywają się, gdy \(\sum_i w_i=N\).</p>
-<h3 id="przyklad">Przykład</h3>
-<p>Badanie dochodów w dwóch warstwach:</p>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Warstwa</th>
-<th><code>N_h</code></th>
-<th><code>n_h</code></th>
-<th><code>ybar_h</code></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Biedna</td>
-<td>800</td>
-<td>20</td>
-<td>2 000 zł</td>
-</tr>
-<tr>
-<td>Bogata</td>
-<td>200</td>
-<td>80</td>
-<td>8 000 zł</td>
-</tr>
-</tbody></table></div>
-<p>Estymator <strong>prosty</strong>: \(\bar{y} = (20 \cdot 2000 + 80 \cdot 8000)/100 = 6800\) zł — drastycznie zawyżony, bo bogata warstwa jest nadreprezentowana w próbie.</p>
-<p>Estymator <strong>ważony</strong> (warstwowy):</p>
-<div class="mathblock">\[\hat{\bar{Y}}_{st} = \frac{800}{1000} \cdot 2000 + \frac{200}{1000} \cdot 8000 = 1600 + 1600 = 3200 \text{ zł}\]</div>
-<h2 id="dobor-estymatora-w-zaleznosci-od-schematu-losowania">Dobór estymatora w zależności od schematu losowania</h2>
-<h3 id="definicja-formalna">Definicja formalna</h3>
-<p>Schemat losowania \(p(s)\) determinuje klasę dopuszczalnych estymatorów i ich własności. Oznaczenia we wzorach na wariancję: \(f=n/N\) (frakcja losowania), \(S^2=\frac{1}{N-1}\sum_{i\in U}(y_i-\bar Y)^2\) (wariancja populacyjna cechy); \(f_h=n_h/N_h\) oraz \(S_h^2\) to ich odpowiedniki w warstwie \(h\). Podstawowe schematy i przypisane im estymatory:</p>
-<p><strong>SRSWOR</strong> (Simple Random Sampling Without Replacement):</p>
-<div class="mathblock">\[\pi_i = n/N \quad \forall i \implies \hat{\bar{Y}}_{SRS} = \bar{y}, \quad \text{Var}(\bar{y}) = \frac{1-f}{n}S^2\]</div>
-<p><strong>Warstwowe losowanie proporcjonalne</strong> (stratified, proportional allocation \(n_h = n \cdot N_h/N\)):</p>
-<div class="mathblock">\[\hat{\bar{Y}}_{st} = \sum_{h=1}^H W_h \bar{y}_h, \quad W_h = N_h/N, \quad \text{Var}(\hat{\bar{Y}}_{st}) = \sum_h W_h^2 \frac{1-f_h}{n_h}S_h^2\]</div>
-<p><strong>Losowanie PPS</strong> (Probability Proportional to Size — prawdopodobieństwo proporcjonalne do rozmiaru; \(\pi_i = n x_i / X\) nie jest ogólnie inkluzją w losowaniu ze zwracaniem. W schemacie Hansena-Hurwitza losujemy z prawdopodobieństwem pojedynczego losowania <code>p_i=x_i/X</code>, a inkluzja po <code>n</code> losowaniach wynosi <code>1-(1-p_i)^n</code>. Zapis <code>n x_i/X</code> jest przybliżeniem albo specjalnym celem projektowym dla PPS bez zwracania, wymagającym \(\pi_i\le 1\) dla wszystkich jednostek):</p>
-<div class="mathblock">\[\hat{Y}_{HT} = \sum_{i \in s} \frac{y_i}{\pi_i} = \frac{X}{n}\sum_{i \in s}\frac{y_i}{x_i}\]</div>
-<p>Wariancja <strong>wynosi 0</strong> gdy \(y_i = c \cdot x_i\) dla pewnej stałej \(c\) — HT zwraca dokładną wartość \(Y\) niezależnie od próby.</p>
-<p><strong>Losowanie wielostopniowe</strong> (dwustopniowe: najpierw losujemy jednostki I stopnia — PSU, Primary Sampling Unit, np. gminy; potem wewnątrz nich jednostki II stopnia — SSU, Secondary Sampling Unit, np. gospodarstwa). Wariancja rozkłada się na dwa składniki:</p>
-<div class="mathblock">\[\text{Var}(\hat{Y}) = \underbrace{\text{Var}_{\text{między PSU}}}_{\text{losowanie jednostek I stopnia}} + \underbrace{\text{Var}_{\text{wewnątrz PSU}}}_{\text{losowanie jednostek II stopnia}}\]</div>
-<p>Zwykle dominuje składnik między-PSU, więc o precyzji decyduje przede wszystkim liczba wylosowanych PSU, a nie liczba SSU w każdej z nich.</p>
-<p>Schemat losowania decyduje o tym, <em>jakie informacje</em> można wyciągnąć z próby. Estymator musi być spójny ze schematem — ignorowanie struktury schematu prowadzi do błędnych wniosków.  <strong>Estymator powinien odzwierciedlać mechanizm, który wygenerował dane</strong>.</p>
+    <p>Chcemy oszacować średnią (lub sumę) pewnej cechy w populacji, dysponując tylko wylosowaną próbą. Kluczowa intuicja całego zagadnienia: <strong>estymator musi odpowiadać schematowi losowania</strong>. Jeśli wszystkie jednostki mają równą szansę trafienia do próby, wystarczy zwykła średnia arytmetyczna; jeśli szanse są różne, trzeba użyć wag, inaczej wynik będzie systematycznie przekłamany.</p>
+
+    <h2 id="obciazenie-wariancja-mse">Obciążenie, wariancja, MSE</h2>
+    <p>Jakość estymatora \(\hat\theta\) parametru \(\theta\) oceniamy trzema pojęciami. <strong>Obciążenie</strong> \(B(\hat\theta)=E(\hat\theta)-\theta\) to błąd systematyczny — estymator średnio celuje w zły punkt. <strong>Wariancja</strong> \(\text{Var}(\hat\theta)\) mierzy jego niestabilność między różnymi realizacjami próby i maleje, gdy \(n\) rośnie. Łączy je <strong>błąd średniokwadratowy</strong> (MSE):</p>
+    <div class="mathblock">\[\text{MSE}(\hat{\theta}) = E\left[(\hat{\theta} - \theta)^2\right] = \text{Var}(\hat{\theta}) + B(\hat{\theta})^2\]</div>
+
+    <h2 id="estymator-prosty-a-wazony">Estymator prosty a ważony</h2>
+    <div class="viz-mount" data-viz="v01"></div>
+    <p><strong>Estymator prosty (naiwny)</strong> to zwykła średnia z próby, \(\bar y=\dfrac{1}{n}\sum_{i\in s}y_i\), traktująca wszystkie obserwacje jednakowo. Jest poprawny tylko wtedy, gdy każda jednostka miała identyczne prawdopodobieństwo włączenia do próby. <strong>Estymator ważony</strong> przywraca reprezentatywność, przypisując jednostkom wagi:</p>
+    <div class="mathblock">\[\bar Y_w=\dfrac{\sum_{i\in s} w_iy_i}{\sum_{i\in s} w_i}\]</div>
+    <p>W losowaniu warstwowym wagą jednostki z warstwy \(h\) jest \(w_i=N_h/n_h\), więc estymator ważony redukuje się do średniej warstwowej \(\hat{\bar Y}_{st}=\sum_h W_h\bar y_h\), gdzie \(W_h=N_h/N\).</p>
+
+    <h3 id="przyklad">Przykład</h3>
+    <p>Badamy dochody w dwóch warstwach:</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Warstwa</th><th>\(N_h\)</th><th>\(n_h\)</th><th>\(\bar y_h\)</th></tr></thead>
+      <tbody>
+        <tr><td>Biedna</td><td>800</td><td>20</td><td>2 000 zł</td></tr>
+        <tr><td>Bogata</td><td>200</td><td>80</td><td>8 000 zł</td></tr>
+      </tbody>
+    </table></div>
+    <p>Estymator <strong>prosty</strong>: \(\bar{y} = (20 \cdot 2000 + 80 \cdot 8000)/100 = 6800\) zł — drastycznie zawyżony, bo bogata warstwa jest nadreprezentowana w próbie. Estymator <strong>ważony</strong>:</p>
+    <div class="mathblock">\[\hat{\bar{Y}}_{st} = \tfrac{800}{1000} \cdot 2000 + \tfrac{200}{1000} \cdot 8000 = 3200 \text{ zł}\]</div>
+    <p>czyli wartość poprawną. Sama liczność próby tego nie ratuje — o poprawności decyduje uwzględnienie wag.</p>
+
+    <h2 id="estymator-horvitza-thompsona">Estymator Horvitza–Thompsona</h2>
+    <p>Uogólnieniem wag jest estymator Horvitza–Thompsona. Jeśli jednostka \(i\) ma prawdopodobieństwo włączenia \(\pi_i=P(i\in s)\), to jej wagą jest \(w_i=1/\pi_i\), a estymator sumy cechy \(Y=\sum_{i\in U}y_i\) ma postać:</p>
+    <div class="mathblock">\[\hat Y_{HT}=\sum_{i\in s}\frac{y_i}{\pi_i}=\sum_{i\in s}w_iy_i\]</div>
+    <p>Intuicja: każda wylosowana jednostka reprezentuje \(1/\pi_i\) jednostek populacji. Jednostka o małej szansie wylosowania dostaje dużą wagę, bo „mówi w imieniu” wielu podobnych, które do próby nie trafiły. Takie nierówne prawdopodobieństwa często wprowadza się celowo — na przykład losując firmy proporcjonalnie do ich rozmiaru — i HT jest wtedy naturalnym estymatorem, który to zniekształcenie (obciążenie) koryguje. HT jest nieobciążony pod warunkiem, że każda jednostka ma dodatnią szansę wejścia (\(\pi_i>0\)) — inaczej część populacji byłaby z góry niereprezentowana.</p>
+
+    <h2 id="estymator-ilorazowy-i-regresyjny">Estymator ilorazowy i regresyjny</h2>
+    <p>Gdy dla każdej jednostki znamy dodatkową <strong>zmienną pomocniczą</strong> \(x_i\), a jej sumę populacyjną \(X=\sum_{i\in U}x_i\) znamy z rejestru, możemy poprawić szacunek. <strong>Estymator ilorazowy</strong> zakłada, że stosunek \(y/x\) jest w populacji w przybliżeniu stały (\(y_i\approx R\,x_i\)) i koryguje wynik, wykorzystując znaną wartość \(X\):</p>
+    <div class="mathblock">\[\hat Y_R=\dfrac{\hat Y}{\hat X}\cdot X=\hat R\cdot X\]</div>
+    <p><strong>Estymator regresyjny</strong> jest elastyczniejszy — zakłada zależność liniową między \(y\) a \(x\) i koryguje średnią próby o odchylenie \(\bar x\) od znanej populacyjnej \(\bar X\). Im silniej \(y\) koreluje z \(x\), tym większy zysk (niższą wariancję) dają oba. Przykład: szacując łączny plon, jako \(x\) bierzemy powierzchnię pól znaną z rejestru — skoro plon rośnie mniej więcej proporcjonalnie do areału, korekta ilorazowa wyraźnie zbija wariancję.</p>
+    <p><strong>Zdanie zamykające</strong>: wspólny wniosek to zasada, że estymator powinien odzwierciedlać mechanizm, który wygenerował dane. To łączy całe zagadnienie ze schematami losowania — dobór schematu i dobór estymatora to dwie strony tej samej decyzji projektowej.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#obciazenie-i-wariancja-estymatorow">Obciążenie i wariancja estymatorów</a></li>
-<li><a href="#estymator-horvitza-thompsona">Estymator Horvitza-Thompsona</a></li>
-<li><a href="#estymator-ilorazowy-i-regresyjny">Estymator ilorazowy i regresyjny</a></li>
-<li><a href="#estymator-prosty-vs-wazony">Estymator prosty vs. ważony</a></li>
-<li><a href="#dobor-estymatora-w-zaleznosci-od-schematu-losowania">Dobór estymatora w zależności od schematu losowania</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#obciazenie-wariancja-mse">Obciążenie, wariancja, MSE</a></li>
+    <li><a href="#estymator-prosty-a-wazony">Estymator prosty a ważony</a></li>
+    <li><a href="#estymator-horvitza-thompsona">Estymator Horvitza–Thompsona</a></li>
+    <li><a href="#estymator-ilorazowy-i-regresyjny">Estymator ilorazowy i regresyjny</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

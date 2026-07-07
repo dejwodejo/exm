@@ -20,105 +20,55 @@
     <p class="eyebrow">Przygotowanie danych i modele klasyczne</p>
     <h1>Wstępne przetwarzanie danych</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="etapy-preprocessingu">Etapy preprocessingu</h2>
-<ol>
-<li>Czyszczenie - usuwanie szumu, braku danych, duplikatów, niespójnych formatów,</li>
-<li>Integracja - łączenie danych z różnych źródeł, rozwiązując konflikty schematów i redundancję (np. tabela klientów z CRM (Customer Relationship Management) + tabela transakcji z bazy zamówień - trzeba uzgodnić klucze, typy i jednostki),</li>
-<li>Transformacja - przygotowuje dane do modelowania przez normalizację, kodowanie i agregację,</li>
-<li>Redukcja zmniejsza wolumen bez istotnej utraty informacji - mniej cech, mniej próbek, mniejsza precyzja tam gdzie nie jest potrzebna.</li>
-</ol>
-<h2 id="braki-danych">Braki danych</h2>
-<ol>
-<li><strong>MCAR <em>(Missing Completely At Random)</em></strong> - prawdopodobieństwo braku nie zależy od żadnych danych, ani obserwowanych, ani nieobserwowanych np, ankietowany przypadkowo pomija pytanie, bo przewrócił stronę. Nawet proste usunięcie wierszy daje nieobciążone estymatory, choć tracimy moc statystyczną.</li>
-<li><strong>MAR <em>(Missing At Random)</em></strong> - brak zależy od zmiennych obserwowanych, ale nie od samej brakującej wartości np. młodsi respondenci częściej pomijają pytanie o dochód, brak więc zależy od wieku (obserwowanego), nie od samego dochodu. Zwykłe usunięcie wierszy zwykle daje obciążenie; wyjątkiem są modele warunkowe, w których mechanizm braku zależy tylko od uwzględnionych kowariatów. Imputacja warunkowa (np. modelując brak na podstawie wieku) jest wtedy poprawnym kierunkiem.</li>
-<li><strong>MNAR <em>(Missing Not At Random)</em></strong> - brak zależy od samej brakującej wartości np. osoby z bardzo wysokim dochodem odmawiają odpowiedzi na pytanie właśnie z powodu wysokości swojego dochodu. Żadna standardowa imputacja nie rozwiąże problemu w pełni.</li>
-</ol>
-<h2 id="metody-imputacji">Metody imputacji</h2>
-<ol>
-<li><strong>Proste</strong>: usunięcie wierszy/kolumn, imputacja średnią/medianą/modą.</li>
-<li><strong>Imputacja warunkowa</strong>: regresja (przewidujemy brakującą wartość z pozostałych zmiennych), \(k-NN\) (bierzemy wartości od \(k\)-najbardziej podobnych obserwacji), imputacja gorącym talerzem (losowy dobór dawcy z podobnej grupy),</li>
-<li><strong>Wielokrotna imputacja</strong>: generujemy \(m\) zestawów danych z imputowanymi wartościami, każdy z pewną losowością. Modelujemy na każdym osobno, a wyniki agregujemy <strong>regułami Rubina</strong>: estymator łączony to średnia z \(m\) imputacji \(\bar\theta = \frac{1}{m}\sum_j \hat\theta_j\), a wariancję łączy się jako \(T = \bar W + (1 + \tfrac{1}{m})\,B\), gdzie \(\bar W\) to średnia wariancja <em>wewnątrz</em> imputacji, a \(B = \frac{1}{m-1}\sum_j (\hat\theta_j - \bar\theta)^2\) to wariancja <em>między</em> imputacjami. Człon \((1+\tfrac{1}{m})B\) oddaje niepewność wynikającą z samego braku danych. Złoty standard.</li>
-</ol>
-<h2 id="wartosci-odstajace-outliers">Wartości odstające (<em>outliers</em>)</h2>
-<h3 id="metoda-iqr-interquartile-range">Metoda IQR (<em>InterQuartile Range</em>)</h3>
-<p>Zbiór dzielimy na kwartyle \(Q1\) (pierwszy kwartyl, 25 percentyl) - wartość, poniżej której leży \(25\%\) danych. \(Q3\) (trzeci kwartyl, 75. percentyl) — wartość, poniżej której leży 75% danych. \(IQR\) to rozstęp międzykwartylowy, czyli \(IQR=Q3-Q1\), co mówi nam jak “szeroko” rozłożone jest środkowe \(50\%\) danych. Teraz definiujemy granice (tzw. ogrodzenia Tukeya):</p>
-<ul>
-<li>dolna granica = \(Q1 − 1.5 · IQR\),</li>
-<li>górna granica = \(Q3 + 1.5 · IQR\).</li>
-</ul>
-<p>Każda obserwacja poza nimi, to outlier. Współczynnik \(1.5\) nie wynika z żadnego twierdzenia, to konwencja zaproponowana przez Tukeya, która dobrze działa w praktyce. </p>
-<p>Metoda \(IQR\)  jest <strong>nieparametryczna</strong> - nie zakłada żadnego rozkładu danych. Mediana i kwartyle same w sobie są odporne na outliery, więc ekstremalne punkty nie zaburzają kryteriów.</p>
-<h3 id="metoda-z-score">Metoda Z-Score</h3>
-<p>Z-Score mówi, o ile odchyleń standardowych obserwacja odbiega od średniej</p>
-<div class="mathblock">\[z= \dfrac{(x − \mu)}{\sigma}\]</div>
-<p>gdzie \(\mu\) to średnia, a \(\sigma\) to odchylenie standardowe. \(z=0\) oznacza, że wartość równa się średniej, \(z=2\) oznacza, że wartość leży \(2\) odchylenia powyżej średniej. Typowym kryterium jest, że za outliery uznajemy wartości spełniające \(|z|>3\). Zarówno jednak \(\mu\) i \(\sigma\) są wrażliwe na outliery, co można rozwiązać używając <strong>Modified Z-Score</strong>, gdzie zamiast \(\mu\) używamy mediany i zamiast \(\sigma\) używamy odchylenia absolutnego mediany \(MAD=\text{median}_i(|x_i-\text{median}(X)|)\) (mediana zewnętrzna biegnie po obserwacjach \(i\)). Wtedy \(z_{mod}=0.6745\cdot\dfrac{x-\text{median}(X)}{MAD}\). Stała \(0.6745=\Phi^{-1}(0.75)\) (kwantyl \(0.75\) rozkładu normalnego) skaluje \(MAD\) tak, by pod normalnością dawał asymptotycznie zgodną skalę dla \(\sigma\).</p>
-<h2 id="normalizacja-i-standaryzacja">Normalizacja i standaryzacja</h2>
-<div class="viz-mount" data-viz="v02"></div>
 
-<h4>Standaryzacja (Z-Score scaling)</h4>
-<div class="mathblock">\[x' = \frac{x-\mu}{\sigma}\]</div>
-<p>Gdzie μ to średnia cechy, σ to odchylenie standardowe. Po transformacji cecha ma średnią 0 i odchylenie standardowe 1. Zakres wynikowy <strong>nie jest ograniczony</strong> — wartości mogą być dowolnie ujemne czy dodatnie.</p>
-<p>Przesuwamy rozkład tak, żeby był wycentrowany na zerze (odejmujemy średnią), a potem skalujemy go tak, żeby rozrzut wynosił jedną jednostkę (dzielenie przez \(\sigma\)). Nie zmienia to kształtu rozkładu.</p>
-<p>Stosujemy przy algorytmach korzystających z odległości (\(k\)-NN, \(k\)-means, SVM (Support Vector Machine)) albo z gradientów (regresja logistyczna, sieci neuronowe) oraz przy PCA (Principal Component Analysis, analiza składowych głównych — redukcja wymiarowości opisana niżej).</p>
-<h4>Normalizacja min-max</h4>
-<div class="mathblock">\[x' = \frac{x-min}{max-min}\]</div>
-<p>Wynik mieści się w przedziale <strong>[0, 1]</strong>. Można uogólnić do dowolnego zakresu </p>
-<div class="mathblock">\[x' = a + \frac{(x - x_{\min})(b - a)}{x_{\max} - x_{\min}}\]</div>
-<p>Jest bardzo wrażliwa na outliery. Dane \([1, 2, 3, 4, 100]\) po min-max dają \([0,\; 0{,}01,\; 0{,}02,\; 0{,}03,\; 1{,}0]\) — jeden outlier ściska 99% danych do wąskiego pasma.</p>
-<h4>Robust scaling</h4>
-<div class="mathblock">\[x' = \frac{x - \text{median}(X)}{\text{IQR}}\]</div>
-<p>Zamiast średniej używa mediany (odporna na outliery), zamiast \(\sigma\) używa \(IQR\) (też odporny). Kompromis: centrujemy i skalujemy dane, ale ekstremalny punkt nie zaburza transformacji dla reszty obserwacji.</p>
-<p>Reguła kciuka: drzewa decyzyjne i lasy losowe nie wymagają skalowania (dzielą na progach, są niezmiennicze na transformacje monotoniczne); metody oparte na odległości, gradientach oraz PCA — tak. Szczegóły per model w sekcji „Wrażliwość algorytmów&quot;.</p>
-<h2 id="kodowanie-zmiennych-kategorycznych">Kodowanie zmiennych kategorycznych</h2>
-<p>Modele ML operują na liczbach. Zmienna „kolor&quot; z wartościami \(\{\)czerwony, zielony, niebieski\(\}\) musi zostać przekształcona w reprezentację numeryczną.</p>
-<h3 id="label-encoding">Label encoding</h3>
-<p>Każdej kategorii przypisujemy liczbę całkowitą: mały \(= 0\), średni \(= 1\), duży \(= 2\). Model widzi wtedy porządek (\(2 > 1 > 0\)) i równe odległości (\(2 - 1 = 1 - 0\)). <strong>OK dla zmiennych porządkowych</strong> (wykształcenie, ocena), ale dla <strong>nominalnych</strong> (kolory, miasta) wprowadza fałszywy porządek, który algorytmy gradientowe błędnie interpretują. Drzewa decyzyjne są mniej wrażliwe, ale progi nadal narzucają sztuczny porządek; podzbiory kategorii odtwarzają dopiero przez sekwencję splitów. Dla nominalnych bezpieczniejsze bywa one-hot lub natywna obsługa kategorii niż warunki \(x \leq c\), co de facto tworzy podzbiory kategorii.</p>
-<h3 id="one-hot-encoding-dummy-variables">One-hot encoding (dummy variables)</h3>
-<p>Tworzymy osobną kolumnę binarną \(\{0, 1\}\) dla każdej kategorii. „Kolor&quot; z 3 wartościami \(\to\) 3 kolumny. Obserwacja „zielony&quot; \(\to [0, 1, 0]\). Żadnego fałszywego porządku — odległość euklidesowa między dowolnymi dwiema kategoriami wynosi \(\sqrt{2}\). W regresji liniowej \(k\) kolumn one-hot jest liniowo zależnych (sumują się do 1), więc macierz \(\mathbf{X}^\top\mathbf{X}\) jest osobliwa — idealna współliniowość (<em>dummy variable trap</em>). Rozwiązanie: usuwamy jedną kolumnę (<em>drop-first</em>), która staje się kategorią referencyjną. Drzewa i sieci neuronowe nie mają tego problemu. Przy wysokiej kardynalności (np. 10 000 kategorii \(\to\) 10 000 kolumn) eksploduje wymiarowość, co spowalnia trening i zwiększa ryzyko przeuczenia.</p>
-<h3 id="target-encoding-mean-encoding">Target encoding (mean encoding)</h3>
-<p>Zastępujemy kategorię średnią zmiennej docelowej dla tej kategorii. Niech \(C_j = \{\, i : \text{obserwacja } i \text{ należy do kategorii } j\,\}\) będzie zbiorem indeksów obserwacji tej kategorii, a \(|C_j|\) jego licznością:</p>
-<div class="mathblock">\[x_{\text{encoded}} = \frac{1}{|C_j|}\sum_{i \in C_j} y_i\]</div>
-<p>czyli średnia zmiennej docelowej \(y\) po obserwacjach danej kategorii. Jedna kolumna, zachowuje informację predykcyjną, radzi sobie z wysoką kardynalnością. Dla rzadkiej kategorii (np. 1 obserwacja) target encoding idealnie koduje \(y\), co grozi overfitting (target przekazany do cech) i przeuczeniem. Rozwiązania: wygładzanie (<em>blending</em> ze średnią globalną), leave-one-out, obliczanie w ramach foldów CV.</p>
-<h3 id="binary-encoding-i-hash-encoding">Binary encoding i hash encoding</h3>
-<p>Binary encoding zapisuje indeks kategorii binarnie, potrzebując \(\lceil \log_2 k \rceil\) kolumn zamiast \(k\) przy one-hot. Hash encoding mapuje kategorię funkcją haszującą do jednej z \(m\) kolumn (\(m \ll k\)) — ryzyko kolizji, ale skaluje się do ekstremalnej kardynalności i nowych kategorii w czasie rzeczywistym.</p>
-<h2 id="pca-principal-component-analysis">PCA — Principal Component Analysis</h2>
-<h3 id="intuicja">Intuicja</h3>
-<p>Chmura punktów w \(\mathbb{R}^d\) leży w przybliżeniu w podprzestrzeni o niższym wymiarze. PCA obraca układ współrzędnych tak, by nowe osie (składowe główne) pokrywały się z kierunkami największej zmienności danych. Odrzucając osie o małej zmienności, redukujemy wymiarowość przy minimalnej utracie informacji.</p>
-<h3 id="algorytm">Algorytm</h3>
-<p>Najpierw standaryzujemy dane \(x'_{ij} = (x_{ij} - \mu_j) / \sigma_j\), bo bez tego cecha o dużej skali dominuje wariancję i pierwszą składową. Na danych wycentrowanych \(\mathbf{X}_c\) (od każdej cechy odjęto jej średnią) liczymy macierz kowariancji:</p>
-<div class="mathblock">\[\mathbf{S} = \frac{1}{n-1}\mathbf{X}_c^\top\mathbf{X}_c\]</div>
-<p>gdzie \(n\) to liczba obserwacji; element \(S_{ab}\) mówi, jak silnie cechy \(a\) i \(b\) zmieniają się razem (dla danych wystandaryzowanych \(\mathbf{S}\) jest w istocie macierzą korelacji). Macierz jest symetryczna \(d \times d\), więc z równania własnego \(\mathbf{S}\mathbf{v} = \lambda\mathbf{v}\) dostajemy ortogonalne wektory własne \(\mathbf{v}\) (kierunki składowych głównych) i wartości własne \(\lambda_i \geq 0\) (ile wariancji leży wzdłuż danego kierunku). Sortujemy je malejąco \(\lambda_1 \geq \ldots \geq \lambda_d \geq 0\) i rzutujemy te same wycentrowane dane na \(k\) pierwszych wektorów:</p>
-<div class="mathblock">\[\mathbf{Z} = \mathbf{X}_c \cdot \mathbf{V}_k, \qquad \mathbf{V}_k = [\mathbf{v}_1, \ldots, \mathbf{v}_k]\ (d \times k)\]</div>
-<p>Nowe dane \(\mathbf{Z}\) mają \(k\) wymiarów zamiast \(d\).</p>
-<h3 id="wybor-liczby-skladowych">Wybór liczby składowych</h3>
-<p>Udział \(i\)-tej składowej w wariancji to \(\lambda_i / \sum_{j=1}^{d}\lambda_j\). Zwykle wybieramy najmniejsze \(k\), dla którego skumulowana wariancja wyjaśniona przekracza próg (np. 95%): \(\sum_{i=1}^{k} \lambda_i / \sum_{i=1}^{d} \lambda_i \geq 0{,}95\). Alternatywy: kryterium Kaisera (dla danych standaryzowanych zachowujemy składowe z \(\lambda_i > 1\)) oraz scree plot — szukamy „łokcia&quot; na wykresie \(\lambda_i\) vs \(i\).</p>
-<h3 id="ograniczenia-pca">Ograniczenia PCA</h3>
-<p>PCA jest liniowa — znajduje tylko liniowe kombinacje cech. Jeśli dane leżą na nieliniowej rozmaitości (np. spirala w 3D), PCA tego nie wykryje; do tego służy kernel PCA, t-SNE czy UMAP (te dwa ostatnie głównie do wizualizacji, nie do modelowania). Składowe główne tracą interpretowalność — składowa postaci \(0{,}4 \cdot x_1 + 0{,}35 \cdot x_2 - 0{,}2 \cdot x_3 + \ldots\) nie ma nazwy. Alternatywą jest selekcja cech, która zachowuje oryginalne zmienne. Wymaga też standaryzacji — bez niej cecha o dużej skali dominuje — wyjątek: gdy zmienne są w <strong>tych samych jednostkach</strong> (np. piksele, wartości spektralne), standaryzacja może być szkodliwa, bo niszczy rzeczywiste różnice wariancji.</p>
-<h2 id="wplyw-preprocessingu-na-modele-ml">Wpływ preprocessingu na modele ML</h2>
-<h3 id="data-leakage">Data leakage</h3>
-<p>Informacja ze zbioru testowego „przecieka&quot; do treningu. Obliczasz \(\mu\) i \(\sigma\) na całym zbiorze (łącznie z testem), potem dzielisz na train/test — model pośrednio „widział&quot; rozkład danych testowych. Poprawnie: dzielisz na train/test \(\to\) obliczasz \(\mu\), \(\sigma\) tylko na treningu (fit) \(\to\) transformujesz train i test tymi samymi parametrami (transform). W <code>sklearn</code>: <code>fit_transform()</code> na treningu, <code>transform()</code> na teście. Cały preprocessing w <code>Pipeline</code>. To samo dotyczy każdego kroku: imputacji, target encoding, PCA.</p>
-<h3 id="wrazliwosc-algorytmow">Wrażliwość algorytmów</h3>
-<ul>
-<li><strong>Drzewa decyzyjne i lasy losowe (RF)</strong>: niezmiennicze na skalę i odporne na outliery, ale wrażliwe na niezbalansowane klasy i wysoką wymiarowość (szum w losowym wyborze cech).</li>
-<li><strong>\(k\)-NN</strong>: ekstremalnie wrażliwy na skalę (cecha w tysiącach dominuje odległość) i na outliery; dotknięty <em>curse of dimensionality</em> — w wysokich wymiarach odległości się „wyrównują&quot; i \(k\)-NN traci moc dyskryminacyjną (PCA może pomóc).</li>
-<li><strong>SVM z jądrem RBF (Radial Basis Function)</strong>: wymaga standaryzacji, bo parametr \(\gamma\) (szerokość jądra) działa inaczej na cechach o różnych skalach; outliery przy miękkim marginesie (parametr kary \(C\)) mogą przesuwać hiperpłaszczyznę.</li>
-<li><strong>Regresja liniowa/logistyczna</strong>: standaryzacja czyni współczynniki porównywalnymi, a regularyzacja \(L_1\)/\(L_2\) karze cechy „sprawiedliwie&quot; (bez niej kara zależy od skali, nie od ważności). OLS (Ordinary Least Squares, metoda najmniejszych kwadratów) jest wrażliwy na outliery, bo minimalizuje \(\sum_i e_i^2\), gdzie \(e_i\) to reszta (różnica między wartością obserwowaną a przewidywaną).</li>
-<li><strong>Sieci neuronowe</strong>: wymagają normalizacji, bo losowo inicjalizowane wagi dają aktywacje o różnych skalach \(\to\) niestabilne gradienty i wolny trening. Batch normalization łagodzi to częściowo, ale standaryzacja wejścia to standard.</li>
-</ul>
-<h3 id="curse-of-dimensionality">Curse of dimensionality</h3>
-<p>W wysokich wymiarach objętość rośnie wykładniczo. Przy \(d\) wymiarach i stałej liczbie obserwacji \(n\) dane stają się coraz bardziej „rzadkie&quot; — każda obserwacja jest odległa od każdej innej. Fałszywe wzorce łatwo znaleźć \(\to\) przeuczenie. PCA lub selekcja cech redukują ten problem, ale zbyt agresywna redukcja wyrzuca sygnał — zawsze kompromis.</p>
-<h3 id="garbage-in-garbage-out">Garbage in, garbage out</h3>
-<p>Żaden model nie skompensuje złego preprocessingu. Przykład kliniczny: dane medyczne, 30% braków ciśnienia krwi. Braki MNAR — ciężko chorzy nie mogli mierzyć ciśnienia. Usunięcie wierszy = obciążenie selekcji: model uczy się na „zdrowszej&quot; subpopulacji i nie generalizuje. Żaden hiperparametr tego nie naprawi — potrzeba poprawnego preprocessingu.</p>
+    <p><strong>Wstępne przetwarzanie danych</strong> (preprocessing) to zestaw kroków, które surowe i niespójne dane zamieniają w postać nadającą się do analizy i modelowania. Obowiązuje tu zasada <em>garbage in, garbage out</em>: żaden model nie skompensuje złych danych, więc jakość preprocessingu wyznacza górną granicę jakości wyników.</p>
 
+    <h2 id="etapy">Etapy preprocessingu</h2>
+    <ul>
+      <li><strong>Czyszczenie</strong> — usuwanie szumu, braków, duplikatów i niespójnych formatów.</li>
+      <li><strong>Integracja</strong> — łączenie danych z różnych źródeł (np. klienci z CRM + transakcje z bazy zamówień) przy uzgodnieniu kluczy, typów i jednostek.</li>
+      <li><strong>Transformacja</strong> — przygotowanie do modelowania przez normalizację, kodowanie i agregację.</li>
+      <li><strong>Redukcja</strong> — zmniejszenie wolumenu (mniej cech lub próbek) bez istotnej utraty informacji.</li>
+    </ul>
+
+    <h2 id="braki">Braki danych i imputacja</h2>
+    <p>Sposób postępowania zależy od <em>mechanizmu</em> braku — bo to on decyduje, czy usunięcie wierszy zaszkodzi:</p>
+    <ul>
+      <li><strong>MCAR</strong> (Missing Completely At Random) — brak nie zależy od żadnych danych; nawet zwykłe usunięcie wierszy daje nieobciążone estymatory, tracimy tylko moc statystyczną.</li>
+      <li><strong>MAR</strong> (Missing At Random) — brak zależy od zmiennych obserwowanych, np. młodsi rzadziej podają dochód. Usunięcie wierszy obciąża wynik; ratuje imputacja warunkowa (modelujemy brak na podstawie wieku).</li>
+      <li><strong>MNAR</strong> (Missing Not At Random) — brak zależy od samej brakującej wartości (najbogatsi nie podają dochodu). Żadna standardowa imputacja nie rozwiąże tego w pełni.</li>
+    </ul>
+    <p>Metody imputacji: proste (średnia, mediana, moda) oraz warunkowe (regresja, \(k\)-NN), modelujące brak na podstawie pozostałych cech.</p>
+
+    <h2 id="outliery">Wartości odstające i skalowanie</h2>
+    <div class="viz-mount" data-viz="v02"></div>
+    <p><strong>Outliery</strong> wykrywamy najczęściej dwiema regułami. Metoda <strong>IQR</strong> (rozstęp międzykwartylowy, \(IQR=Q3-Q1\)) uznaje za odstające punkty poza granicami \(Q1-1{,}5\cdot IQR\) i \(Q3+1{,}5\cdot IQR\); jest nieparametryczna i sama odporna na outliery. Metoda <strong>Z-Score</strong> mierzy, o ile odchyleń standardowych punkt odbiega od średniej, a próg to zwykle \(|z|>3\):</p>
+    <div class="mathblock">\[z=\frac{x-\mu}{\sigma}\]</div>
+    <p><strong>Skalowanie</strong> sprowadza cechy do porównywalnych zakresów. Standaryzacja \(x'=(x-\mu)/\sigma\) centruje na zerze i daje jednostkowe odchylenie standardowe; normalizacja min-max sprowadza wartości do przedziału \([0,1]\), ale jest wrażliwa na outliery; robust scaling używa mediany i \(IQR\), więc znosi ekstrema. Reguła: drzewa i lasy losowe nie wymagają skalowania (dzielą na progach), a metody oparte na odległości, gradientach oraz PCA — wymagają.</p>
+
+    <h2 id="kodowanie">Kodowanie zmiennych kategorycznych</h2>
+    <p>Modele operują na liczbach, więc kategorie trzeba przekształcić.</p>
+    <ul>
+      <li><strong>Label encoding</strong> — kolejne liczby całkowite; dobre dla zmiennych <em>porządkowych</em>, ale dla nominalnych (kolory, miasta) narzuca fałszywy porządek.</li>
+      <li><strong>One-hot encoding</strong> — osobna kolumna binarna dla każdej kategorii; brak fałszywego porządku, lecz przy wysokiej kardynalności gwałtownie rośnie liczba kolumn.</li>
+      <li><strong>Target encoding</strong> — zastąpienie kategorii średnią zmiennej docelowej; radzi sobie z kardynalnością, ale grozi wyciekiem zmiennej docelowej (target leakage) i przeuczeniem.</li>
+    </ul>
+
+    <h2 id="pca">PCA — przykład redukcji</h2>
+    <p><strong>PCA</strong> (Principal Component Analysis) to sztandarowy przykład etapu redukcji: obraca układ współrzędnych tak, by nowe osie (składowe główne) pokrywały się z kierunkami największej wariancji, po czym odrzuca osie o małej wariancji przy minimalnej utracie informacji. Wymaga standaryzacji, jest liniowa (nie wykryje struktury nieliniowej), a nowe składowe tracą interpretowalność.</p>
+
+    <h2 id="leakage">Data leakage i pipeline</h2>
+    <p>Najgroźniejsza pułapka to <strong>data leakage</strong>: informacja ze zbioru testowego przecieka do treningu. Klasyczny błąd to policzenie \(\mu\) i \(\sigma\) na całych danych przed podziałem — model pośrednio „widzi” rozkład testu, a wyniki walidacji są zawyżone. Poprawna kolejność: <strong>podział</strong> na train/test → <strong>fit</strong> preprocessingu tylko na treningu → <strong>transform</strong> obu zbiorów tymi samymi parametrami → model → walidacja. W praktyce cały preprocessing zamyka się w <code>Pipeline</code>, co gwarantuje, że imputacja, skalowanie czy PCA nie zobaczą danych testowych.</p>
+    <p><strong>Zdanie zamykające</strong>: preprocessing nie jest formalnością przed „właściwym” modelowaniem — jest kluczowy właśnie ze względu na wrażliwość algorytmów (por. klasyczne modele ML) i chroni wynik przed wyciekiem, którego żaden hiperparametr nie naprawi.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#etapy-preprocessingu">Etapy preprocessingu</a></li>
-<li><a href="#braki-danych">Braki danych</a></li>
-<li><a href="#metody-imputacji">Metody imputacji</a></li>
-<li><a href="#wartosci-odstajace-outliers">Wartości odstające (outliers)</a></li>
-<li><a href="#normalizacja-i-standaryzacja">Normalizacja i standaryzacja</a></li>
-<li><a href="#kodowanie-zmiennych-kategorycznych">Kodowanie zmiennych kategorycznych</a></li>
-<li><a href="#pca-principal-component-analysis">PCA — Principal Component Analysis</a></li>
-<li><a href="#wplyw-preprocessingu-na-modele-ml">Wpływ preprocessingu na modele ML</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#etapy">Etapy preprocessingu</a></li>
+    <li><a href="#braki">Braki danych i imputacja</a></li>
+    <li><a href="#outliery">Wartości odstające i skalowanie</a></li>
+    <li><a href="#kodowanie">Kodowanie zmiennych kategorycznych</a></li>
+    <li><a href="#pca">PCA — przykład redukcji</a></li>
+    <li><a href="#leakage">Data leakage i pipeline</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

@@ -1,572 +1,93 @@
 <!doctype html>
-<html lang="pl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Klasyczna analiza vs Big Data</title>
-    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
-    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../assets/notes.css" />
-  <script defer src="../assets/katex/katex.min.js"></script>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klasyczna analiza vs Big Data</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
 <script defer src="../assets/katex/auto-render.min.js"></script>
 <script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
-</head>
-  <body>
-    <div class="topbar">
-      <a href="../index.html">← Wszystkie notatki</a>
-      <span class="sp"></span>
-      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
-        Drukuj
-      </button>
-      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
-        ◐ Motyw
-      </button>
-    </div>
-    <div class="layout">
-      <main class="wrap">
-        <p class="eyebrow">Big Data i systemy rozproszone</p>
-        <h1>Klasyczna analiza vs Big Data</h1>
-        <p class="subtitle">Notatka egzaminacyjna</p>
-        <h2 id="1-definicje-fundamentalne-potrzebne-dalej">
-          1. Definicje fundamentalne (potrzebne dalej)
-        </h2>
-        <ul>
-          <li>
-            <strong>Populacja generalna</strong>
-            \(\mathcal{P}\)
-            — zbiór wszystkich obiektów objętych badaniem.
-            <strong>Próba</strong>
-            \(X_1,\ldots,X_n\)
-            — skończony, zwykle losowy, podzbiór populacji.
-          </li>
-          <li>
-            <strong>Zmienna losowa</strong>
-            \(X:\Omega\to\mathbb{R}\)
-            — przypisuje liczbę wynikowi losowego doświadczenia (\(\Omega\)
-            to przestrzeń zdarzeń elementarnych, konceptualnie odrębna od
-            populacji obiektów
-            \(\mathcal{P}\)).
-          </li>
-          <li>
-            <strong>Estymator</strong> parametru
-            \(\theta\)
-            — funkcja próby
-            \(\hat\theta_n=T(X_1,\ldots,X_n)\), mająca przybliżać nieznany
-            \(\theta\).
-          </li>
-          <li>
-            <strong>Obciążenie</strong>:
-            \(\text{bias}(\hat\theta)=\mathbb{E}[\hat\theta]-\theta\)
-            (nieobciążony, gdy
-            \(=0\)). <strong>MSE</strong> (mean squared error, błąd
-            średniokwadratowy):
-            \(\text{MSE}(\hat\theta)=\mathbb{E}[(\hat\theta-\theta)^2]=\text{Var}(\hat\theta)+\text{bias}(\hat\theta)^2\)
-            — rozkład błędu na wariancję i obciążenie.
-          </li>
-          <li>
-            <strong>Test statystyczny</strong> składa się z: pary hipotez
-            \(H_0\)
-            vs
-            \(H_1\), statystyki testowej
-            \(T\)
-            (o wartości zaobserwowanej
-            \(t_{\text{obs}}\)), poziomu istotności
-            \(\alpha=P(\text{odrzucenie }H_0\mid H_0\text{
-                      prawdziwa})\)
-            oraz <strong>p-value</strong> = prawdopodobieństwa statystyki co
-            najmniej tak skrajnej jak
-            \(t_{\text{obs}}\)
-            przy
-            \(H_0\): prawostronnie
-            \(P(T\geq t_{\text{obs}}\mid H_0)\), dwustronnie dla symetrycznej statystyki testowej
-            \(P(|T|\geq |t_{\text{obs}}|\mid H_0)\).
-          </li>
-          <li>
-            <strong>Złożoność asymptotyczna</strong>
-            \(O(g(n))\)
-            — tempo wzrostu kosztu ograniczone z góry przez
-            \(g(n)\)
-            z dokładnością do stałej; miara skalowalności algorytmu.
-          </li>
-        </ul>
-        <h2 id="2-big-data-model-5v">2. Big Data — model 5V</h2>
-        <p>
-          <strong>Big Data</strong> to dane, których właściwości uniemożliwiają
-          stosowanie klasycznych narzędzi (jednowęzłowy RDBMS — Relational
-          Database Management System, in-memory pandas/R). Charakteryzuje się
-          modelem 5V:
-        </p>
-        <ul>
-          <li>
-            <strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej
-            maszynie.
-          </li>
-          <li>
-            <strong>Velocity</strong> — tempo napływu (strumieniowe,
-            near-real-time).
-          </li>
-          <li>
-            <strong>Variety</strong> — różnorodność: ustrukturyzowane,
-            semi-strukturyzowane (JSON — JavaScript Object Notation, logi),
-            nieustrukturyzowane (tekst, obraz, audio).
-          </li>
-          <li>
-            <strong>Veracity</strong> — niepewność/jakość (szum, brakujące,
-            sprzeczne źródła).
-          </li>
-          <li>
-            <strong>Value</strong> — wartość biznesowa wydobyta z danych
-            (kryterium &quot;po co to robimy&quot;).
-          </li>
-        </ul>
-        <p>
-          Granica &quot;duże dane&quot; vs &quot;Big Data&quot; jest
-          <strong>mieszana</strong> — istnieją progi ilościowe (TB-PB, jeden vs
-          wiele węzłów), ale klasyfikacja zależy też od variety i velocity, nie
-          tylko volume: gdy musimy zmienić paradygmat (rozproszenie,
-          schema-on-read, aproksymacje) — to Big Data. Sam wzrost
-          \(n\)
-          to nadal klasyka.
-        </p>
-        <h2 id="3-paradygmat-klasyczny">3. Paradygmat klasyczny</h2>
-        <ul>
-          <li>
-            <strong>Próbka reprezentatywna</strong> z populacji +
-            <strong>wnioskowanie statystyczne</strong> o parametrach.
-          </li>
-          <li>
-            Fundament probabilistyczny (oznaczenia: <strong>i.i.d.</strong> —
-            independent and identically distributed, niezależne o jednakowym
-            rozkładzie;
-            \(\xrightarrow{P}\)
-            zbieżność według prawdopodobieństwa;
-            \(\xrightarrow{d}\)
-            zbieżność według rozkładu;
-            \(\mathcal{N}(0,1)\)
-            standardowy rozkład normalny):
-            <ul>
-              <li>
-                <strong>Słabe Prawo Wielkich Liczb (LLN)</strong>: dla
-                \(X_i\)
-                i.i.d. ze średnią
-                \(\mu\)
-                zachodzi
-                \(\bar X_n\xrightarrow{P}\mu\).
-              </li>
-              <li>
-                <strong>Centralne Twierdzenie Graniczne (CLT)</strong>: dla
-                \(X_i\)
-                i.i.d. ze skończoną wariancją
-                \(\sigma^2\),
-                \(\sqrt{n}(\bar
-                          X_n-\mu)/\sigma\xrightarrow{d}\mathcal{N}(0,1)\)
-                — stąd przedział ufności
-                \(\bar X_n\pm
-                          z_{1-\alpha/2}\,\sigma/\sqrt{n}\)
-                oraz testy.
-              </li>
-            </ul>
-          </li>
-          <li>
-            Skalowanie <strong>pionowe (scale-up)</strong>: większa pamięć/CPU
-            jednej maszyny.
-          </li>
-          <li>
-            <strong>ACID</strong> (Atomicity, Consistency, Isolation,
-            Durability) — gwarancje transakcyjne RDBMS.
-          </li>
-          <li>
-            <strong>ETL</strong> (Extract–Transform–Load) i
-            <strong>schema-on-write</strong>: schemat ustalony przed
-            załadowaniem do hurtowni.
-          </li>
-          <li>
-            Narzędzia: pandas, NumPy, scikit-learn, R, SAS, klasyczne hurtownie
-            (PostgreSQL, Oracle).
-          </li>
-        </ul>
-        <h2 id="4-paradygmat-big-data">4. Paradygmat Big Data</h2>
-        <ul>
-          <li>
-            <strong>N≈all</strong> (często dane administracyjne lub wyczerpujące
-            względem systemu, ale niekoniecznie prawdziwa populacja docelowa)
-            zamiast próby.
-          </li>
-          <li>
-            Przesunięcie celu: z <strong>inferencji</strong> (testy hipotez) na
-            <strong>predykcję</strong> (modele uczenia maszynowego).
-          </li>
-          <li>
-            Skalowanie <strong>poziome (scale-out)</strong>: klaster commodity
-            hardware; ekonomicznie i fizycznie nieuniknione przy TB–PB.
-          </li>
-          <li>
-            <strong>BASE</strong> (Basically Available, Soft state, Eventual
-            consistency) — łagodniejsze gwarancje, wymuszone przez systemy
-            rozproszone.
-          </li>
-          <li>
-            <strong>ELT</strong> + <strong>schema-on-read</strong>: surowe dane
-            do data lake, schemat dopiero przy odczycie (większa elastyczność,
-            ryzyko &quot;data swamp&quot;).
-          </li>
-          <li>
-            <strong>Batch vs streaming</strong>: przetwarzanie wsadowe
-            (Hadoop/Spark batch) vs strumieniowe (Kafka, Flink, Spark Structured
-            Streaming) z pojęciami event time / processing time / watermarks.
-          </li>
-          <li>
-            Architektury: data lake (HDFS — Hadoop Distributed File System, lub
-            S3) → <strong>lakehouse</strong> (Delta Lake, Iceberg, Hudi) łączący
-            elastyczność lake z transakcyjnością hurtowni (DWH — Data
-            Warehouse).
-          </li>
-        </ul>
-        <h2 id="5-twierdzenie-cap-i-mapreduce">
-          5. Twierdzenie CAP i MapReduce
-        </h2>
-        <p>
-          <strong>Twierdzenie CAP (Brewer)</strong>: w systemie rozproszonym
-          <strong>w obecności partycji sieciowej</strong> musisz wybrać C lub A
-          (Gilbert-Lynch 2002 — formalizacja przypuszczenia Brewera 2000); bez
-          partycji oba możliwe. Składowe: <strong>C</strong>onsistency
-          (wszystkie węzły widzą te same dane), <strong>A</strong>vailability
-          (każde żądanie dostaje odpowiedź), <strong>P</strong>artition
-          tolerance (system działa mimo zerwania połączeń). W praktyce
-          \(P\)
-          jest wymuszone (sieć zawodzi), więc wybór sprowadza się do
-          <strong>CP</strong> lub <strong>AP</strong>. Stąd dychotomia RDBMS
-          (CP, ACID) vs wiele NoSQL (AP, BASE).
-        </p>
-        <p>
-          <strong>Częsty mit</strong>: mapowanie ACID↔CP, BASE↔AP. To różne
-          wymiary: ACID dotyczy transakcji, CAP dotyczy replikacji w obecności
-          partycji. PostgreSQL na pojedynczym węźle nie podpada pod CAP. Część
-          systemów NoSQL (MongoDB ≥ 4.0, FoundationDB) obsługuje ACID, a bazy
-          NewSQL (CockroachDB) łączą rozproszenie z pełnym ACID.
-        </p>
-        <p><strong>MapReduce</strong> — model obliczeń rozproszonych:</p>
-        <div class="mathblock">
-          \[\text{Map}: (k_1, v_1) \to [(k_2, v_2)],\qquad
-                      \text{Reduce}: (k_2, [v_2]) \to [(k_3, v_3)].\]
-        </div>
-        <p>
-          Pozwala wyrazić wiele zadań przetwarzania jako kombinację dwóch
-          funkcji uruchamianych równolegle na klastrze (szczegóły w
-          <a href="07_mapreduce.html">MapReduce</a>). Spark uogólnia ten model
-          przez DAG (Directed Acyclic Graph, skierowany graf acykliczny)
-          operacji i in-memory caching (rzędy wielkości szybciej niż klasyczny
-          Hadoop MR).
-        </p>
-        <h2 id="6-pulapki-teoretyczne-duzej-skali">
-          6. Pułapki teoretyczne dużej skali
-        </h2>
-        <ul>
-          <li>
-            <strong
-              >Kryzys p-value przy
-              \(n\to\infty\)</strong
-            >: ponieważ moc testu rośnie z
-            \(n\), dla dowolnego prawdziwego efektu
-            \(\neq 0\)
-            mamy p-value
-            \(\xrightarrow{P}0\)
-            — dowolnie mały efekt staje się &quot;istotny&quot; przy
-            dostatecznie dużym
-            \(n\). <strong>Istotność statystyczna ≠ istotność praktyczna</strong> —
-            trzeba raportować wielkość efektu (effect size, np. Cohena
-            \(d=(\bar x_1-\bar x_2)/s_{\text{pooled}}\)), nie tylko p.
-          </li>
-          <li>
-            <strong>Big Data paradox</strong> (Meng 2018): błąd losowy maleje
-            jak
-            \(1/\sqrt{n}\), ale
-            <strong>błąd systematyczny (selection bias) nie znika</strong> z
-            większą próbą — duża próba nielosowa bywa mniej dokładna niż mała
-            reprezentatywna. &quot;Więcej danych&quot; nie zwalnia z myślenia o
-            tym, jak dane zebrano.
-          </li>
-          <li>
-            <strong>Curse of dimensionality</strong>: objętość kuli wpisanej w
-            \([0,1]^d\)
-            dąży do zera względem kostki przy
-            \(d\to\infty\), więc masa skupia się w narożnikach, a odległości się koncentrują
-            (\((\max_i\|x_i\|-\min_i\|x_i\|)/\min_i\|x_i\|\to
-                      0\)) — znika kontrast między bliskim a dalekim sąsiadem, przez co
-            \(k\)-NN i kernel density estimation tracą sens. Remedium: redukcja
-            wymiaru (PCA), regularyzacja, embeddingi.
-          </li>
-          <li>
-            <strong>Wielokrotne porównania</strong>: przy
-            \(m\)
-            niezależnych testach na poziomie
-            \(\alpha\)
-            prawdopodobieństwo choć jednego fałszywie dodatniego to
-            \(1-(1-\alpha)^m\)
-            — stąd poprawka Bonferroniego (\(\alpha/m\)) lub kontrola FDR metodą Benjamini–Hochberg.
-          </li>
-          <li>
-            <strong>Two cultures Breimana</strong>: modelowanie statystyczne
-            (rozkłady, interpretowalność) vs algorytmiczne (predykcja, czarne
-            skrzynki); Big Data sprzyja temu drugiemu, ale przyczynowość (causal
-            inference) pozostaje potrzebna.
-          </li>
-        </ul>
-        <h2 id="7-algorytmy-aproksymacyjne">7. Algorytmy aproksymacyjne</h2>
-        <p>
-          Gdy dokładny wynik jest zbyt drogi obliczeniowo, używa się estymatorów
-          probabilistycznych z gwarancją:
-        </p>
-        <div class="mathblock">
-          \[P(|\hat\theta -
-                      \theta|>\varepsilon)<\delta,\]
-        </div>
-        <p>
-          gdzie
-          \(\varepsilon\)
-          to tolerancja błędu, a
-          \(\delta\)
-          — dopuszczalne prawdopodobieństwo jej przekroczenia.
-        </p>
-        <ul>
-          <li>
-            <strong>HyperLogLog</strong> — count-distinct (liczba unikatów) przy
-            stałym rozmiarze rejestru
-            \(m\); pamięć
-            \(O(\log\log n)\)
-            na komórkę (nie liniowo od
-            \(n\)), błąd względny
-            \(\approx 1{,}04/\sqrt{m}\). Ściśle
-            \(O(1)\)
-            tylko jako inżynierskie przybliżenie stałego rejestru.
-          </li>
-          <li>
-            <strong>Count-Min Sketch</strong> — częstości elementów z błędem
-            addytywnym.
-          </li>
-          <li>
-            <strong>Bloom filter</strong> — test przynależności bez fałszywie
-            ujemnych (false positives kontrolowane).
-          </li>
-          <li>
-            <strong>Reservoir sampling</strong> — losowa próba o stałym
-            rozmiarze ze strumienia o nieznanej długości.
-          </li>
-        </ul>
-        <p>
-          To matematyczna konsekwencja połączenia dużego wolumenu (Volume) i
-          wysokiego tempa napływu (Velocity): rezygnacja z dokładności w zamian
-          za skalowalność.
-        </p>
-        <h2 id="8-stos-technologiczny-kiedy-co-stosowac">
-          8. Stos technologiczny — kiedy co stosować
-        </h2>
-        <p>Heurystyka skali (przybliżona):</p>
-        <div class="tablewrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Skala danych</th>
-                <th>Narzędzia</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>&lt; 10 GB, single-node</td>
-                <td>pandas, NumPy, R, DuckDB, SQLite</td>
-              </tr>
-              <tr>
-                <td>10 GB – 1 TB, jeden mocny węzeł</td>
-                <td>
-                  Polars, Dask, Modin, single-node Spark, hurtownia chmurowa
-                </td>
-              </tr>
-              <tr>
-                <td>&gt; 1 TB albo stały streaming</td>
-                <td>
-                  Apache Spark (PySpark, MLlib), Flink, Kafka + lakehouse
-                  (Delta/Iceberg)
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Formaty kolumnowe (<strong>Parquet</strong>, <strong>ORC</strong>) z
-          kompresją i predicate pushdown są standardem w Big Data — trzymanie TB
-          w CSV (Comma-Separated Values) to klasyczny błąd.
-        </p>
-        <p><strong>Pułapki praktyczne</strong>:</p>
-        <ul>
-          <li>
-            <strong>Premature Big Data</strong> — stawianie klastra Spark dla 10
-            GB, które DuckDB obsłuży na laptopie; narzut rozproszenia często
-            przewyższa korzyści.
-          </li>
-          <li>
-            <strong><code>collect()</code> / <code>toPandas()</code></strong> w
-            PySpark na dużym DataFrame → OOM (Out Of Memory, wyczerpanie
-            pamięci) w driverze.
-          </li>
-          <li>
-            <strong>Data skew</strong> — nierównomierny rozkład kluczy w
-            <code>groupBy</code>/<code>join</code> zabija wydajność (remedia:
-            salting, broadcast join).
-          </li>
-          <li>
-            <strong>Koszt operacyjny</strong> — w chmurze (BigQuery slots,
-            Snowflake credits) optymalizacja kosztów jest częścią inżynierii,
-            której klasyczna analiza nie ma.
-          </li>
-        </ul>
-        <h2 id="9-synteza-paradygmatow">9. Synteza paradygmatów</h2>
-        <div class="viz-mount" data-viz="v06"></div>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Big Data i systemy rozproszone</p>
+    <h1>Klasyczna analiza vs Big Data</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
 
-        <div class="tablewrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Wymiar</th>
-                <th>Klasyczna analiza</th>
-                <th>Big Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Dane</td>
-                <td>próba reprezentatywna z populacji</td>
-                <td>
-                  N≈all, dane administracyjne/wyczerpujące względem źródła
-                </td>
-              </tr>
-              <tr>
-                <td>Cel</td>
-                <td>wnioskowanie o parametrach</td>
-                <td>predykcja, wzorce</td>
-              </tr>
-              <tr>
-                <td>Skalowanie</td>
-                <td>pionowe (scale-up)</td>
-                <td>poziome (scale-out)</td>
-              </tr>
-              <tr>
-                <td>Spójność</td>
-                <td>ACID</td>
-                <td>BASE / eventual consistency</td>
-              </tr>
-              <tr>
-                <td>Schemat</td>
-                <td>schema-on-write (ETL, hurtownia)</td>
-                <td>schema-on-read (ELT, lake/lakehouse)</td>
-              </tr>
-              <tr>
-                <td>Obliczenia</td>
-                <td>
-                  jeden węzeł,
-                  \(O(n^2)\)
-                  akceptowalne
-                </td>
-                <td>
-                  rozproszone, wymagane
-                  \(O(n)/O(n\log n)\)
-                  lub aproksymacje
-                </td>
-              </tr>
-              <tr>
-                <td>Metoda</td>
-                <td>
-                  testy istotności,
-                  \(p\)-value
-                </td>
-                <td>metryki predykcyjne, walidacja krzyżowa</td>
-              </tr>
-              <tr>
-                <td>Główny problem</td>
-                <td>mała moc, brak danych</td>
-                <td>jakość, bias, koszt, latencja</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Dwa paradygmaty <strong>nie są wykluczające</strong> — w praktyce
-          projekty łączą oba (np. Spark do agregacji + scikit-learn do modelu na
-          zagregowanej próbie).
-        </p>
-        <h2 id="10-powiazania-z-innymi-zagadnieniami">
-          10. Powiązania z innymi zagadnieniami
-        </h2>
-        <ul>
-          <li>
-            <strong>Obliczenia i dane</strong>:
-            <a href="07_mapreduce.html">MapReduce</a> — realizacja modelu
-            rozproszonego;
-            <a href="00_schematy_losowania.html">populacja, losowanie</a> — przy
-            N≈all sampling staje się optymalizacją, ale błąd selekcji nie znika;
-            <a href="01_estymatory_wartosci_sredniej.html">estymatory</a> —
-            dekompozycja MSE + estymatory aproksymacyjne (HLL, CMS).
-          </li>
-          <li>
-            <strong>Modelowanie</strong>:
-            <a href="10_klasyczne_ml.html">klasyczne ML</a> i
-            <a href="11_sieci_neuronowe.html">sieci neuronowe</a> (emblemat Big
-            Data) — wersje rozproszone (Spark MLlib) lub online;
-            <a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a>/<a
-              href="09_porownanie_modelowania.html"
-              >Porównanie modelowania</a
-            >
-            — two cultures, curse of dimensionality, skalowalne PCA.
-          </li>
-          <li>
-            <strong>Inżynieria danych</strong>:
-            <a href="02_preprocessing.html">preprocessing</a> (ETL vs ELT),
-            <a href="05_raportowanie.html">raportowanie</a> (BI, Business
-            Intelligence, okresowe vs dashboardy real-time),
-            <a href="13_text_mining.html">text mining</a> (Variety),
-            <a href="08_porownanie_narzedzi.html">dobór stosu wg skali</a>.
-          </li>
-        </ul>
-      </main>
-      <nav class="toc" aria-label="Spis treści">
-        <h5>Na tej stronie</h5>
-        <ol>
-          <li>
-            <a href="#1-definicje-fundamentalne-potrzebne-dalej"
-              >1. Definicje fundamentalne (potrzebne dalej)</a
-            >
-          </li>
-          <li><a href="#2-big-data-model-5v">2. Big Data — model 5V</a></li>
-          <li><a href="#3-paradygmat-klasyczny">3. Paradygmat klasyczny</a></li>
-          <li><a href="#4-paradygmat-big-data">4. Paradygmat Big Data</a></li>
-          <li>
-            <a href="#5-twierdzenie-cap-i-mapreduce"
-              >5. Twierdzenie CAP i MapReduce</a
-            >
-          </li>
-          <li>
-            <a href="#6-pulapki-teoretyczne-duzej-skali"
-              >6. Pułapki teoretyczne dużej skali</a
-            >
-          </li>
-          <li>
-            <a href="#7-algorytmy-aproksymacyjne"
-              >7. Algorytmy aproksymacyjne</a
-            >
-          </li>
-          <li>
-            <a href="#8-stos-technologiczny-kiedy-co-stosowac"
-              >8. Stos technologiczny — kiedy co stosować</a
-            >
-          </li>
-          <li><a href="#9-synteza-paradygmatow">9. Synteza paradygmatów</a></li>
-          <li>
-            <a href="#10-powiazania-z-innymi-zagadnieniami"
-              >10. Powiązania z innymi zagadnieniami</a
-            >
-          </li>
-        </ol>
-      </nav>
+    <p><strong>Big Data</strong> to dane, których rozmiar, tempo napływu lub różnorodność uniemożliwiają przetwarzanie klasycznymi narzędziami na jednej maszynie (pandas, R, jednowęzłowy RDBMS) i wymuszają zmianę paradygmatu na rozproszony. Sam wzrost liczby wierszy to jeszcze klasyka — Big Data zaczyna się tam, gdzie trzeba <em>zmienić sposób</em> pracy.</p>
+
+    <h2 id="5v">Model 5V</h2>
+    <ul>
+      <li><strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej maszynie.</li>
+      <li><strong>Velocity</strong> — tempo napływu (strumienie, near-real-time).</li>
+      <li><strong>Variety</strong> — różnorodność: dane ustrukturyzowane, semi-strukturyzowane (JSON, logi), nieustrukturyzowane (tekst, obraz, audio).</li>
+      <li><strong>Veracity</strong> — niepewność i jakość (szum, braki, sprzeczne źródła).</li>
+      <li><strong>Value</strong> — wartość biznesowa wydobyta z danych („po co to robimy").</li>
+    </ul>
+
+    <h2 id="klasyka">Paradygmat klasyczny</h2>
+    <p>Całej populacji zwykle nie da się zmierzyć, więc bada się reprezentatywną <strong>próbę</strong> i z niej wnioskuje o całości — a że próba to tylko fragment, do wyników dokleja się miarę niepewności (przedziały ufności, testy).</p>
+    <ul>
+      <li><strong>Dane</strong>: reprezentatywna <strong>próba</strong> z populacji.</li>
+      <li><strong>Cel</strong>: <strong>wnioskowanie</strong> o parametrach populacji (testy hipotez, przedziały ufności).</li>
+      <li><strong>Skalowanie pionowe</strong> (scale-up): mocniejsza jedna maszyna.</li>
+      <li><strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) — mocne gwarancje transakcyjne RDBMS.</li>
+      <li><strong>ETL</strong> + <strong>schema-on-write</strong>: schemat ustalony przed załadowaniem do hurtowni.</li>
+      <li><strong>Narzędzia</strong>: pandas, NumPy, scikit-learn, R, klasyczne hurtownie (PostgreSQL, Oracle).</li>
+    </ul>
+
+    <h2 id="bigdata">Paradygmat Big Data</h2>
+    <p>Skoro mamy (prawie) wszystkie dane, nie trzeba zgadywać parametru populacji z próby — pytanie przesuwa się z „jaki jest parametr" na „co się wydarzy", i stąd nacisk na <strong>predykcję</strong>.</p>
+    <ul>
+      <li><strong>Dane</strong>: <strong>N≈all</strong> — całe dostępne dane zamiast próby.</li>
+      <li><strong>Cel</strong>: przesunięcie z wnioskowania na <strong>predykcję</strong> (uczenie maszynowe, wykrywanie wzorców).</li>
+      <li><strong>Skalowanie poziome</strong> (scale-out): klaster tanich maszyn.</li>
+      <li><strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) — łagodniejsze gwarancje, wymuszone przez rozproszenie.</li>
+      <li><strong>ELT</strong> + <strong>schema-on-read</strong>: surowe dane do <em>data lake</em>, schemat dopiero przy odczycie.</li>
+      <li><strong>Narzędzia</strong>: Hadoop, Apache Spark, Kafka, data lake / lakehouse (HDFS, S3, Delta Lake).</li>
+    </ul>
+
+    <h2 id="cap-mapreduce">Dwa pojęcia do wymienienia</h2>
+    <p><strong>Twierdzenie CAP</strong>: w systemie rozproszonym, gdy dojdzie do rozerwania sieci (partycji), można zagwarantować tylko dwie z trzech własności — spójność (<strong>C</strong>), dostępność (<strong>A</strong>), odporność na partycje (<strong>P</strong>). Ponieważ sieć zawodzi, w praktyce wybór to <strong>C albo A</strong>. Stąd: RDBMS stawiają na spójność, wiele baz NoSQL na dostępność.</p>
+    <p><strong>MapReduce</strong> — model obliczeń rozproszonych: dane dzielone na fragmenty, faza <em>map</em> przetwarza je równolegle na klastrze do par klucz–wartość, faza <em>reduce</em> agreguje wartości o tym samym kluczu.</p>
+    <div class="mathblock">\[\text{Map}: (k_1,v_1)\to[(k_2,v_2)],\qquad \text{Reduce}: (k_2,[v_2])\to[(k_3,v_3)].\]</div>
+
+    <h2 id="synteza">Synteza</h2>
+    <div class="viz-mount" data-viz="v06"></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Wymiar</th><th>Klasyczna analiza</th><th>Big Data</th></tr></thead>
+        <tbody>
+          <tr><td>Dane</td><td>próba z populacji</td><td>N≈all, dane wyczerpujące</td></tr>
+          <tr><td>Cel</td><td>wnioskowanie o parametrach</td><td>predykcja, wzorce</td></tr>
+          <tr><td>Skalowanie</td><td>pionowe (scale-up)</td><td>poziome (scale-out)</td></tr>
+          <tr><td>Spójność</td><td>ACID</td><td>BASE / eventual consistency</td></tr>
+          <tr><td>Schemat</td><td>schema-on-write (ETL)</td><td>schema-on-read (ELT, lake)</td></tr>
+          <tr><td>Metoda</td><td>testy istotności, p-value</td><td>metryki predykcyjne, walidacja</td></tr>
+          <tr><td>Narzędzia</td><td>pandas, R, RDBMS</td><td>Spark, Kafka, lakehouse</td></tr>
+        </tbody>
+      </table>
     </div>
-    <script src="../assets/notes.js"></script>
-  </body>
-</html>
+    <p><strong>Pułapka</strong>: „premature Big Data" — stawianie klastra Spark dla 10 GB, które obsłuży laptop; narzut rozproszenia bywa większy niż zysk. Duża próba nie zwalnia z myślenia o tym, <em>jak</em> zebrano dane — błąd doboru nie znika z wolumenem.</p>
+    <p><strong>Zdanie zamykające</strong>: oba paradygmaty się nie wykluczają — realne projekty łączą je (np. Spark do agregacji dużych danych, potem klasyczny model statystyczny na wyniku).</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#5v">Model 5V</a></li>
+      <li><a href="#klasyka">Paradygmat klasyczny</a></li>
+      <li><a href="#bigdata">Paradygmat Big Data</a></li>
+      <li><a href="#cap-mapreduce">CAP i MapReduce</a></li>
+      <li><a href="#synteza">Synteza</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

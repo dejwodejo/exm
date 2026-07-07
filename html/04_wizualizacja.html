@@ -20,106 +20,53 @@
     <p class="eyebrow">Przygotowanie danych i modele klasyczne</p>
     <h1>Wizualizacja danych</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Wizualizacja służy dwóm celom: <strong>eksploracji</strong> (EDA, Exploratory Data Analysis — szukamy struktury w danych) i <strong>komunikacji</strong> (explanatory — przekazujemy wniosek odbiorcy). Inny cel = inny wykres, inna estetyka.</p>
-<h2 id="definicje-fundamentalne">Definicje fundamentalne</h2>
-<p><strong>Skale Stevensa</strong> (typy zmiennych) — determinują dobór wykresu:</p>
-<ul>
-<li><strong>nominalna</strong> — etykiety bez porządku (kolor oczu),</li>
-<li><strong>porządkowa</strong> — porządek bez metryki (oceny 1–5),</li>
-<li><strong>interwałowa</strong> — różnice mają sens, brak zera bezwzględnego (temperatura °C),</li>
-<li><strong>ilorazowa</strong> — pełna metryka, zero bezwzględne (wzrost, masa).</li>
-</ul>
-<p><strong>Dystrybuanta</strong> \(F(x) = P(X \leq x)\) i <strong>gęstość</strong> \(f(x) = dF/dx\) — fundament histogramu, KDE, violin plot (wszystkie estymują \(f\)).</p>
-<p><strong>Kwantyl rzędu \(p\)</strong>: \(Q(p) = \inf\{x : F(x) \geq p\}\). Stąd \(Q_1 = Q(0.25)\), mediana \(= Q(0.5)\), \(Q_3 = Q(0.75)\), \(IQR = Q_3 - Q_1\) (Interquartile Range, rozstęp międzykwartylowy).</p>
-<p><strong>Reguła Tukeya</strong> (outliery w boxplot): \(x < Q_1 - 1.5\,IQR\) lub \(x > Q_3 + 1.5\,IQR\) — wąsy kończą się na ostatniej obserwacji w tym zakresie, reszta to punkty odstające.</p>
 
-<p><strong>Liczba binów histogramu</strong> — kilka reguł wyboru:</p>
-<ul>
-<li><strong>Sturges</strong>: \(k = \lceil \log_2 n + 1 \rceil\) (Sturges 1926 — sufit obejmuje całość),</li>
-<li><strong>Scott</strong>: \(h = 3.5\sigma / n^{1/3}\),</li>
-<li><strong>Freedman–Diaconis</strong>: \(h = 2\,IQR / n^{1/3}\) (odporne na outliery).</li>
-</ul>
-<p>Sturges podaje \(k\) (liczba binów); Scott i Freedman-Diaconis podają \(h\) (szerokość bina). Konwersja: \(k \approx (\max - \min)/h\).</p>
-<p><strong>Kowariancja</strong>: \(\mathrm{Cov}(X,Y) = E[(X-\mu_X)(Y-\mu_Y)]\), gdzie \(\mu_X = E[X]\). <strong>Odchylenie standardowe</strong>: \(\sigma_X = \sqrt{\mathrm{Var}(X)}\). <strong>Współczynnik korelacji Pearsona</strong>: \(\rho = \dfrac{\mathrm{Cov}(X,Y)}{\sigma_X\,\sigma_Y} \in [-1,1]\) — mierzy zależność <strong>liniową</strong> między zmiennymi interwałowymi/ilorazowymi (dla próby estymator to \(r\)). Dla porządkowych — <strong>Spearman</strong> (na rangach), dla par zgodnych/niezgodnych — <strong>Kendall \(\tau\)</strong>.</p>
-<h2 id="dobor-wykresu-do-typu-danych">Dobór wykresu do typu danych</h2>
-<p>Trzy decyzje: (1) ile zmiennych, (2) jakie typy, (3) jaki cel (rozkład / porównanie / relacja / kompozycja / trend).</p>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Cel</th>
-<th>Dane</th>
-<th>Wykres</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Rozkład jednej zmiennej ciągłej</td>
-<td>ilorazowa/interwałowa</td>
-<td>histogram, KDE, boxplot, violin</td>
-</tr>
-<tr>
-<td>Porównanie kategorii</td>
-<td>nominalna × ilorazowa</td>
-<td>bar chart (sortuj po wartości)</td>
-</tr>
-<tr>
-<td>Część-całość</td>
-<td>nominalna sumująca do 100%</td>
-<td>bar (pie tylko dla 2–3 kat.)</td>
-</tr>
-<tr>
-<td>Relacja dwóch ciągłych</td>
-<td>ilorazowa × ilorazowa</td>
-<td>scatter (+ trendline)</td>
-</tr>
-<tr>
-<td>Trend w czasie</td>
-<td>szereg czasowy</td>
-<td>line</td>
-</tr>
-<tr>
-<td>Macierz par</td>
-<td>wiele ciągłych</td>
-<td>pairplot, heatmap korelacji</td>
-</tr>
-</tbody></table></div>
-<p><strong>Hierarchia percepcyjna Cleveland–McGill</strong> (od najlepiej odczytywanych): pozycja na wspólnej skali &gt; pozycja na skali niewspółosiowej &gt; długość &gt; kąt/nachylenie &gt; pole &gt; objętość &gt; barwa/nasycenie. Stąd: bar bije pie (pozycja &gt; kąt), scatter bije bubble chart (pozycja &gt; pole).</p>
-<h2 id="pulapki-wizualizacji">Pułapki wizualizacji</h2>
-<div class="viz-mount" data-viz="v04"></div>
+    <p>Wizualizacja służy dwóm celom: <strong>eksploracji</strong> (EDA, Exploratory Data Analysis — szukamy struktury w danych, jeszcze bez tezy) i <strong>komunikacji</strong> (przekazujemy gotowy wniosek odbiorcy). Inny cel wymusza inny wykres i inną estetykę. Zasada przewodnia: dobry wykres <strong>minimalizuje wysiłek poznawczy i maksymalizuje zgodność formy z typem danych</strong>.</p>
 
-<ul>
-<li><strong>Lie Factor Tufte&#39;a</strong> — miara zniekształcenia: \(\text{Lie Factor} = \dfrac{\text{wielkość efektu na wykresie}}{\text{wielkość efektu w danych}}\), gdzie wielkość efektu \(= \dfrac{|\text{wartość}_2 - \text{wartość}_1|}{|\text{wartość}_1|}\). Uczciwy wykres: \(\text{Lie Factor} \approx 1\); \(>1\) wyolbrzymia, \(<1\) pomniejsza. Typowe przyczyny: obcięta oś Y, manipulacja aspect ratio, kodowanie 1D zmiennej polem/objętością (rośnie nieliniowo). Osobno: pie chart &gt;5 kategorii — oko nie porównuje kątów.</li>
-<li><strong>Boxplot ukrywa multimodalność</strong> — rozkład bimodalny wygląda identycznie jak normalny. Dla podejrzenia bimodalności: violin lub KDE.</li>
-<li><strong>Overplotting</strong> w scatter (miliony punktów = czarna plama): <code>alpha</code>, <code>hexbin</code>, 2D KDE, <code>datashader</code>, sampling, jitter.</li>
-<li><strong>Korelacja \(\neq\) zależność</strong>: kwartet <strong>Anscombe&#39;a</strong> i <strong>Datasaurus dozen</strong> — zbiory o identycznych \(\bar{x}\), \(\bar{y}\), \(\sigma\), \(\rho\), ale drastycznie różnych kształtach. Stąd zasada: <strong>rysuj zanim policzysz</strong>.</li>
-<li><strong>Skala log</strong> — tylko dla \(x > 0\), dla rozkładów o ciężkich ogonach lub wielorzędowych. Słupki na skali log są mylące (bo długość nie odpowiada wartości).</li>
-<li><strong>Złe palety</strong>: rainbow/jet ma <strong>nieliniową luminancję</strong> — fałszywe kontury i nieintuicyjne uporządkowanie (to główny problem); nieprzyjazność dla CVD (Color Vision Deficiency, deficyt widzenia barw) jest wtórna. Zamiast tego używaj <strong>viridis</strong>, <strong>cividis</strong> (sekwencyjne, perceptualnie jednorodne) lub <strong>coolwarm</strong> z <code>center=0</code> (dywergentne, do korelacji). Dla dostępności koduj redundantnie (kolor + marker).</li>
-</ul>
-<h2 id="biblioteki-python">Biblioteki Python</h2>
-<ul>
-<li><strong>matplotlib</strong> — niskopoziomowa, pełna kontrola. Używaj API (Application Programming Interface) obiektowego (<code>fig, ax = plt.subplots()</code>), nie globalnego (<code>plt.plot()</code>). Fundament dla seaborn i pandas.</li>
-<li><strong>seaborn</strong> — statystyczna nadbudowa nad matplotlib. Działa na <code>DataFrame</code>, automatyczne grupowanie po <code>hue</code>, <code>col</code>, <code>row</code>. Idealny do EDA: <code>sns.pairplot(df)</code>, <code>sns.heatmap(df.corr(), annot=True, cmap='coolwarm', center=0)</code>, <code>sns.boxplot(data=df, x=, y=, hue=)</code>.</li>
-<li><strong>plotly</strong> — wykresy interaktywne (hover, zoom, 3D). Do dashboardów (<code>dash</code>/<code>streamlit</code>), raportów HTML (HyperText Markup Language). Słabo skalowalne dla bardzo dużych \(n\) w przeglądarce.</li>
-<li><strong>pandas <code>.plot()</code></strong> — skrót do matplotlib na <code>DataFrame</code> (<code>df.plot(kind='bar')</code>, <code>df.hist()</code>).</li>
-</ul>
-<p><strong>Grammar of Graphics</strong> (Wilkinson, ggplot2, altair, deklaratywne API plotly express): wykres = warstwy <code>(data, aesthetic mapping, geometry, scale, statistic, coord, facet)</code>. Paradygmat odmienny od imperatywnego matplotlib.</p>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: EDA = wizualizacja (histogramy, boxploty do braków/outlierów, korelogramy do redundancji).</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja</a></strong>: scatter z linią regresji, wykresy reszt, QQ-plot (Quantile-Quantile), diagnostyka modelu liniowego.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong>: krzywa ROC (Receiver Operating Characteristic), Precision-Recall, confusion matrix, learning curves.</li>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a></strong>: PCA (Principal Component Analysis) + scatter, biplot, t-SNE (t-distributed Stochastic Neighbor Embedding)/UMAP (Uniform Manifold Approximation and Projection), pairplot.</li>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data</a> / <a href="07_mapreduce.html">MapReduce</a></strong>: dla dużych \(n\) — sampling, agregacje, hexbin, datashader; klasyczny scatter się nie skaluje.</li>
-<li><strong><a href="05_raportowanie.html">Raportowanie</a></strong>: wykresy są budulcem raportów (Jupyter, Quarto, Dash, Streamlit).</li>
-</ul>
-<p><strong>Pojęcia wspólne</strong>: rozkład, kwantyle, IQR, korelacja, outlier, EDA, KDE, redukcja wymiaru, krzywa ROC, dashboard.</p>
+    <h2 id="typ-danych">Typ danych i cel wyznaczają wykres</h2>
+    <p>Punktem wyjścia są <strong>skale Stevensa</strong>. Zmienna <strong>nominalna</strong> to etykiety bez porządku (kolor oczu), <strong>porządkowa</strong> ma porządek bez metryki (oceny 1–5), a <strong>ilościowa</strong> (interwałowa/ilorazowa) ma pełną metrykę liczbową (temperatura, masa). Typ zmiennej razem z liczbą zmiennych i celem (rozkład, porównanie, relacja, kompozycja, trend) wskazuje właściwy wykres.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Cel</th><th>Dane</th><th>Wykres</th></tr></thead>
+      <tbody>
+        <tr><td>Rozkład jednej zmiennej ciągłej</td><td>ilorazowa / interwałowa</td><td>histogram, KDE, boxplot, violin</td></tr>
+        <tr><td>Porównanie kategorii</td><td>nominalna × ilorazowa</td><td>bar chart (sortuj po wartości)</td></tr>
+        <tr><td>Część–całość</td><td>kategorie sumujące się do 100%</td><td>bar (pie tylko dla 2–3 kat.)</td></tr>
+        <tr><td>Relacja dwóch ciągłych</td><td>ilorazowa × ilorazowa</td><td>scatter (+ trendline)</td></tr>
+        <tr><td>Trend w czasie</td><td>szereg czasowy</td><td>line</td></tr>
+        <tr><td>Macierz par</td><td>wiele ciągłych</td><td>pairplot, heatmap korelacji</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Hierarchia percepcyjna Cleveland–McGill</strong> mówi, że oko najdokładniej odczytuje położenie na wspólnej skali, gorzej długość, jeszcze gorzej kąt, a najgorzej pole i objętość. Stąd praktyczne reguły: bar wygrywa z pie (pozycja &gt; kąt), a scatter z bubble chart (pozycja &gt; pole).</p>
+
+    <h2 id="pulapki">Pułapki wizualizacji</h2>
+    <div class="viz-mount" data-viz="v04"></div>
+    <ul>
+      <li><strong>Obcięta oś Y</strong> — najczęstsze zniekształcenie: słupek wyolbrzymia różnice, bo jego długość przestaje odpowiadać wartości.</li>
+      <li><strong>Boxplot ukrywa multimodalność</strong> — rozkład bimodalny wygląda w nim identycznie jak normalny; przy podejrzeniu dwóch szczytów użyj violin lub KDE.</li>
+      <li><strong>Overplotting</strong> — miliony punktów w scatter zlewają się w czarną plamę; ratują przezroczystość (<code>alpha</code>), <code>hexbin</code>, 2D KDE lub próbkowanie.</li>
+      <li><strong>Korelacja \(\neq\) zależność</strong> — kwartet Anscombe’a to zbiory o identycznych średnich, odchyleniach i korelacji \(\rho\), lecz zupełnie różnych kształtach. Stąd zasada: <strong>rysuj, zanim policzysz</strong>.</li>
+      <li><strong>Złe palety</strong> — rainbow/jet ma nieliniową luminancję, więc tworzy fałszywe kontury; zamiast tego <strong>viridis</strong> (sekwencyjna, percepcyjnie jednorodna) lub <strong>coolwarm</strong> z <code>center=0</code> do korelacji. Dla dostępności koduj redundantnie (kolor + marker).</li>
+    </ul>
+
+    <h2 id="biblioteki">Biblioteki Python</h2>
+    <ul>
+      <li><strong>matplotlib</strong> — niskopoziomowa, pełna kontrola; używaj API obiektowego (<code>fig, ax = plt.subplots()</code>). Fundament dla pozostałych.</li>
+      <li><strong>seaborn</strong> — statystyczna nadbudowa nad matplotlib, działa na <code>DataFrame</code>, sama grupuje po <code>hue</code>. Idealna do EDA: <code>sns.pairplot(df)</code>, <code>sns.heatmap(df.corr(), annot=True)</code>.</li>
+      <li><strong>plotly</strong> — wykresy interaktywne (hover, zoom, 3D) do dashboardów i raportów HTML; słabo się skaluje przy bardzo dużych \(n\) w przeglądarce.</li>
+      <li><strong>pandas <code>.plot()</code></strong> — szybki skrót do matplotlib na <code>DataFrame</code>.</li>
+    </ul>
+    <p>Osobnym paradygmatem jest <strong>Grammar of Graphics</strong> (ggplot2, altair, plotly express): wykres opisujemy deklaratywnie jako warstwy — dane, mapowanie estetyczne, geometria, skala, faceting — zamiast rysować imperatywnie jak w matplotlib.</p>
+
+    <h2 id="powiazania">Powiązania z innymi zagadnieniami</h2>
+    <p>Wizualizacja spina cały proces analizy: w <strong><a href="02_preprocessing.html">preprocessingu</a></strong> histogramy i boxploty pokazują braki i outliery, a korelogram — redundancję cech. W <strong><a href="03_regresja_liniowa.html">regresji</a></strong> scatter z linią, wykresy reszt i QQ-plot służą diagnostyce modelu, a w <strong><a href="10_klasyczne_ml.html">klasycznym ML</a></strong> — krzywa ROC i macierz pomyłek. Dla dużych \(n\) (<a href="06_big_data_vs_klasyczna.html">Big Data</a>) klasyczny scatter się nie skaluje i trzeba sięgnąć po agregacje, hexbin lub próbkowanie. Wspólny słownik to: rozkład, kwantyle, IQR, korelacja, outlier, EDA, KDE.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#definicje-fundamentalne">Definicje fundamentalne</a></li>
-<li><a href="#dobor-wykresu-do-typu-danych">Dobór wykresu do typu danych</a></li>
-<li><a href="#pulapki-wizualizacji">Pułapki wizualizacji</a></li>
-<li><a href="#biblioteki-python">Biblioteki Python</a></li>
-
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#typ-danych">Typ danych i cel</a></li>
+    <li><a href="#pulapki">Pułapki wizualizacji</a></li>
+    <li><a href="#biblioteki">Biblioteki Python</a></li>
+    <li><a href="#powiazania">Powiązania z innymi zagadnieniami</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

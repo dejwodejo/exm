@@ -20,174 +20,39 @@
     <p class="eyebrow">Modele wielowymiarowe</p>
     <h1>Modele wielowymiarowe w prognozowaniu</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p><strong>Analiza wielowymiarowa</strong> to dział statystyki badający łączny rozkład wektora losowego \(X = (X_1, \ldots, X_p)^\top\) — zależności między zmiennymi, strukturę utajoną, redukcję wymiarowości, klasyfikację i grupowanie. Cel praktyczny: wspomaganie decyzji przez wydobycie struktury z danych wielowymiarowych (scoring, segmentacja, diagnostyka).</p>
-<h2 id="aparat-probabilistyczny">Aparat probabilistyczny</h2>
-<p><strong>Wektor losowy</strong> \(X: \Omega \to \mathbb{R}^p\) (mierzalny). <strong>Wartość oczekiwana</strong> \(\mu = \mathbb{E}[X] \in \mathbb{R}^p\). <strong>Macierz kowariancji</strong>:</p>
-<div class="mathblock">\[\Sigma = \mathbb{E}[(X - \mu)(X - \mu)^\top] \in \mathbb{R}^{p \times p}\]</div>
-<p>zawsze <strong>symetryczna i dodatnio półokreślona</strong>.</p>
-<ul>
-<li><p><strong>Macierz korelacji</strong> \(R = D^{-1/2} \Sigma D^{-1/2}\), gdzie \(D = \text{diag}(\Sigma)\) (wariancje na przekątnej).</p>
-</li>
-<li><p><strong>Rozkład normalny wielowymiarowy</strong> \(\mathcal{N}_p(\mu, \Sigma)\): \(f(x) = (2\pi)^{-p/2} |\Sigma|^{-1/2} \exp(-\tfrac{1}{2}(x-\mu)^\top \Sigma^{-1}(x-\mu))\).</p>
-</li>
-<li><p><strong>Odległość Mahalanobisa</strong> \(d_M(x, \mu) = \sqrt{(x-\mu)^\top \Sigma^{-1}(x-\mu)}\) — norma skalowana kowariancją cech (kwadrat = wykładnik gęstości \(\mathcal{N}_p\)).</p>
-</li>
-<li><p><strong>Twierdzenie spektralne</strong> (macierz symetryczna): \(\Sigma = Q \Lambda Q^\top\), \(Q\) ortogonalna (kolumny = wektory własne \(\Sigma\)), \(\Lambda = \text{diag}(\lambda_1 \geq \ldots \geq \lambda_p \geq 0)\).</p>
-</li>
-<li><p><strong>SVD (Singular Value Decomposition)</strong> macierzy danych: \(X = U S V^\top\); \(U, V\) ortogonalne (lewe/prawe wektory osobliwe), \(S = \text{diag}(\sigma_1 \geq \ldots \geq 0)\) — inne obiekty niż \(Q, \Lambda\) powyżej. Zaleta: brak jawnego liczenia \(\Sigma\).</p>
-</li>
-<li><p><strong>Estymator kowariancji</strong>: nieobciążony \(\hat\Sigma = \tfrac{1}{n-1} \sum_i (x_i - \bar x)(x_i - \bar x)^\top\); MLE (Maximum Likelihood Estimation) używa \(\tfrac{1}{n}\). Dla \(p > n\) macierz osobliwa.</p>
-</li>
-</ul>
-<p><strong>Relacja PCA (Principal Component Analysis)–SVD</strong>: dla wycentrowanego \(X \in \mathbb{R}^{n \times p}\) z \(X = U S V^\top\) kolumny \(V\) są wektorami własnymi \(\hat\Sigma = \tfrac{1}{n-1} X^\top X\), a \(\lambda_i = \sigma_i^2/(n-1)\), gdzie \(\sigma_i\) to wartości osobliwe; SVD numerycznie stabilniejsze niż jawny rozkład \(\hat\Sigma\). <strong>Testy wielowymiarowej normalności</strong>: Mardia (wektorowa skośność i kurtoza), Henze-Zirkler (empiryczna funkcja charakterystyczna).</p>
-<h2 id="pca-principal-component-analysis">PCA (Principal Component Analysis)</h2>
-<p><strong>Główna składowa</strong> \(Y_k = v_k^\top (X - \mu)\), gdzie \(v_k\) to \(k\)-ty wektor własny \(\Sigma\). Sformułowanie optymalizacyjne (mnożniki Lagrange&#39;a):</p>
-<div class="mathblock">\[\max_{v} v^\top \Sigma v \quad \text{przy} \quad \|v\| = 1, \quad v \perp v_1, \ldots, v_{k-1}\]</div>
-<p>Rozwiązanie: \(v_k\) = wektor własny dla \(\lambda_k\), \(\text{Var}(Y_k) = \lambda_k\). <strong>Udział wariancji wyjaśnionej</strong> \(\lambda_k / \sum_i \lambda_i\), skumulowany do progu (np. 95%). Kryteria liczby komponentów: <strong>Kaiser</strong> (\(\lambda > 1\) na korelacji), <strong>scree plot</strong> (łokieć), próg skumulowanej wariancji.</p>
-<p><strong>Twierdzenie Eckarta-Younga-Mirsky&#39;ego</strong>: SVD obcięte do \(k\) komponentów daje <strong>najlepszą aproksymację rzędu \(k\)</strong> w normie Frobeniusa — twierdzenie zachodzi dla <strong>każdej normy unitarnie niezmienniczej</strong> (Frobeniusa, spektralnej, nuklearnej), nie tylko Frobeniusa — uzasadnia PCA jako optymalną kompresję liniową.</p>
-<p><strong>PCA na kowariancji vs korelacji</strong> to decyzja modelarska: na kowariancji komponenty zdominowane przez zmienne o dużej wariancji absolutnej; na korelacji (≡ na danych standaryzowanych) wszystkie zmienne traktowane równoważnie. Bez standaryzacji pierwszy komponent odzwierciedla cechę o największej wariancji w jednostkach pomiaru, nie strukturę.</p>
-<h2 id="fa-factor-analysis">FA (Factor Analysis)</h2>
-<p><strong>Model</strong>: \(X - \mu = \Lambda F + \varepsilon\), gdzie \(F \in \mathbb{R}^m\) to <strong>czynniki wspólne</strong> (\(\mathbb{E}[F] = 0\), \(\text{Cov}(F) = I\)), \(\varepsilon\) to <strong>czynniki specyficzne</strong> (diagonalna \(\Psi\)), \(\Lambda \in \mathbb{R}^{p \times m}\) to <strong>macierz ładunków</strong>. Implikacja: \(\Sigma = \Lambda \Lambda^\top + \Psi\). <strong>Komunalność</strong> \(h_i^2 = \sum_j \lambda_{ij}^2\) — wariancja \(X_i\) wyjaśniona czynnikami wspólnymi; \(\psi_i\) — wariancja specyficzna.</p>
-<p>Estymacja: <strong>MLE (Maximum Likelihood Estimation)</strong> maksymalizuje \(\ell(\Lambda, \Psi) = -\tfrac{n}{2}[\ln |\Lambda\Lambda^\top + \Psi| + \text{tr}((\Lambda\Lambda^\top + \Psi)^{-1} S)]\), gdzie \(S\) to próbkowa kowariancja; algorytmicznie <strong>EM (Expectation-Maximization)</strong> z czynnikami \(F\) jako zmiennymi ukrytymi. Alternatywa: <strong>principal axis factoring</strong> (iteracyjne podstawienie komunalności). <strong>Rotacje</strong> dla interpretowalności: <strong>Varimax</strong> (ortogonalna, czynniki nieskorelowane), <strong>Promax/Oblimin</strong> (ukośna, czynniki skorelowane). Diagnostyka:</p>
-<ul>
-<li><strong>test sferyczności Bartletta</strong> \(H_0: R = I\), statystyka \(\chi^2 = -[n - 1 - (2p+5)/6] \ln |R|\) o \(p(p-1)/2\) st. swobody — odrzucenie \(H_0\) uzasadnia FA</li>
-<li><strong>KMO (Kaiser-Meyer-Olkin)</strong> \(= \sum_{i \neq j} r_{ij}^2 / (\sum_{i \neq j} r_{ij}^2 + \sum_{i \neq j} a_{ij}^2)\), gdzie \(a_{ij}\) to korelacje cząstkowe; &gt;0.6 akceptowalne, &gt;0.8 dobre</li>
-</ul>
-<p>Liczba czynników: <strong>analiza równoległa Horna</strong> porównuje \(\lambda_k\) z rozkładem wartości własnych macierzy korelacji <strong>danych losowych</strong> o tej samej \((n, p)\) — komponent zachowywany gdy \(\lambda_k >\) percentyl 95 z permutacji (najsolidniejsza statystycznie); scree (Cattell, łokieć); kryterium Kaisera \(\lambda > 1\) (zbyt liberalne).</p>
-<h2 id="pca-vs-fa">PCA vs FA</h2>
-<ul>
-<li><strong>Kierunek modelu</strong>: PCA — zmienne → komponenty (kombinacja liniowa obserwowanych); FA — czynniki ukryte → zmienne (model generatywny).</li>
-<li><strong>Cel</strong>: PCA maksymalizuje wariancję wyjaśnioną; FA modeluje strukturę kowariancji wspólnej.</li>
-<li><strong>Błąd specyficzny</strong>: PCA nie ma; FA jawnie rozdziela \(\Lambda\Lambda^\top\) (wspólna) od \(\Psi\) (specyficzna).</li>
-<li><strong>Założenia</strong>: PCA — deskryptywna procedura algebraiczna, brak założeń rozkładowych; FA klasyczna — wielowymiarowa normalność.</li>
-<li><strong>Jednoznaczność</strong>: PCA daje jednoznaczne rozwiązanie (z dokładnością do znaku) <strong>dla prostych wartości własnych</strong>; przy powtarzających się \(\lambda\) baza w podprzestrzeni własnej jest zdefiniowana z dokładnością do dowolnej rotacji ortogonalnej (niejednoznaczność); FA wymaga wyboru rotacji.</li>
-</ul>
-<h2 id="lda-linear-discriminant-analysis">LDA (Linear Discriminant Analysis)</h2>
-<p><strong>Reguła decyzyjna Bayesa</strong>: \(h^*(x) = \arg\max_k \pi_k f_k(x)\) — minimalizuje błąd 0-1, gdzie \(\pi_k = P(Y = k)\), \(f_k\) to gęstość warunkowa klasy. LDA zakłada \(f_k = \mathcal{N}_p(\mu_k, \Sigma)\) ze <strong>wspólną</strong> \(\Sigma\) dla wszystkich klas. Stąd <strong>liniowa funkcja dyskryminacyjna</strong>:</p>
-<div class="mathblock">\[\delta_k(x) = x^\top \Sigma^{-1} \mu_k - \tfrac{1}{2} \mu_k^\top \Sigma^{-1} \mu_k + \ln \pi_k\]</div>
-<p>Granica decyzyjna \(\{x: \delta_k(x) = \delta_l(x)\}\) jest hiperpłaszczyzną. LDA jako <strong>redukcja wymiaru nadzorowana</strong> rzutuje na podprzestrzeń maksymalizującą iloraz Rayleigha \(J(w) = w^\top \Sigma_B w / w^\top \Sigma_W w\) (kryterium Fishera, \(\Sigma_W\) — kowariancja wewnątrzklasowa, \(\Sigma_B\) — międzyklasowa); liczba wymiarów ≤ \(\min(p, K-1)\), gdzie \(K\) — liczba klas.</p>
-<h2 id="qda-i-lda-vs-qda">QDA i LDA vs QDA</h2>
-<p><strong>QDA (Quadratic Discriminant Analysis)</strong> odrzuca założenie wspólnej \(\Sigma\) — różne \(\Sigma_k\) per klasa. Funkcja dyskryminacyjna:</p>
-<div class="mathblock">\[\delta_k(x) = -\tfrac{1}{2} \ln |\Sigma_k| - \tfrac{1}{2} (x - \mu_k)^\top \Sigma_k^{-1} (x - \mu_k) + \ln \pi_k\]</div>
-<p>— kwadratowa, granice decyzyjne kwadratowe.</p>
-<ul>
-<li><strong>Koszt parametrów</strong>: LDA estymuje \(p(p+1)/2\) (jedna wspólna \(\Sigma\)), QDA \(K \cdot p(p+1)/2\) — wymaga znacznie większej próby na klasę, wrażliwe na klątwę wymiarowości.</li>
-<li><strong>Test Boxa M</strong> (\(H_0: \Sigma_1 = \ldots = \Sigma_K\)): statystyka asymptotycznie \(\chi^2\), silnie wrażliwa na nienormalność.</li>
-<li><strong>Shrinkage Ledoit-Wolfa</strong>: \(\hat\Sigma_\text{LW} = (1-\alpha)\hat\Sigma + \alpha \cdot \tfrac{\text{tr}(\hat\Sigma)}{p} I\), \(\alpha\) minimalizuje MSE (Mean Squared Error) estymatora — mityguje osobliwość przy multikolinearności i \(p > n\).</li>
-<li><strong>RDA (Regularized Discriminant Analysis; Friedman 1989)</strong>: interpoluje LDA, QDA i klasyfikator diagonalny dwoma parametrami \((\alpha, \gamma)\).</li>
-</ul>
-<h2 id="pca-vs-lda">PCA vs LDA</h2>
-<div class="viz-mount" data-viz="v12"></div>
 
-<p>PCA jest <strong>nienadzorowane</strong> — szuka kierunków maksymalnej wariancji bez użycia etykiet; LDA jest <strong>nadzorowane</strong> — maksymalizuje separowalność klas. <strong>Konsekwencja</strong>: PCA może odrzucić informację dyskryminacyjną, jeśli leży ona wzdłuż kierunku małej wariancji; LDA tego nie robi z definicji.</p>
-<h2 id="manova-multivariate-analysis-of-variance">MANOVA (Multivariate Analysis of Variance)</h2>
-<p>Uogólnienie ANOVA (Analysis of Variance) na wektorowe średnie. Hipoteza \(H_0: \mu_1 = \ldots = \mu_K\). Dla \(K=2\) grup redukuje się do <strong>testu Hotellinga \(T^2\)</strong> (wielowymiarowy \(t\)-test): jednopróbkowy \(T^2 = n(\bar x - \mu_0)^\top S^{-1}(\bar x - \mu_0)\) — kwadrat Mahalanobisa średniej próbkowej, z \(\tfrac{n-p}{p(n-1)} T^2 \sim F_{p, n-p}\); MANOVA uogólnia go na \(K > 2\). Dekompozycja <strong>całkowitej macierzy rozproszenia</strong> \(T = B + W\):</p>
-<div class="mathblock">\[B = \sum_k n_k (\bar x_k - \bar x)(\bar x_k - \bar x)^\top, \qquad W = \sum_k \sum_{i \in k} (x_i - \bar x_k)(x_i - \bar x_k)^\top\]</div>
-<p>Cztery klasyczne statystyki testowe (oparte na wartościach własnych \(\lambda_i\) macierzy \(W^{-1}B\)):</p>
-<ul>
-<li><strong>Wilks&#39; \(\Lambda\)</strong> \(= |W|/|T| = \prod_i 1/(1+\lambda_i)\) — najczęściej raportowane</li>
-<li><strong>Pillai&#39;s trace</strong> \(V = \text{tr}(B(B+W)^{-1}) = \sum \lambda_i/(1+\lambda_i)\) — najodporniejsze na łamanie założeń</li>
-<li><strong>Hotelling-Lawley trace</strong> \(T_0 = \text{tr}(BW^{-1}) = \sum \lambda_i\)</li>
-<li><strong>Roy&#39;s largest root</strong> \(\theta = \lambda_\text{max}\) — najmocniejsze gdy separacja w jednym kierunku</li>
-</ul>
-<p>Założenia: wielowymiarowa normalność (Mardia), homogeniczność \(\Sigma_k\) (Boxa M), niezależność. <strong>MANOVA i LDA dzielą aparat \(W^{-1}B\)</strong> — test istotności i kierunki Fishera to dwa końce tego samego problemu.</p>
-<h2 id="cca-canonical-correlation-analysis">CCA (Canonical Correlation Analysis)</h2>
-<p>Dla dwóch wektorów losowych \(X \in \mathbb{R}^p, Y \in \mathbb{R}^q\) szuka par kierunków \((a, b)\) maksymalizujących korelację:</p>
-<div class="mathblock">\[\rho = \max_{a, b} \text{corr}(a^\top X, b^\top Y) = \frac{a^\top \Sigma_{XY} b}{\sqrt{a^\top \Sigma_X a \cdot b^\top \Sigma_Y b}}\]</div>
-<p>Rozwiązanie: problem własny macierzy \(\Sigma_X^{-1}\Sigma_{XY}\Sigma_Y^{-1}\Sigma_{YX}\); istnieje \(\min(p, q)\) par kanonicznych \((a_k, b_k)\) z malejącymi korelacjami \(\rho_k\). Wymaga <strong>niesingularności</strong> \(\Sigma_X\) i \(\Sigma_Y\); dla \(p, q > n\) zagadnienie zdegenerowane (rozwiązaniem <strong>regularyzowane CCA</strong> z karą L2 na obie strony). <strong>Test istotności Bartletta-Lawleya</strong>: \(-(n - 1 - (p+q+1)/2) \sum_{k > k_0} \ln(1 - \rho_k^2) \approx \chi^2\) — czy istnieje więcej niż \(k_0\) istotnych korelacji. <strong>Specjalne przypadki</strong>: \(q=1\) → regresja wieloraka (\(\rho_1 = R\) wielokrotne); \(p = q = 1\) → korelacja Pearsona. Zastosowania: psychometria (cechy ↔ wyniki), bioinformatyka (geny ↔ fenotyp), fuzja modalności.</p>
-<h2 id="klasteryzacja">Klasteryzacja</h2>
-<h3 id="k-means">k-means</h3>
-<p>Minimalizuje <strong>WCSS (Within-Cluster Sum of Squares)</strong> \(J = \sum_{k=1}^K \sum_{x \in C_k} \|x - \mu_k\|^2\). <strong>Algorytm Lloyda</strong>: 1) przypisz każdy punkt do najbliższego centroidu, 2) zaktualizuj centroidy, 3) powtarzaj do zbieżności. Zbiega do <strong>lokalnego</strong> minimum, wynik zależy od inicjalizacji — <strong>k-means++</strong> wybiera startowe centroidy proporcjonalnie do kwadratu odległości od już wybranych. Klastry <strong>kuliste</strong> (komórki Woronoja w metryce euklidesowej), wymaga znanego \(K\) i skalowania cech. Złożoność \(O(n \cdot K \cdot i \cdot p)\).</p>
-<h3 id="gmm-gaussian-mixture-model-i-em">GMM (Gaussian Mixture Model) i EM</h3>
-<p><strong>Model mieszanin Gaussa</strong>: \(f(x) = \sum_{k=1}^K \pi_k \mathcal{N}(x|\mu_k, \Sigma_k)\), \(\sum \pi_k = 1\). Klasteryzacja <strong>miękka</strong> — odpowiedzialność \(\gamma_{ik} = P(Z_i = k | x_i)\) zamiast twardego przypisania. <strong>EM (Expectation-Maximization; Dempster-Laird-Rubin, 1977)</strong>:</p>
-<ul>
-<li><p><strong>E-step</strong>: \(\gamma_{ik} = \pi_k \mathcal{N}(x_i|\mu_k, \Sigma_k) / \sum_j \pi_j \mathcal{N}(x_i|\mu_j, \Sigma_j)\)</p>
-</li>
-<li><p><strong>M-step</strong>: \(N_k = \sum_i \gamma_{ik}\), \(\hat\pi_k = N_k/n\), \(\hat\mu_k = \tfrac{1}{N_k}\sum_i \gamma_{ik} x_i\), \(\hat\Sigma_k = \tfrac{1}{N_k}\sum_i \gamma_{ik}(x_i - \hat\mu_k)(x_i - \hat\mu_k)^\top\)</p>
-</li>
-<li><p><strong>Zbieżność</strong>: log-wiarygodność rośnie monotonicznie (nie maleje) w każdej iteracji; ciąg zbiega do <strong>punktu stacjonarnego</strong> (lokalne maksimum, siodło lub plateau — Wu 1983). Wynik zależy od inicjalizacji (start z k-means).</p>
-</li>
-<li><p><strong>k-means jako granica GMM</strong>: \(\Sigma_k = \sigma^2 I\), \(\sigma \to 0\) → odpowiedzialności \(\gamma_{ik} \in \{0,1\}\) (twarde przypisania), EM redukuje się do Lloyda.</p>
-</li>
-<li><p><strong>Warianty \(\Sigma_k\)</strong> (rosnąca liczba parametrów): spherical \(\Sigma_k = \sigma_k^2 I\); diag (przekątniowa); tied (wspólna \(\Sigma\) dla wszystkich \(k\)); full (dowolna).</p>
-</li>
-<li><p><strong>Wybór \(K\)</strong>: BIC (Bayesian Information Criterion) \(= -2\ell + k \ln n\), AIC (Akaike Information Criterion) \(= -2\ell + 2k\), gdzie \(k\) = liczba wolnych parametrów modelu (nie wymiar \(p\)); BIC karze parametry silniej.</p>
-</li>
-</ul>
-<h3 id="hierarchiczna-aglomeracyjna">Hierarchiczna aglomeracyjna</h3>
-<p>Zaczyna z \(n\) klastrami, iteracyjnie łączy najbliższe pary aż do jednego — wynik jako <strong>dendrogram</strong>, \(K\) wybiera się ex post (cięcie). <strong>Linkage</strong> (odległość między klastrami): single (min — łańcuchy), complete (max — zwarte), average, <strong>Ward</strong> (minimalizuje przyrost WCSS przy łączeniu: \(\Delta(a, b) = \tfrac{n_a n_b}{n_a + n_b} \|\mu_a - \mu_b\|^2\), wymaga metryki euklidesowej). Złożoność \(O(n^2)\)–\(O(n^3)\) — nieskalowalna powyżej ~10⁴ punktów.</p>
-<h3 id="dbscan-i-kryteria-wyboru-k">DBSCAN i kryteria wyboru <code>K</code></h3>
-<p><strong>DBSCAN (Density-Based Spatial Clustering of Applications with Noise)</strong>: parametry \(\varepsilon\) i <code>minPts</code>, klastry o dowolnym kształcie, oznacza outliery jako szum, nie wymaga \(K\); problem z klastrami o różnej gęstości (rozwiązuje HDBSCAN — Hierarchical DBSCAN).</p>
-<p><strong>Kryteria wyboru \(K\)</strong>:</p>
-<ul>
-<li><strong>metoda łokcia</strong> — wykres <code>inertia_</code> (\(J\) z k-means) vs \(K\), wybór punktu załamania</li>
-<li><strong>silhouette</strong> \(s(i) = (b(i) - a(i))/\max(a(i), b(i)) \in [-1, 1]\), gdzie \(a\) — średnia odległość wewnątrzklastrowa, \(b\) — do najbliższego sąsiedniego klastra</li>
-<li><strong>Calinski-Harabasz</strong> (variance ratio) \(\text{CH} = \tfrac{\text{tr}(B)/(K-1)}{\text{tr}(W)/(n-K)}\) — większa wartość lepsza</li>
-<li><strong>Davies-Bouldin</strong> \(\text{DB} = \tfrac{1}{K}\sum_k \max_{l \neq k}(s_k + s_l)/d_{kl}\) — mniejsza lepsza (\(s_k\) — średnia odległość w klastrze, \(d_{kl}\) — odległość centroidów)</li>
-<li><strong>gap statistic Tibshirani</strong>: \(\text{Gap}(K) = \mathbb{E}^*[\log W_K^*] - \log W_K\) — porównanie log-WCSS z wartością oczekiwaną pod referencyjnym rozkładem jednostajnym; wybór \(K\) z największą luką</li>
-</ul>
-<h2 id="mds-multidimensional-scaling">MDS (Multidimensional Scaling)</h2>
-<p>Rekonstrukcja konfiguracji \(X \in \mathbb{R}^{n \times k}\) z danych niepodobieństw \(\Delta = (\delta_{ij})\) tak, by \(d_{ij} = \|x_i - x_j\| \approx \delta_{ij}\) (konwencja: \(\delta_{ij}\) — dana odległość, \(d_{ij}\) — odległość w rekonstrukcji, \(\hat d_{ij}\) — dysparycja).</p>
-<ul>
-<li><strong>Klasyczne MDS (Torgerson)</strong>: rozkład spektralny macierzy podwójnie centrowanej \(B = -\tfrac{1}{2} H \Delta^{(2)} H\), gdzie \(H = I - \tfrac{1}{n}\mathbf{1}\mathbf{1}^\top\), \(\Delta^{(2)}\) — macierz kwadratów danych odległości; pierwsze \(k\) wartości własnych daje współrzędne. <strong>Dla odległości euklidesowych klasyczne MDS = PCA</strong> na danych.</li>
-<li><strong>Niemetryczne MDS (Kruskal)</strong>: minimalizuje <strong>stress</strong> \(\sigma = \sqrt{\sum (\hat d_{ij} - d_{ij})^2 / \sum d_{ij}^2}\), gdzie \(\hat d_{ij}\) to monotoniczna transformacja \(\delta_{ij}\) — używa tylko <strong>porządku</strong> odległości, nie ich wartości.</li>
-<li><strong>Sammon mapping</strong>: ważona stress \(\sum (\delta_{ij} - d_{ij})^2 / \delta_{ij}\) — preferuje zachowanie <strong>lokalnej</strong> geometrii.</li>
-</ul>
-<p>Zastosowanie: macierz odległości znana, surowe cechy nie (sekwencje DNA, percepcja, sieci). Współcześni krewni: Isomap (geodezyjne), t-SNE / UMAP (probabilistyczne, nieliniowe).</p>
-<h2 id="zastosowania-w-prognozowaniu-i-wspomaganiu-decyzji">Zastosowania w prognozowaniu i wspomaganiu decyzji</h2>
-<ul>
-<li><strong>Scoring kredytowy</strong>: cel — predykcja prawdopodobieństwa default (PD — Probability of Default) na 12 miesięcy. Standard: <strong>regresja logistyczna z WoE (Weight of Evidence)</strong> — interpretowalność wymagana regulacyjnie; WoE binuje zmienne ciągłe i koduje je \(\ln(P(X|\text{good})/P(X|\text{bad}))\), zachowuje monotoniczność i odporność na outliery. LDA stosowane gdy założenie Gaussa wiarygodne, rzadziej w praktyce bo cechy bywają binarne/skategoryzowane. Ocena: ROC (Receiver Operating Characteristic), AUC (Area Under Curve), statystyka Kołmogorowa-Smirnowa, Gini = 2·AUC − 1.</li>
-<li><strong>Segmentacja klientów</strong>: cechy RFM (Recency, Frequency, Monetary) → standaryzacja → log-transformacja przy skośności → k-means (\(K = 3{-}8\)) lub hierarchiczna; profilowanie segmentów po średnich i sylwetce. Pułapka: bez log-transformacji segmenty zdominowane przez kilka klientów o ekstremalnym wolumenie; segmenty muszą być <strong>operacyjnie użyteczne</strong> (różne strategie marketingowe per segment).</li>
-<li><strong>Diagnostyka medyczna</strong>: PCA do wizualizacji separowalności klas (np. zbiór Wisconsin Breast Cancer — 30 cech fizycznych jąder komórkowych), LDA/QDA jako klasyfikator bazowy, ocena ROC/AUC bo klasy często niezbalansowane (więcej próbek łagodnych niż złośliwych). Klasteryzacja podtypów choroby (np. molekularnych podtypów raka piersi) przez hierarchiczną na profilach ekspresji genów.</li>
-<li><strong>Wspomaganie decyzji przez redukcję wymiarowości</strong>: PCA/FA jako <strong>regularyzacja</strong> przeciw klątwie wymiarowości — w QDA macierze stają się osobliwe gdy \(p\) zbliża się do \(n\); redukcja przed klasteryzacją usuwa szum i poprawia separowalność. Ścieżka decyzyjna: dane → diagnostyka (Bartlett, KMO) → wybór metody → walidacja (silhouette, ROC, kros-walidacja) → interpretacja → decyzja biznesowa.</li>
-</ul>
-<h2 id="wybor-metody-drzewo-decyzyjne">Wybór metody — drzewo decyzyjne</h2>
-<ul>
-<li><strong>Cel: zrozumieć strukturę zmiennych</strong> → PCA (deskryptywna, brak modelu) lub FA (model z czynnikami ukrytymi; gdy zależy interpretowalność i obecność błędu pomiaru — psychometria, ankiety).</li>
-<li><strong>Cel: zredukować wymiar przed klasyfikacją</strong> z etykietami → LDA (nadzorowana redukcja, \(K-1\) wymiarów); bez etykiet → PCA.</li>
-<li><strong>Cel: klasyfikacja, klasy gaussowskie, mała próba</strong> → LDA (mniej parametrów); <strong>klasy gaussowskie, duża próba na klasę i różne \(\Sigma_k\)</strong> → QDA; <strong>w innych przypadkach</strong> — regresja logistyczna lub klasyczne ML.</li>
-<li><strong>Cel: pogrupowanie obserwacji bez etykiet</strong> — znana liczba klastrów, klastry zwarte → k-means; nieznana, dowolne kształty → DBSCAN; potrzeba dendrogramu / hierarchii → hierarchiczna; klastry eliptyczne → Gaussian Mixture Model.</li>
-<li><strong>Cel: regresja przy współliniowości</strong> → PCR (Principal Component Regression — regresja po PCA) lub PLS (max kowariancji \(X\) z \(y\)); PLS zwykle lepszy predykcyjnie.</li>
-</ul>
-<h2 id="pulapki-i-kluczowe-rozroznienia">Pułapki i kluczowe rozróżnienia</h2>
-<ul>
-<li><strong>Eksploracja vs konfirmacja</strong>: PCA, klasteryzacja, EFA (Exploratory Factor Analysis) generują hipotezy o strukturze; CFA (Confirmatory Factor Analysis) i SEM (Structural Equation Modeling) testują z góry zadany model. Użycie PCA do &quot;potwierdzenia&quot; struktury jest metodologicznie nieprawidłowe.</li>
-<li><strong>Redukcja wymiaru vs selekcja cech</strong>: redukcja (PCA, FA, LDA) tworzy nowe zmienne jako kombinacje liniowe — interpretowalność trudniejsza, ale informacja zachowana; selekcja wybiera podzbiór oryginalnych — interpretowalność zachowana, traci się informację.</li>
-<li><strong>PCA &quot;wyjaśnia wariancję&quot; ≠ &quot;wyjaśnia \(y\)&quot;</strong>: komponent o największej wariancji wejściowej może być nieskorelowany z target. <strong>PCR (Principal Component Regression)</strong> bez selekcji komponentów po korelacji z \(y\) często gorszy niż <strong>PLS (Partial Least Squares)</strong>, które maksymalizuje kowariancję \(X\) z \(y\).</li>
-<li><strong>Data leakage</strong>: PCA i StandardScaler MUSZĄ być w <code>Pipeline</code> z <code>fit</code> tylko na zbiorze treningowym — skalowanie/PCA na całym zbiorze przed splitem zawyża wynik walidacji krzyżowej.</li>
-<li><strong>Dane mieszane</strong>: PCA zakłada zmienne ilościowe; dla mieszanych typów — FAMD (Factor Analysis of Mixed Data); dla samych kategorycznych — MCA (Multiple Correspondence Analysis).</li>
-<li><strong>Klątwa wymiarowości</strong> (curse of dimensionality): w wysokich \(p\) stosunek \(\max/\min\) odległości euklidesowych \(\to 1\), estymatory \(\Sigma\) stają się niestabilne, klastry tracą sens — uzasadnienie redukcji wymiaru jako metody regularyzacji, nie tylko kompresji.</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong>: PCA, LDA/QDA, k-means, hierarchiczna i DBSCAN to rdzeń klasycznego ML — te modele dostarczają generatywnych klasyfikatorów i metod nienadzorowanych.</li>
-<li><strong><a href="09_porownanie_modelowania.html">Porównanie modelowania</a></strong>: LDA/QDA reprezentują podejście generatywne; PCA/FA — eksploracyjne; CFA/SEM — konfirmacyjne. Bezpośredni paralel.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: standaryzacja, imputacja, kodowanie warunkują działanie tych modeli; redukcja wymiaru sama bywa krokiem preprocessingu.</li>
-<li><strong><a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: autoenkoder = nieliniowe uogólnienie PCA; SOM (Self-Organizing Map) = neuronowa klasteryzacja; embeddingi = nieliniowa redukcja.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory wartości średniej</a></strong>: FA i LDA/QDA opierają się na MLE estymatorów \(\mu_k\), \(\Sigma_k\); własności estymatorów (zgodność, nieobciążoność) determinują jakość; shrinkage to regularyzacja źle uwarunkowanych \(\hat\Sigma\).</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja</a></strong>: PCR jako remedium na współliniowość; FA dostarcza zmiennych ukrytych jako predyktorów.</li>
-<li><strong><a href="04_wizualizacja.html">Wizualizacja danych</a></strong>: PCA + t-SNE (t-Distributed Stochastic Neighbor Embedding) + UMAP (Uniform Manifold Approximation and Projection) — wizualizacja w 2D/3D; dendrogramy i scree ploty jako wykresy diagnostyczne.</li>
-<li><strong><a href="13_text_mining.html">Text mining</a></strong>: LSA (Latent Semantic Analysis) = obcięte SVD macierzy term-document/TF-IDF; z PCA jest blisko spokrewnione, ale standardowo nie jest po prostu PCA na wycentrowanej macierzy; LDA topic = Latent Dirichlet Allocation (probabilistyczny kuzyn FA dla tekstu); klasteryzacja dokumentów.</li>
-<li><strong><a href="14_optymalizacja_wielokryterialna.html">Optymalizacja wielokryterialna</a></strong>: PCA = optymalizacja z ograniczeniami (iloraz Rayleigha); k-means minimalizuje WCSS; LDA maksymalizuje iloraz Rayleigha — wszystkie to zadania ekstremalne pod ograniczeniami.</li>
-<li><strong><a href="00_schematy_losowania.html">Populacja</a> / <a href="00_schematy_losowania.html">Schematy losowania</a></strong>: wnioskowanie o macierzy kowariancji i średnich klas wymaga reprezentatywnej próby — założenia <a href="00_schematy_losowania.html">populacji generalnej</a> i <a href="00_schematy_losowania.html">schematów losowania</a> warunkują uogólnialność.</li>
-</ul>
+    <p><strong>Analiza wielowymiarowa</strong> bada łączny rozkład wektora cech \(X = (X_1, \ldots, X_p)^\top\) — zależności między zmiennymi, strukturę ukrytą, redukcję wymiaru, klasyfikację i grupowanie. Cel jest praktyczny: z wielu skorelowanych zmiennych chcemy wydobyć strukturę, która wspiera prognozę lub segmentację, zamiast analizować każdą cechę osobno.</p>
+
+    <h2 id="aparat">Kowariancja i korelacja</h2>
+    <p>Punktem wyjścia jest macierz kowariancji \(\Sigma = \mathbb{E}[(X-\mu)(X-\mu)^\top]\), zawsze symetryczna i dodatnio półokreślona, oraz jej znormalizowana wersja — macierz korelacji. To w niej, a nie w pojedynczych wariancjach, zawarta jest informacja o współzależności cech i dlatego prawie każda metoda wielowymiarowa jest w istocie operacją na \(\Sigma\).</p>
+
+    <h2 id="pca">PCA — redukcja wymiaru</h2>
+    <p><strong>PCA</strong> (analiza głównych składowych) obraca układ współrzędnych tak, by kolejne osie — składowe główne — wyjaśniały maksimum wariancji. Są to kierunki wektorów własnych \(\Sigma\), a wariancję wyjaśnianą przez każdą składową mierzy odpowiadająca jej wartość własna. Zatrzymując kilka pierwszych składowych (np. do 95% skumulowanej wariancji), redukujemy wymiar przy minimalnej stracie informacji. PCA robimy zwykle na danych standaryzowanych — inaczej pierwsza składowa odzwierciedla po prostu cechę o największej skali pomiaru, a nie strukturę. Jest to metoda nienadzorowana i czysto opisowa. Pokrewna analiza czynnikowa (FA) idzie dalej — modeluje zmienne jako generowane przez ukryte czynniki wspólne — ale służy raczej interpretacji konstruktów niż prognozie.</p>
+
+    <h2 id="lda-qda">LDA i QDA — klasyfikacja</h2>
+    <p><strong>LDA</strong> (liniowa analiza dyskryminacyjna) zakłada, że klasy mają rozkłady normalne o wspólnej macierzy kowariancji, i wyznacza między nimi liniowe granice decyzyjne. <strong>QDA</strong> dopuszcza różne \(\Sigma_k\) w każdej klasie, więc granice stają się kwadratowe — ale kosztem wielokrotnie większej liczby parametrów, przez co wymaga znacznie większej próby na klasę. LDA służy też jako nadzorowana redukcja wymiaru.</p>
+    <div class="viz-mount" data-viz="v12"></div>
+    <p>W odróżnieniu od PCA, które szuka kierunków dużej wariancji ignorując etykiety, LDA szuka kierunków najlepiej <strong>rozdzielających klasy</strong>. Konsekwencja: PCA potrafi odrzucić informację różnicującą klasy, jeśli leży ona wzdłuż osi małej wariancji — LDA tego z definicji nie robi.</p>
+
+    <h2 id="klasteryzacja">Klasteryzacja — segmentacja</h2>
+    <p>Klasteryzacja grupuje obserwacje bez etykiet. <strong>k-means</strong> minimalizuje sumę kwadratów wewnątrz klastrów \(J = \sum_k \sum_{x \in C_k} \|x - \mu_k\|^2\), wymaga zadanej liczby klastrów \(K\) i daje klastry kuliste. Klasteryzacja <strong>hierarchiczna</strong> nie wymaga z góry \(K\) — buduje zagnieżdżoną strukturę grup, z której liczbę klastrów wybiera się dopiero po fakcie.</p>
+
+    <h2 id="zastosowania">Zastosowania: prognozowanie i decyzje</h2>
+    <p>Te metody wprost wspierają decyzje. <strong>Przykład</strong>: segmentacja klientów — z cech RFM (jak dawno, jak często i za ile kupują) po standaryzacji budujemy segmenty metodą k-means, potem profilujemy je i przypisujemy różne strategie marketingowe. W <strong>scoringu kredytowym</strong> klasyfikatory (regresja logistyczna, rzadziej LDA) prognozują prawdopodobieństwo niewypłacalności, a jakość ocenia się krzywą ROC i polem pod nią (AUC).</p>
+
+    <h2 id="pulapki">Pułapki</h2>
+    <p><strong>Pułapka</strong>: PCA wyjaśnia wariancję wejścia, a nie zmiennej celu — składowa o największej wariancji może być zupełnie nieskorelowana z tym, co prognozujemy. Druga: standaryzację i PCA wolno dopasować <em>tylko</em> na zbiorze treningowym — policzone na całości przed podziałem zawyżają wynik walidacji (data leakage).</p>
+    <p><strong>Zdanie zamykające</strong>: wspólnym mianownikiem jest walka z klątwą wymiarowości — gdy liczba cech rośnie, odległości się zacierają, a estymatory \(\Sigma\) stają się niestabilne, więc redukcja wymiaru działa jak regularyzacja. To wprost łączy analizę wielowymiarową z klasycznym ML i preprocessingiem, gdzie PCA, LDA i k-means są codziennymi narzędziami.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#aparat-probabilistyczny">Aparat probabilistyczny</a></li>
-<li><a href="#pca-principal-component-analysis">PCA (Principal Component Analysis)</a></li>
-<li><a href="#fa-factor-analysis">FA (Factor Analysis)</a></li>
-<li><a href="#pca-vs-fa">PCA vs FA</a></li>
-<li><a href="#lda-linear-discriminant-analysis">LDA (Linear Discriminant Analysis)</a></li>
-<li><a href="#qda-i-lda-vs-qda">QDA i LDA vs QDA</a></li>
-<li><a href="#pca-vs-lda">PCA vs LDA</a></li>
-<li><a href="#manova-multivariate-analysis-of-variance">MANOVA (Multivariate Analysis of Variance)</a></li>
-<li><a href="#cca-canonical-correlation-analysis">CCA (Canonical Correlation Analysis)</a></li>
-<li><a href="#klasteryzacja">Klasteryzacja</a></li>
-<li><a href="#mds-multidimensional-scaling">MDS (Multidimensional Scaling)</a></li>
-<li><a href="#zastosowania-w-prognozowaniu-i-wspomaganiu-decyzji">Zastosowania w prognozowaniu i wspomaganiu decyzji</a></li>
-<li><a href="#wybor-metody-drzewo-decyzyjne">Wybór metody — drzewo decyzyjne</a></li>
-<li><a href="#pulapki-i-kluczowe-rozroznienia">Pułapki i kluczowe rozróżnienia</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#aparat">Kowariancja i korelacja</a></li>
+    <li><a href="#pca">PCA — redukcja wymiaru</a></li>
+    <li><a href="#lda-qda">LDA i QDA — klasyfikacja</a></li>
+    <li><a href="#klasteryzacja">Klasteryzacja — segmentacja</a></li>
+    <li><a href="#zastosowania">Zastosowania: prognozowanie i decyzje</a></li>
+    <li><a href="#pulapki">Pułapki</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

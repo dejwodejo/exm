@@ -20,115 +20,42 @@
     <p class="eyebrow">Uczenie głębokie</p>
     <h1>Sieci neuronowe</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p><strong>Sieć neuronowa</strong> to parametryczny model funkcyjny powstały przez kompozycję transformacji afinicznych i nieliniowości:</p>
-<div class="mathblock">\[f_\theta(x) = \phi_L(W_L \phi_{L-1}(\ldots \phi_1(W_1 x + b_1) \ldots) + b_L), \qquad \theta = \{W_l, b_l\}_{l=1}^L\]</div>
-<p>gdzie \(W_l \in \mathbb{R}^{n_l \times n_{l-1}}\) to macierz wag, \(b_l\) to bias, \(\phi_l\) to <strong>funkcja aktywacji</strong> (mierzalna, niemal zawsze ciągła i niewielomianowa). Trening = minimalizacja <strong>ryzyka empirycznego</strong> \(\hat R(\theta) = \tfrac{1}{n}\sum_i \ell(f_\theta(x_i), y_i)\) — problem niewypukły z minimami lokalnymi i punktami siodłowymi.</p>
-<h2 id="perceptron-mlp">Perceptron, MLP</h2>
-<p><strong>Perceptron Rosenblatta (1958)</strong>: pojedynczy neuron z funkcją progową Heaviside&#39;a; reguła perceptronowa zbieżna gwarantowana <strong>tylko</strong> dla danych liniowo separowalnych (twierdzenie Novikoffa, 1962). Pojedynczy perceptron nie rozwiązuje XOR (eXclusive OR; Minsky &amp; Papert, 1969). <strong>MLP (Multi-Layer Perceptron — perceptron wielowarstwowy)</strong> używa różniczkowalnej aktywacji i co najmniej jednej warstwy ukrytej — rozwiązuje XOR, uczony jest gradientowo.</p>
-<h2 id="funkcje-aktywacji">Funkcje aktywacji</h2>
-<ul>
-<li><strong>Sigmoid</strong> \(\sigma(x) = 1/(1 + e^{-x}) \in (0, 1)\), pochodna max \(0.25\) — w głębokich sieciach nasyca się i powoduje <strong>znikający gradient (vanishing gradient)</strong>.</li>
-<li><strong>Tanh</strong> \(\tanh(x) \in (-1, 1)\), wycentrowana w zerze (sigmoid nie jest), lepsza propagacja gradientu; nadal nasyca się dla \(|x| \gg 0\).</li>
-<li><strong>ReLU (Rectified Linear Unit)</strong> \(\text{ReLU}(x) = \max(0, x)\), pochodna \(1\) dla \(x > 0\) — eliminuje nasycanie po stronie dodatniej. Pułapka <strong>dead ReLU</strong>: neuron z trwale ujemnym wejściem nigdy nie aktualizuje wag (gradient \(= 0\)). Leaky ReLU / PReLU (Parametric ReLU) dodają drobne nachylenie dla \(x < 0\), GELU (Gaussian Error Linear Unit) jest wygładzonym wariantem standardowym w Transformerach.</li>
-<li><strong>Softmax</strong> \(\text{softmax}(z)_k = e^{z_k}/\sum_j e^{z_j}\) — przekształcenie \(\mathbb{R}^K \to \Delta^{K-1}\) na simpleks probabilistyczny; warstwa wyjściowa klasyfikacji wieloklasowej.</li>
-</ul>
-<h2 id="funkcje-straty">Funkcje straty</h2>
-<ul>
-<li><strong>MSE (Mean Squared Error)</strong> \(\ell(\hat y, y) = \tfrac{1}{2}\|\hat y - y\|^2\) — wyprowadzalna z MLE (Maximum Likelihood Estimation) przy założeniu szumu gaussowskiego; standard regresji.</li>
-<li><strong>Cross-entropy</strong> \(\ell(\hat y, y) = -\sum_k y_k \log \hat y_k\) — z MLE dla rozkładu kategorialnego; standard klasyfikacji. Dla pary softmax+CE gradient jest <strong>liniowy w błędzie</strong> \((\hat p - y)\), numerycznie stabilny. MSE na softmaxie ma w gradiencie pochodną softmaxu, która zanika i spowalnia uczenie.</li>
-</ul>
-<h2 id="backpropagation-i-gradient-descent">Backpropagation i gradient descent</h2>
-<div class="viz-mount" data-viz="v11"></div>
 
-<p><strong>Gradient</strong> \(\nabla_\theta \hat R \in \mathbb{R}^{|\theta|}\) to wektor pochodnych cząstkowych. <strong>Reguła łańcuchowa</strong> dla złożeń wektorowych: \(J_{f \circ g}(x) = J_f(g(x)) \cdot J_g(x)\), gdzie \(J_f\) oznacza <strong>jakobian</strong> — macierz pochodnych cząstkowych \([\partial f_i/\partial x_j]\). <strong>Backpropagation</strong> = automatyczne różniczkowanie w trybie odwrotnym (reverse-mode autodiff) zastosowane do funkcji straty. Oznaczenia: \(z^{(l)} = W^{(l)}a^{(l-1)} + b^{(l)}\) to <strong>pre-aktywacja</strong> (suma ważona przed nieliniowością), \(a^{(l)} = \phi(z^{(l)})\) to <strong>aktywacja</strong> warstwy \(l\), \(\delta^{(l)} = \partial L/\partial z^{(l)}\) to <strong>błąd</strong> (gradient straty względem pre-aktywacji), a \(\odot\) to <strong>iloczyn Hadamarda</strong> (mnożenie element-wise). Rekursja:</p>
-<div class="mathblock">\[\delta^{(l)} = \big((W^{(l+1)})^\top \delta^{(l+1)}\big) \odot \phi'(z^{(l)}), \qquad \frac{\partial L}{\partial W^{(l)}} = \delta^{(l)} (a^{(l-1)})^\top\]</div>
-<p>Koszt \(O(|\theta|)\), nie \(O(|\theta|^2)\). Backprop <strong>nie jest algorytmem uczenia</strong> — to algorytm liczenia gradientu; uczenie wykonuje optymalizator.</p>
-<p><strong>SGD (Stochastic Gradient Descent)</strong>: \(\theta_{t+1} = \theta_t - \eta_t \hat g_t\), gdzie \(\hat g_t = \tfrac{1}{|B|}\sum_{i \in B} \nabla \ell_i\) jest <strong>estymatorem nieobciążonym</strong> pełnego gradientu na <strong>mini-batchu</strong> \(B\) (losowy podzbiór próbek; jedno przejście przez cały zbiór = <strong>epoka</strong>). Warunki zbieżności Robbinsa-Monro: \(\sum \eta_t = \infty\), \(\sum \eta_t^2 < \infty\) (warunki gwarantują zbieżność do <strong>stacjonarnego punktu w problemie wypukłym</strong>; w niewypukłym deep learning brak gwarancji globalnego minimum, tylko zbieżność do punktu krytycznego).</p>
-<p><strong>Momentum</strong>: akumulator \(v_t = \beta v_{t-1} + g_t\), aktualizacja \(\theta_{t+1} = \theta_t - \eta\, v_t\) — \(v_t\) to wykładniczo ważona średnia gradientów (\(\beta\approx 0.9\)), tłumi oscylacje w wąskich wąwozach funkcji straty. <strong>Adam</strong> (Kingma &amp; Ba, 2014) utrzymuje estymaty pierwszego i drugiego momentu gradientu z korektą obciążenia:</p>
-<div class="mathblock">\[m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \quad v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2\]</div>
-<div class="mathblock">\[\hat m_t = \frac{m_t}{1-\beta_1^t}, \quad \hat v_t = \frac{v_t}{1-\beta_2^t}, \quad \theta_{t+1} = \theta_t - \eta\,\frac{\hat m_t}{\sqrt{\hat v_t} + \varepsilon}\]</div>
-<p>gdzie \(g_t = \hat g_t\) to gradient mini-batcha w kroku \(t\); \(g_t^2\) i pierwiastek liczone element-wise, \(\varepsilon\) zapobiega dzieleniu przez zero.
-<strong>SGD vs Adam</strong>: Adam zbiega szybciej na początku, ale dobrze dostrojone SGD+momentum często <strong>lepiej generalizuje</strong> (Wilson i in., 2017) — stąd <strong>AdamW</strong> (decoupled weight decay) i przewaga SGD w treningu CNN (Convolutional Neural Network — sieć konwolucyjna) dla wizji; Adam/AdamW dominują w NLP (Natural Language Processing — przetwarzanie języka naturalnego) i Transformerach.</p>
-<h2 id="inicjalizacja-i-znikajacy-eksplodujacy-gradient">Inicjalizacja i znikający/eksplodujący gradient</h2>
-<p>W głębokich sieciach gradient warstwy \(l\) to iloczyn jakobianów warstw późniejszych: jeśli ich wartości własne \(< 1\) — gradient zanika eksponencjalnie; \(> 1\) — eksploduje. Środki zaradcze: <strong>inicjalizacja Xavier/Glorot</strong> (dla tanh/sigmoid, \(\text{Var}(w) = 2/(n_\text{in} + n_\text{out})\)), <strong>He</strong> (dla ReLU, \(\text{Var}(w) = 2/n_\text{in}\), bo ReLU zeruje połowę aktywacji), <strong>residual connections</strong> (ResNet — He i in., 2015), <strong>gradient clipping</strong> (\(g \leftarrow g \cdot \min(1, c/\|g\|)\)), normalizacja warstw.</p>
-<h2 id="uniwersalne-twierdzenie-aproksymacji">Uniwersalne twierdzenie aproksymacji</h2>
-<p><strong>Cybenko (1989), Hornik (1991)</strong>: dla dowolnej funkcji ciągłej \(f: K \to \mathbb{R}\) na zwartym \(K\) i \(\varepsilon > 0\) istnieje sieć z <strong>jedną warstwą ukrytą</strong> i niewielomianową aktywacją taka, że \(\sup_{x \in K} |f(x) - \hat f(x)| < \varepsilon\). Twierdzenie o <strong>istnieniu</strong>, nie o <strong>uczeniu się</strong> ani liczbie neuronów. Telgarsky (2016): istnieją funkcje wymagające <strong>wykładniczo</strong> wielu neuronów w sieci płytkiej, a tylko <strong>wielomianowo</strong> w głębokiej — głębokość daje istotny zysk w sile reprezentacyjnej.</p>
-<h2 id="cnn">CNN</h2>
-<p><strong>Splot dyskretny</strong> \((K * x)[i, j] = \sum_{m, n} K[m, n]\, x[i-m, j-n]\). CNN narzuca trzy priors architektoniczne:</p>
-<ol>
-<li><strong>Lokalność</strong> — pole receptywne ograniczone do sąsiedztwa.</li>
-<li><strong>Współdzielenie wag</strong> — to samo jądro przesuwane po przestrzeni → <strong>translation equivariance</strong> (\(f(T x) = T f(x)\)).</li>
-<li><strong>Hierarchia</strong> — pooling/stride redukują rozdzielczość, dają ograniczoną, lokalną <strong>translation invariance</strong> (\(f(T x) = f(x)\)). Equivariance (\(f(Tx)=Tf(x)\), gdzie \(T\) to przesunięcie): przesunięcie wejścia przesuwa wyjście. Invariance (\(f(Tx)=f(x)\)): przesunięcie wejścia nie zmienia wyjścia. To dwa jakościowo różne pojęcia, nie stopnie tej samej własności. Pooling daje <strong>lokalną</strong> invariance dzięki redukcji rozdzielczości.</li>
-</ol>
-<p>Dla obrazu \(224 \times 224 \times 3\) warstwa w pełni połączona do \(1000\) neuronów ma ~\(150\) mln parametrów; warstwa konwolucyjna \(3 \times 3 \times 3 \times 64\) ma \(1728\) — drastyczna redukcja. Architektury: VGG (Visual Geometry Group), ResNet, EfficientNet, ViT (Vision Transformer — czysty Transformer na patche obrazu).</p>
-<h2 id="rnn-lstm-gru">RNN, LSTM, GRU</h2>
-<p><strong>RNN (Recurrent Neural Network)</strong>: \(h_t = \phi(W_h h_{t-1} + W_x x_t + b)\), gdzie \(h_t\) to <strong>stan ukryty</strong> — skompresowana pamięć całej dotychczasowej sekwencji; przetwarzanie sekwencyjne, obliczenia nieparalelizowalne po długości. Trening: BPTT (Backpropagation Through Time) — gradient po czasie to iloczyn jakobianów \(\frac{\partial h_t}{\partial h_k} = \prod_{k<i\le t} \frac{\partial h_i}{\partial h_{i-1}}\) (ten sam mechanizm co w sieciach głębokich), stąd <strong>znikający/eksplodujący gradient po czasie</strong> uniemożliwia uczenie długich zależności.</p>
-<p><strong>LSTM (Long Short-Term Memory; Hochreiter &amp; Schmidhuber, 1997)</strong>: dodaje komórkę pamięci \(c_t\) z <strong>addytywną</strong> aktualizacją (constant error carousel — gradient bliski \(1\)) i trzy bramki: input, forget, output (4 zestawy wag). <strong>GRU (Gated Recurrent Unit; Cho i in., 2014)</strong>: łączy stan i pamięć w jeden wektor, dwie bramki (update, reset, 3 zestawy wag, ~25% mniej parametrów). Empirycznie GRU bywa szybszy i równie dobry; LSTM ma teoretycznie większą pojemność.</p>
-<h2 id="transformer-i-attention">Transformer i attention</h2>
-<p><strong>Self-attention</strong> (Vaswani i in., 2017): \(Q = X W_Q\), \(K = X W_K\), \(V = X W_V\);</p>
-<div class="mathblock">\[\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{Q K^\top}{\sqrt{d_k}}\right) V\]</div>
-<p>gdzie \(d_k\) to wymiar wektorów query/key. Skalowanie przez \(1/\sqrt{d_k}\) utrzymuje wariancję iloczynu skalarnego \(Q K^\top\) na poziomie ~1 (iloczyn \(d_k\) składników rośnie z \(d_k\)), co zapobiega nasyceniu softmaxu i zanikowi gradientu. <strong>Multi-head attention</strong> — \(h\) równoległych projekcji w niższy wymiar, dywersyfikacja &quot;trybów&quot; uwagi. <strong>Causal mask</strong> w dekoderze blokuje patrzenie w przyszłość. Transformer <strong>nie ma rekurencji ani splotu</strong>, więc kolejność tokenów wstrzykiwana jest jawnie przez <strong>positional encoding</strong> (sinusoidalne lub uczone).</p>
-<p><strong>RNN vs Transformer</strong>: RNN \(O(n d^2)\) na sekwencji długości \(n\), ścisła sekwencyjność, długie zależności degradowane przez wiele kroków rekurencji. Transformer self-attention \(O(n^2 d)\) (plus projekcje i FFN rzędu <code>O(nd²)</code>) — kwadratowo z długością, ale <strong>w pełni paralelizowalny</strong>, każdy token &quot;widzi&quot; każdy inny w jednym kroku. BERT (Bidirectional Encoder Representations from Transformers) — encoder, GPT (Generative Pre-trained Transformer) — decoder.</p>
-<h2 id="regularyzacja">Regularyzacja</h2>
-<p>Modyfikacja ryzyka empirycznego: \(\tilde R(\theta) = \hat R(\theta) + \lambda \Omega(\theta)\), gdzie \(\Omega(\theta)\) to <strong>kara za złożoność</strong> (funkcja regularyzacji zależna od wag), a \(\lambda \ge 0\) — hiperparametr siły regularyzacji.</p>
-<ul>
-<li><strong>Weight decay (L2)</strong> \(\Omega = \|\theta\|_2^2\) — interpretacja jako MAP (Maximum A Posteriori) z priorem gaussowskim.</li>
-<li><strong>Dropout</strong> (Srivastava i in., 2014): losowo zeruje aktywacje z prawdopodobieństwem \(p\) w trybie treningowym, mnoży pozostałe przez \(1/(1-p)\) dla zachowania skali; w inferencji wyłączony (<strong>inverted dropout</strong> — skalowanie w treningu; oryginał Srivastavy skalował w inferencji). Interpretacja: uśrednianie ekspotencjalnie wielu podsieci (ensemble).</li>
-<li><strong>Batch Normalization (BN; Ioffe &amp; Szegedy, 2015)</strong>: normalizacja \(\hat x = (x - \mu_B)/\sqrt{\sigma_B^2 + \varepsilon}\), następnie afiniczna transformacja \(y = \gamma \hat x + \beta\) (uczone \(\gamma,\beta\) przywracają zdolność reprezentacyjną, m.in. odtworzenie identyczności), gdzie \(\mu_B, \sigma_B^2\) to średnia i wariancja po wymiarze batcha; wymaga dużych batchów; źle działa w RNN i przy małych batchach.</li>
-<li><strong>Layer Normalization (LN)</strong>: po wymiarze cech jednego przykładu; standard w Transformerach i RNN.</li>
-<li><strong>GroupNorm/InstanceNorm</strong>: dla batch=1 lub segmentacji.</li>
-<li><strong>Early stopping</strong> — zatrzymanie treningu przy wzroście błędu walidacyjnego; <strong>niejawna regularyzacja</strong> przez ograniczenie liczby kroków.</li>
-</ul>
-<p>BN i Dropout to <strong>nie zamienniki</strong>: pierwsze stabilizuje rozkład aktywacji, drugie zapobiega współadaptacji neuronów; ich kombinacja bywa szkodliwa (variance shift).</p>
-<p><strong>Sieci przeparametryzowane</strong> (więcej parametrów niż danych) zaskakująco generalizują, łamiąc klasyczną teorię VC (Vapnik-Chervonenkis) i bias-variance — zjawisko <strong>double descent</strong> (Belkin i in., 2019): błąd testowy spada, rośnie przy interpolacji, znów spada w reżimie przeparametryzowanym. Sam SGD ma <strong>niejawny bias indukcyjny</strong> w stronę rozwiązań o małej normie i płaskich minimów.</p>
-<h2 id="trening-i-frameworki">Trening i frameworki</h2>
-<ul>
-<li><strong>PyTorch</strong> (<code>torch.nn</code>, <code>torch.optim</code>, DataLoader): dynamiczny graf obliczeń (define-by-run), standard badań i prototypowania; pełna kontrola nad pętlą treningową.</li>
-<li><strong>TensorFlow 2.x + Keras</strong>: stos produkcyjny z dojrzałym serwowaniem (TensorFlow Serving, TFLite, TensorFlow.js), pipeline <code>tf.data</code>; preferowane przy deploymencie i edge.</li>
-<li><strong>JAX (+ Flax/Haiku, Optax)</strong>: kompozycja transformacji funkcyjnych (<code>jit</code>, <code>grad</code>, <code>vmap</code>, <code>pmap</code>), kompilacja XLA (Accelerated Linear Algebra), świetne na TPU (Tensor Processing Unit) i meta-learningu; wymaga immutable state.</li>
-<li><strong>Hugging Face Transformers + Datasets + Accelerate + PEFT (Parameter-Efficient Fine-Tuning)</strong>: standard de facto NLP; LoRA (Low-Rank Adaptation), QLoRA, adaptery dotrenowują LLM (Large Language Model) na jednym GPU (Graphics Processing Unit).</li>
-</ul>
-<p><strong>Przyspieszenie</strong>: <strong>mixed precision</strong> (<code>torch.cuda.amp</code>, FP16/BF16 — Brain Float 16-bit) — 2–3× mniej VRAM (Video Random Access Memory); DDP (Distributed Data Parallel) zamiast DataParallel; FSDP (Fully Sharded Data Parallel) lub DeepSpeed ZeRO dla modeli &gt;1B parametrów.</p>
-<p><strong>Tuning</strong>: learning rate to najważniejszy hiperparametr — LR finder, schedulery (cosine annealing, OneCycle, ReduceLROnPlateau), warmup dla Transformerów. Heurystyki: AdamW \(1\text{e}{-3}\) do \(3\text{e}{-4}\) dla treningu od zera, \(2\text{e}{-5}\) do \(5\text{e}{-5}\) dla fine-tuningu BERT/GPT. Linear scaling rule dla batch size; gradient accumulation gdy batch nie mieści się w VRAM.</p>
-<p><strong>Transfer learning</strong>: feature extraction (zamrożenie backbone&#39;u, uczenie tylko głowy — mało danych) vs fine-tuning (odmrożenie warstw z małym LR — więcej danych). <strong>Catastrophic forgetting</strong> — pełne fine-tunowanie niszczy oryginalną wiedzę; PEFT to mityguje.</p>
-<p><strong>Sanity check</strong>: overfit na jednym batchu przed pełnym treningiem; ustaw seedy, monitoruj loss train vs val, gradient norms, LR schedule.</p>
-<h2 id="klasyczne-ml-vs-deep-learning">Klasyczne ML vs deep learning</h2>
-<p><a href="10_klasyczne_ml.html">Klasyczne ML</a> opiera się na ręcznie projektowanych cechach (HOG — Histogram of Oriented Gradients, SIFT — Scale-Invariant Feature Transform, MFCC — Mel-Frequency Cepstral Coefficients, n-gramy TF-IDF — Term Frequency-Inverse Document Frequency). Deep learning uczy <strong>hierarchii reprezentacji</strong> end-to-end z surowych danych. Konsekwencja: DL dominuje przy dużych zbiorach surowych sygnałów (obraz, tekst, dźwięk); klasyczny ML wciąż konkurencyjny i często <strong>wygrywa</strong> dla małych tabelarycznych zbiorów (boosting).</p>
-<ul>
-<li><strong>Twierdzenie No Free Lunch</strong>: żaden algorytm nie jest globalnie najlepszy na wszystkich rozkładach danych.</li>
-<li><strong>Założenie IID (Independent and Identically Distributed)</strong>: większość klasycznej teorii generalizacji DL zakłada, że dane treningowe i testowe pochodzą z tego samego rozkładu; istnieją też nurty dla shiftu, domen i danych zależnych.</li>
-<li><strong>Distribution shift</strong> łamie IID i degraduje model bez sygnału w stracie treningowej: <strong>covariate shift</strong> — zmienia się rozkład wejść \(p(x)\); <strong>label shift</strong> — zmienia się rozkład etykiet \(p(y)\); <strong>concept drift</strong> — zmienia się sama zależność \(p(y\mid x)\).</li>
-</ul>
-<p>Sieci nie używać gdy: małe zbiory tabelaryczne (&lt;100k wierszy), wymagana interpretowalność (medycyna, kredyty — preferować modele liniowe/drzewiaste z SHAP — SHapley Additive exPlanations), twarde wymagania latencji na CPU (Central Processing Unit).</p>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong>: sieci to podzbiór ML — dzielą pipeline (split, CV, metryki), różnią się reprezentacją hipotezy i końcem-do-końca uczeniem reprezentacji zamiast feature engineeringu.</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja liniowa</a></strong>: pojedynczy neuron z aktywacją liniową = regresja liniowa, z sigmoidem = regresja logistyczna; MLP uogólnia przez kompozycję.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory wartości średniej</a></strong>: wagi to estymatory parametrów; cross-entropy = MLE, weight decay L2 = MAP z priorem gaussowskim.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: standaryzacja, encoding, augmentacja krytyczne dla zbieżności SGD; sieci znacznie wrażliwsze na skalę cech niż drzewa.</li>
-<li><strong><a href="13_text_mining.html">Text mining</a></strong>: word2vec, RNN, LSTM, Transformer (BERT, GPT) zastąpiły BoW (Bag of Words) i TF-IDF w większości zadań NLP.</li>
-<li><strong><a href="09_porownanie_modelowania.html">Porównanie modelowania</a></strong>: sieci to czarna skrzynka, parametryczne, double descent łamie klasyczny bias-variance — kontrast z modelami interpretowalnymi.</li>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data</a> / <a href="07_mapreduce.html">MapReduce</a></strong>: rozproszony SGD na klastrach GPU używa data/model parallelism — all-reduce gradientów to bezpośredni odpowiednik shuffle+reduce z MapReduce.</li>
-<li><strong><a href="14_optymalizacja_wielokryterialna.html">Optymalizacja wielokryterialna</a></strong>: trening = optymalizacja niewypukła; NAS (Neural Architecture Search) szuka frontu Pareto między dokładnością, latencją i rozmiarem modelu.</li>
-<li><strong><a href="04_wizualizacja.html">Wizualizacja danych</a></strong>: krzywe uczenia, macierz pomyłek, t-SNE (t-Distributed Stochastic Neighbor Embedding) reprezentacji warstw, attention maps — TensorBoard, matplotlib, Weights &amp; Biases.</li>
-<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong>: PyTorch, TensorFlow, JAX vs scikit-learn — dynamiczny vs statyczny graf, autograd, GPU/TPU.</li>
-<li><strong><a href="00_schematy_losowania.html">Schematy losowania</a></strong>: stratyfikacja batchy, GroupKFold w CV, próbkowanie zbalansowane.</li>
-</ul>
+    <p><strong>Sieć neuronowa</strong> to parametryczny model funkcyjny zbudowany przez złożenie transformacji liniowych i nieliniowości:</p>
+    <div class="mathblock">\[f_\theta(x) = \phi_L(W_L \phi_{L-1}(\ldots \phi_1(W_1 x + b_1) \ldots) + b_L)\]</div>
+    <p>gdzie \(W_l\) to macierze wag, \(b_l\) — biasy, a \(\phi_l\) — <strong>funkcje aktywacji</strong>. Bez nieliniowości złożenie warstw liniowych zredukowałoby się do jednej warstwy liniowej — to właśnie aktywacje dają sieci zdolność wyrażania złożonych zależności. Trening to minimalizacja <strong>ryzyka empirycznego</strong> \(\hat R(\theta) = \tfrac{1}{n}\sum_i \ell(f_\theta(x_i), y_i)\); problem jest niewypukły, więc szukamy dobrego minimum lokalnego, nie globalnego.</p>
 
+    <h2 id="perceptron-mlp">Perceptron, MLP, aktywacje, strata</h2>
+    <p><strong>Perceptron</strong> to pojedynczy neuron z funkcją progową — uczy się tylko danych liniowo separowalnych i nie rozwiązuje XOR. <strong>MLP</strong> (perceptron wielowarstwowy) dokłada co najmniej jedną warstwę ukrytą i różniczkowalną aktywację, dzięki czemu radzi sobie z problemami nieliniowymi i można go uczyć gradientowo.</p>
+    <p>Kluczowe aktywacje: <strong>sigmoid</strong> i <strong>tanh</strong> nasycają się i wygaszają gradient w głębokich sieciach; <strong>ReLU</strong> \(\max(0,x)\) eliminuje nasycanie po stronie dodatniej i jest domyślnym wyborem (pułapka: „martwe" neurony przy trwale ujemnym wejściu); <strong>softmax</strong> zamienia wyjścia na rozkład prawdopodobieństwa w klasyfikacji wieloklasowej. Funkcja straty zależy od zadania: <strong>MSE</strong> w regresji, <strong>cross-entropy</strong> w klasyfikacji — para softmax + cross-entropy daje gradient liniowo zależny od błędu \((\hat p - y)\) i jest numerycznie stabilna.</p>
+
+    <h2 id="uczenie">Backpropagation i optymalizacja</h2>
+    <div class="viz-mount" data-viz="v11"></div>
+    <p><strong>Backpropagation</strong> to <em>nie</em> algorytm uczenia, lecz efektywny sposób policzenia gradientu straty względem wszystkich wag — automatyczne różniczkowanie w trybie odwrotnym oparte na regule łańcuchowej, o koszcie rosnącym liniowo z liczbą parametrów. Sam krok uczenia wykonuje <strong>optymalizator</strong>. <strong>SGD</strong> (stochastyczny spadek gradientu) aktualizuje wagi \(\theta_{t+1} = \theta_t - \eta\, g_t\), licząc gradient na losowym <strong>mini-batchu</strong> zamiast na całym zbiorze — jest to tańsze, a wprowadzony szum pomaga uciekać z płytkich minimów. <strong>Adam</strong> dokłada momentum i adaptacyjny krok dla każdego parametru: zbiega szybciej na starcie, choć dobrze dostrojone SGD często lepiej generalizuje.</p>
+
+    <h2 id="gradient-problemy">Znikający i eksplodujący gradient</h2>
+    <p>W głębokiej sieci gradient wczesnej warstwy to iloczyn wielu jakobianów: gdy ich wartości są mniejsze od 1, gradient <strong>zanika</strong> wykładniczo, gdy większe — <strong>eksploduje</strong>. Środki zaradcze: właściwa inicjalizacja (Xavier dla tanh, He dla ReLU), <strong>połączenia rezydualne</strong> (ResNet), normalizacja aktywacji oraz obcinanie gradientu.</p>
+
+    <h2 id="architektury">CNN, RNN, Transformer</h2>
+    <p>Trzy główne rodziny. <strong>CNN</strong> (sieci konwolucyjne) współdzielą małe jądro przesuwane po obrazie, co daje lokalność, niezmienniczość względem przesunięć i drastyczną redukcję parametrów — standard w widzeniu komputerowym. <strong>RNN</strong> przetwarzają sekwencje, utrzymując stan ukryty jako pamięć; są podatne na znikający gradient „po czasie", co utrudniało wychwytywanie długich zależności — stąd <strong>LSTM</strong> i <strong>GRU</strong> z bramkami i addytywną pamięcią. <strong>Transformer</strong> zastąpił rekurencję mechanizmem <strong>self-attention</strong>, w którym każdy token porównuje się z każdym innym i w jednym kroku czerpie z nich informację ważoną podobieństwem. Jest w pełni paralelizowalny, dlatego zdominował NLP i duże modele językowe.</p>
+
+    <h2 id="regularyzacja">Regularyzacja</h2>
+    <p>Sieci mają zwykle więcej parametrów niż danych, więc regularyzacja jest kluczowa: <strong>weight decay</strong> (kara L2 za duże wagi), <strong>dropout</strong> (losowe wygaszanie neuronów w treningu), <strong>batch/layer normalization</strong> stabilizujące rozkład aktywacji oraz <strong>early stopping</strong>. Krytyczna jest też standaryzacja wejść — sieci są znacznie wrażliwsze na skalę cech niż drzewa.</p>
+
+    <h2 id="ml-vs-dl">Klasyczne ML vs deep learning</h2>
+    <p>Klasyczne ML opiera się na ręcznie projektowanych cechach; deep learning uczy <strong>hierarchii reprezentacji</strong> end-to-end z surowych danych. Dlatego DL wygrywa przy dużych zbiorach obrazów, tekstu i dźwięku, ale dla małych zbiorów tabelarycznych albo gdy wymagana jest interpretowalność (medycyna, kredyty) lepsze bywają modele liniowe i drzewiaste (boosting) — co naturalnie domyka temat do zagadnienia <a href="10_klasyczne_ml.html">klasycznego uczenia maszynowego</a>.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#perceptron-mlp">Perceptron, MLP</a></li>
-<li><a href="#funkcje-aktywacji">Funkcje aktywacji</a></li>
-<li><a href="#funkcje-straty">Funkcje straty</a></li>
-<li><a href="#backpropagation-i-gradient-descent">Backpropagation i gradient descent</a></li>
-<li><a href="#inicjalizacja-i-znikajacy-eksplodujacy-gradient">Inicjalizacja i znikający/eksplodujący gradient</a></li>
-<li><a href="#uniwersalne-twierdzenie-aproksymacji">Uniwersalne twierdzenie aproksymacji</a></li>
-<li><a href="#cnn">CNN</a></li>
-<li><a href="#rnn-lstm-gru">RNN, LSTM, GRU</a></li>
-<li><a href="#transformer-i-attention">Transformer i attention</a></li>
-<li><a href="#regularyzacja">Regularyzacja</a></li>
-<li><a href="#trening-i-frameworki">Trening i frameworki</a></li>
-<li><a href="#klasyczne-ml-vs-deep-learning">Klasyczne ML vs deep learning</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#perceptron-mlp">Perceptron, MLP, aktywacje, strata</a></li>
+      <li><a href="#uczenie">Backpropagation i optymalizacja</a></li>
+      <li><a href="#gradient-problemy">Znikający i eksplodujący gradient</a></li>
+      <li><a href="#architektury">CNN, RNN, Transformer</a></li>
+      <li><a href="#regularyzacja">Regularyzacja</a></li>
+      <li><a href="#ml-vs-dl">Klasyczne ML vs deep learning</a></li>
+    </ol>
+  </nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

@@ -20,126 +20,56 @@
     <p class="eyebrow">Big Data i systemy rozproszone</p>
     <h1>MapReduce</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="1-definicje-fundamentalne-potrzebne-dalej">1. Definicje fundamentalne (potrzebne dalej)</h2>
-<ul>
-<li><strong>Multizbiór</strong> (multiset, bag) — para \((A, m)\), gdzie \(m: A\to\mathbb{N}\) to krotność elementów. MapReduce operuje na multizbiorach par, nie na zbiorach.</li>
-<li><strong>Para klucz-wartość</strong> \((k, v) \in K \times V\) — podstawowa struktura danych w modelu.</li>
-<li><strong>Monoid</strong> \((M, \oplus, e)\) — zbiór z łączną operacją binarną \(\oplus\) i elementem neutralnym \(e\), tj. \((a\oplus b)\oplus c = a\oplus (b\oplus c)\) oraz \(a\oplus e=e\oplus a=a\).</li>
-<li><strong>Operacja przemienna</strong>: \(\forall a,b\in M:\ a\oplus b=b\oplus a\). Łączność + przemienność = wynik niezależny od kolejności i grupowania.</li>
-<li><strong>Funkcja partycjonująca</strong> (dla ustalonej liczby reducerów \(R\in\mathbb{N}\)): \(\text{part}_R: K\to\{0,\ldots,R-1\}\) — przypisuje każdy klucz do jednego z \(R\) reducerów; standardowo \(\text{part}_R(k)=h(k)\bmod R\), gdzie \(h:K\to\mathbb{N}\) to funkcja haszująca. (\(R\) = liczba reducerów — symbol wprowadzony tu i używany w sekcjach 3–4.)</li>
-<li><strong>Determinizm funkcji</strong>: ten sam wejściowy klucz-wartość zawsze daje ten sam wynik (brak efektów ubocznych). Wymóg dla fault tolerance.</li>
-</ul>
-<h2 id="2-idea-i-geneza">2. Idea i geneza</h2>
-<p><strong>MapReduce</strong> (Dean &amp; Ghemawat, Google 2004) to model programistyczny i framework wykonawczy dla obliczeń rozproszonych nad bardzo dużymi danymi. Inspiracja: funkcyjne <code>map</code> i <code>reduce</code> z języków rodziny Lisp/ML — czyste funkcje (bez stanu) pozwalają na automatyczną paralelizację i ponawianie zadań po awarii.</p>
-<p>Hasło projektowe: <strong>&quot;move computation to data&quot;</strong> — kod wysyłany jest tam, gdzie leżą dane (HDFS — Hadoop Distributed File System), zamiast przesyłać dane do mocnego serwera. Dzięki temu wąskim gardłem nie jest sieć, lecz dysk lokalny węzła.</p>
-<p>Trzy poziomy abstrakcji, których nie należy mieszać: <strong>paradygmat</strong> (artykuł Google) ≠ <strong>framework</strong> (Hadoop MapReduce) ≠ <strong>resource manager</strong> (YARN — Yet Another Resource Negotiator).</p>
-<h2 id="3-fazy-przetwarzania">3. Fazy przetwarzania</h2>
-<div class="viz-mount" data-viz="v07"></div>
 
-<p>Użytkownik dostarcza dwie funkcje o sygnaturach:</p>
-<div class="mathblock">\[\text{map}: (K_1 \times V_1) \to \text{list}(K_2 \times V_2)\]</div>
-<div class="mathblock">\[\text{reduce}: (K_2 \times \text{list}(V_2)) \to \text{list}(K_3 \times V_3)\]</div>
-<p>gdzie \(K_i, V_i\) to przestrzenie typów kluczy i wartości na kolejnych etapach: wejście (\(K_1,V_1\)) → wyjście map / wejście reduce (\(K_2,V_2\)) → wyjście reduce (\(K_3,V_3\)).</p>
-<p>Pełny pipeline:</p>
-<ol>
-<li><strong>Split</strong> — wejście (np. plik w HDFS) dzielone na bloki ~64–128 MB; każdy blok = jeden input split.</li>
-<li><strong>Map</strong> — równolegle na każdym splicie; mapper schedulowany blisko bloku (data locality, rack-awareness).</li>
-<li><strong>Shuffle &amp; sort</strong> — operacja grupująca \(\gamma: \text{list}(K_2\times V_2)\to \text{list}(K_2\times \text{list}(V_2))\), czyli zebranie wszystkich wartości dla danego klucza w jedną listę i transfer przez sieć do właściwego reducera (zgodnie z <code>part</code>). Sortowanie po kluczu w fazie shuffle to <strong>decyzja implementacyjna Hadoop MapReduce</strong>, a nie wymóg samego modelu: reduce potrzebuje jedynie <strong>grupowania</strong> wartości po kluczu (\(\gamma\) powyżej), niekoniecznie ich sortowania. (W praktyce sortowanie bywa darmowym efektem ubocznym mechanizmu grupowania, wykorzystywanym np. w secondary sort.)</li>
-<li><strong>Reduce</strong> — równolegle na każdym kluczu (lub grupie kluczy); odbiera klucz i listę wartości, emituje wyniki.</li>
-<li><strong>Output</strong> — zapis do HDFS (jeden plik wyjściowy na reducer).</li>
-</ol>
-<p>Reduce dostaje <strong>listę</strong> wartości, nie pojedynczą wartość — to konsekwencja shuffle. Faza shuffle&amp;sort to &quot;ukryte serce&quot; MapReduce i zwykle dominujący koszt zadania (sortowanie + transfer sieciowy).</p>
-<h2 id="4-combiner-i-partitioner">4. Combiner i partitioner</h2>
-<p><strong>Combiner</strong> to opcjonalny mini-reducer wykonywany lokalnie po stronie mappera, zanim dane trafią do shuffle. Jego zadaniem jest zmniejszenie wolumenu danych przesyłanych przez sieć.</p>
-<p><strong>Twierdzenie o poprawności combinera</strong>: jeśli \(\text{reduce}(k,[v_1,\dots,v_n]) = v_1\oplus v_2\oplus\cdots\oplus v_n\) dla operacji \(\oplus\) na \(V_2\) <strong>łącznej i przemiennej</strong>, a combiner emituje wynik znów typu \(V_2\) (<strong>domknięcie typu</strong>: wyjście combinera = wejście reduce), to lokalny combiner daje ten sam wynik co globalny reduce — niezależnie od tego, jak dane podzielono na paczki. Dlatego <strong>SUM</strong> czy <strong>MAX</strong> działają jako combiner bez modyfikacji, a <strong>AVG</strong> (średnia arytmetyczna) — nie, bo średnia średnich nie równa się średniej globalnej. Obejście: emitować pary \((\text{sum}, \text{count})\) i obliczyć średnią dopiero w finalnym reducerze.</p>
-<p><strong>Partitioner</strong> decyduje, do którego z \(R\) reducerów trafi dany klucz. Domyślny <code>hash(key) mod R</code> daje równomierny rozkład tylko dla równomiernego rozkładu kluczy. Gdy kilka kluczy dominuje (typowy rozkład Zipfa) — pojawia się <strong>data skew</strong>: jeden reducer dostaje większość pracy, reszta czeka.</p>
-<h2 id="5-data-locality-i-fault-tolerance">5. Data locality i fault tolerance</h2>
-<ul>
-<li><strong>Data locality</strong>: master scheduler stara się umieścić mappera na węźle, na którym fizycznie leży blok danych (rack-awareness — jeśli się nie da, w tej samej szafie). Minimalizuje to ruch sieciowy.</li>
-<li><strong>Fault tolerance przez re-execution</strong>: master pinguje workery (heartbeat). Gdy worker przestanie odpowiadać, jego niedokończone zadania map/reduce są ponownie schedulowane na innym węźle. Wymaga to <strong>determinizmu</strong> i braku side-effects funkcji map/reduce — ponowne wykonanie tego samego zadania musi dać ten sam wynik; wystarczy do tego determinizm (brak efektów ubocznych), a nie idempotencja \(f(f(x))=f(x)\).</li>
-<li><strong>Speculative execution</strong> — gdy jakiś task działa znacznie wolniej niż mediana (&quot;straggler&quot;), master uruchamia jego kopię na innym węźle; wygrywa szybsza. Zwalcza efekty wolniejszego sprzętu, nie data skew.</li>
-</ul>
-<p>Założenie projektowe: w klastrze setek/tysięcy maszyn awarie są <strong>normą</strong>, nie wyjątkiem; framework musi je tolerować transparentnie.</p>
-<h2 id="6-kanoniczne-wzorce-algorytmiczne">6. Kanoniczne wzorce algorytmiczne</h2>
-<ul>
-<li><strong>WordCount</strong> (&quot;Hello World&quot; MR): map emituje \((w, 1)\) dla każdego słowa, reduce sumuje wartości dla każdego \(w\). Combiner = SUM. W postaci wzoru: \(\text{map}(doc)=\{(w,1): w\in doc\}\), \(\ \text{reduce}(w,[c_1,\dots,c_n])=(w,\sum_i c_i)\).</li>
-<li><strong>Inverted index</strong>: map emituje \((\text{term}, \text{docID})\), reduce zbiera listę dokumentów. Fundament wyszukiwarek.</li>
-<li><strong>Reduce-side join</strong>: map taguje rekordy z każdej tabeli źródłem i emituje \((klucz\_join, (źródło, wartość))\); reduce łączy rekordy po kluczu. Działa zawsze, ale obciąża shuffle.</li>
-<li><strong>Map-side (broadcast) join</strong>: gdy jedna tabela jest mała — wysyła się ją do każdego mappera (broadcast), join wykonuje lokalnie bez shuffle. Szybsze, gdy tabela mieści się w pamięci.</li>
-<li><strong>Algebra macierzowa (regresja liniowa)</strong>: dla macierzy danych \(X\) (wiersze = obserwacje \(x_i\in\mathbb{R}^p\), \(p\) cech) i wektora odpowiedzi \(y\) (składowe \(y_i\)) mamy \(X^\top X=\sum_i x_i x_i^\top\) oraz \(X^\top y=\sum_i x_i\,y_i\) — sumy iloczynów po wierszach. To wprost struktura map + reduce (map: policz \(x_i x_i^\top\) lokalnie; reduce: zsumuj).</li>
-</ul>
-<h2 id="7-ograniczenia-i-porownanie">7. Ograniczenia i porównanie</h2>
-<p>MapReduce jest <strong>disk-heavy</strong>: między fazą map a reduce dane są materializowane na <strong>lokalnym dysku mappera</strong> (NIE HDFS); dopiero output reducera trafia na HDFS. Między kolejnymi zadaniami MR dane są materializowane na HDFS. Każda iteracja = nowe zadanie, nowy odczyt/zapis dysku — stąd <strong>algorytmy iteracyjne</strong> (PageRank, k-means, regresja logistyczna gradientem) są w czystym MR bardzo nieefektywne.</p>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Wymiar</th>
-<th>MapReduce</th>
-<th>Spark</th>
-<th>RDBMS</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Model</td>
-<td>sztywny map → shuffle → reduce</td>
-<td>DAG (Directed Acyclic Graph) operacji</td>
-<td>tabele + SQL (Structured Query Language) + indeksy</td>
-</tr>
-<tr>
-<td>Pamięć</td>
-<td>dysk po każdej fazie</td>
-<td>in-memory (RDD — Resilient Distributed Dataset / DataFrame) cache</td>
-<td>bufor pool</td>
-</tr>
-<tr>
-<td>Schemat</td>
-<td>schema-on-read</td>
-<td>schema-on-read</td>
-<td>schema-on-write</td>
-</tr>
-<tr>
-<td>Latencja</td>
-<td>wysoka (minuty–godziny)</td>
-<td>sekundy–minuty</td>
-<td>milisekundy (OLTP — Online Transaction Processing)</td>
-</tr>
-<tr>
-<td>Iteracyjność</td>
-<td>słaba</td>
-<td>natywna</td>
-<td>n/d</td>
-</tr>
-</tbody></table></div>
-<p>Wyższe abstrakcje generujące zadania MR: <strong>Hive</strong> (HiveQL → MR/Tez/Spark), <strong>Pig</strong> (Pig Latin), <strong>Cascading</strong>. Powstały, bo ręczne pisanie MR jest żmudne.</p>
-<p>W czystej formie MapReduce dziś jest legacy — wyparty przez Spark/Flink. Ale paradygmat <strong>shuffle &amp; sort</strong> i intuicje (data locality, partitioning, combinery, fault tolerance przez re-execution) zostały i są fundamentem wszystkich nowoczesnych silników rozproszonych.</p>
-<h2 id="8-pulapki-praktyczne">8. Pułapki praktyczne</h2>
-<ul>
-<li><strong>Data skew / stragglers</strong> — najpopularniejsze klucze (np. NULL w joinie, częste słowa w korpusie). Mitygacja: salting kluczy (dodanie losowego sufiksu i scalanie w drugim MR), custom partitioner, broadcast join.</li>
-<li><strong>Shuffle to wąskie gardło</strong> — agresywnie używać combinerów, kompresji pośrednich wyników (Snappy).</li>
-<li><strong>Small files problem</strong> — HDFS jest zoptymalizowany pod duże pliki; tysiące małych plików obciążają NameNode i tworzą za dużo mapperów. Remedia: SequenceFile, HAR (Hadoop Archive), CombineFileInputFormat.</li>
-<li><strong>Tuning liczby reducerów</strong> — heurystyka: ~1 reducer na 1 GB danych po shuffle. Za mało → brak równoległości; za dużo → narzut zarządzania i małe pliki wynikowe.</li>
-<li><strong>Format danych</strong> — Parquet/ORC (kolumnowe, kompresja, predicate pushdown) zamiast CSV/JSON. Kompresja musi być <strong>splittable</strong> (Snappy, LZO) — gzip nie jest, blokuje równoległość mapperów.</li>
-<li><strong>Kiedy NIE stosować MR</strong>: zapytania ad-hoc o niskiej latencji (Presto/Trino/BigQuery), streaming (Flink/Kafka Streams), małe dane (pandas/DuckDB), wiele iteracji (Spark).</li>
-</ul>
-<h2 id="9-powiazania-z-innymi-zagadnieniami">9. Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data vs klasyczna</a></strong>: MapReduce operacjonalizuje paradygmat Big Data — poziomą skalowalność i &quot;move computation to data&quot;.</li>
-<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong>: MR vs Spark vs Flink vs SQL/MPP (Massively Parallel Processing) — tabela powyżej to rdzeń tego porównania.</li>
-<li><strong><a href="13_text_mining.html">Text mining</a></strong>: WordCount, inverted index, TF-IDF (Term Frequency–Inverse Document Frequency), n-gramy w skali web to kanoniczne zastosowania MR.</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja liniowa</a></strong>: macierze \(X^\top X\), \(X^\top y\) rozkładają się na sumy iloczynów po wierszach → map (lokalnie) + reduce (agregacja); patrz sekcja 6.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a> / <a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: rozproszone wersje k-means, naive Bayes, regresji są wyrażalne w MR (Mahout); algorytmy iteracyjne (gradient descent w sieciach) pokazują granicę paradygmatu i motywację dla Spark/parameter server.</li>
-</ul>
+    <p><strong>MapReduce</strong> (Dean i Ghemawat, Google 2004) to model programistyczny do rozproszonego przetwarzania bardzo dużych danych na klastrze tanich maszyn. Programista pisze tylko dwie czyste funkcje — <em>map</em> i <em>reduce</em> — a framework sam zajmuje się zrównolegleniem, podziałem danych, transferem sieciowym i awariami. <strong>Celem</strong> jest więc ukrycie całej złożoności systemu rozproszonego za prostym interfejsem operującym na parach klucz-wartość. Klucz-wartość to na tyle uboga struktura, że framework może dowolnie tasować rekordy między maszynami, w ogóle nie znając ich znaczenia.</p>
 
+    <h2 id="zasada">Zasada działania</h2>
+    <p>Użytkownik dostarcza dwie funkcje o sygnaturach:</p>
+    <div class="mathblock">\[\text{map}: (K_1\times V_1)\to\text{list}(K_2\times V_2),\qquad \text{reduce}: (K_2\times\text{list}(V_2))\to\text{list}(K_3\times V_3).\]</div>
+    <div class="viz-mount" data-viz="v07"></div>
+    <ol>
+      <li><strong>Split</strong> — wejście (np. plik w HDFS) dzielone na bloki po ~128 MB.</li>
+      <li><strong>Map</strong> — równolegle na każdym bloku; przetwarza rekordy w pary \((k_2,v_2)\).</li>
+      <li><strong>Shuffle &amp; sort</strong> — zebranie wszystkich wartości o tym samym kluczu w jedną listę i przesłanie ich przez sieć do właściwego reducera.</li>
+      <li><strong>Reduce</strong> — dostaje klucz i całą <em>listę</em> jego wartości, agreguje je i emituje wynik.</li>
+      <li><strong>Output</strong> — zapis do HDFS (jeden plik na reducer).</li>
+    </ol>
+    <p>Fakt, że reduce otrzymuje listę, a nie pojedynczą wartość, to konsekwencja shuffle. Sama faza <strong>shuffle &amp; sort</strong> — transfer i grupowanie po kluczu — jest zwykle najdroższą częścią zadania i „wąskim gardłem” całego przetwarzania.</p>
+
+    <h2 id="mechanizmy">Trzy kluczowe mechanizmy</h2>
+    <ul>
+      <li><strong>Combiner</strong> — lokalny mini-reduce u mappera, zanim dane pójdą do shuffle; dla operacji łącznych redukuje ruch sieciowy.</li>
+      <li><strong>Data locality</strong> („move computation to data”) — to kod jest wysyłany tam, gdzie fizycznie leżą dane, a nie odwrotnie. Dzięki temu wąskim gardłem przestaje być sieć, a staje się lokalny dysk węzła.</li>
+      <li><strong>Fault tolerance przez re-execution</strong> — w klastrze setek maszyn awarie są normą, nie wyjątkiem. Master pinguje workery; gdy któryś milczy, jego zadania są ponownie uruchamiane na innym węźle. Wymaga to <strong>determinizmu</strong> funkcji (te same dane wejściowe zawsze dają ten sam wynik).</li>
+    </ul>
+
+    <h2 id="przyklad">Przykład: WordCount</h2>
+    <p>Kanoniczny „Hello World” MapReduce — zliczenie słów w korpusie:</p>
+    <div class="mathblock">\[\text{map}(doc)=\{(w,1): w\in doc\},\qquad \text{reduce}(w,[c_1,\dots,c_n])=\Big(w,\textstyle\sum_i c_i\Big).\]</div>
+    <p>Map emituje parę \((\text{słowo},1)\) dla każdego słowa, shuffle grupuje jednakowe słowa, a reduce sumuje ich liczności. Combiner (lokalna suma) mocno odciąża tu sieć.</p>
+
+    <h2 id="zastosowania">Zastosowania</h2>
+    <ul>
+      <li><strong>Indeks odwrócony</strong> — map emituje \((\text{term},\text{docID})\), reduce zbiera listę dokumentów. Fundament wyszukiwarek.</li>
+      <li><strong>Join</strong> — łączenie tabel po wspólnym kluczu w fazie reduce.</li>
+      <li><strong>Agregacje i statystyki</strong> — sumy, liczności, min/max po grupach: map liczy lokalnie, reduce scala. To najprostsza klasa zadań, do których MapReduce pasuje wprost.</li>
+    </ul>
+
+    <h2 id="ograniczenia">Ograniczenia i miejsce dziś</h2>
+    <p>MapReduce jest <strong>disk-heavy</strong>: między fazami dane lądują na dysku. Każda iteracja to nowe zadanie i nowy odczyt/zapis, przez co algorytmy <strong>iteracyjne</strong> (PageRank, k-means, spadek gradientu) są w czystym MR bardzo nieefektywne.</p>
+    <p><strong>Pułapka</strong>: <em>data skew</em> — gdy kilka kluczy dominuje (np. NULL w joinie, częste słowo w korpusie), jeden reducer dostaje większość pracy, a reszta czeka. Domyślny podział \(\text{hash}(k)\bmod R\) równoważy obciążenie tylko dla równomiernego rozkładu kluczy.</p>
+    <p><strong>Zdanie zamykające</strong>: w czystej formie MapReduce jest dziś legacy — wyparty przez Spark, który trzyma dane w pamięci i modeluje obliczenie jako DAG operacji. Ale sam paradygmat <strong>shuffle &amp; sort</strong> oraz intuicje (data locality, partycjonowanie, combinery, odporność przez re-execution) stały się fundamentem wszystkich nowoczesnych silników rozproszonych.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#1-definicje-fundamentalne-potrzebne-dalej">1. Definicje fundamentalne (potrzebne dalej)</a></li>
-<li><a href="#2-idea-i-geneza">2. Idea i geneza</a></li>
-<li><a href="#3-fazy-przetwarzania">3. Fazy przetwarzania</a></li>
-<li><a href="#4-combiner-i-partitioner">4. Combiner i partitioner</a></li>
-<li><a href="#5-data-locality-i-fault-tolerance">5. Data locality i fault tolerance</a></li>
-<li><a href="#6-kanoniczne-wzorce-algorytmiczne">6. Kanoniczne wzorce algorytmiczne</a></li>
-<li><a href="#7-ograniczenia-i-porownanie">7. Ograniczenia i porównanie</a></li>
-<li><a href="#8-pulapki-praktyczne">8. Pułapki praktyczne</a></li>
-<li><a href="#9-powiazania-z-innymi-zagadnieniami">9. Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#zasada">Zasada działania</a></li>
+      <li><a href="#mechanizmy">Trzy kluczowe mechanizmy</a></li>
+      <li><a href="#przyklad">Przykład: WordCount</a></li>
+      <li><a href="#zastosowania">Zastosowania</a></li>
+      <li><a href="#ograniczenia">Ograniczenia i miejsce dziś</a></li>
+    </ol>
+  </nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

@@ -20,197 +20,42 @@
     <p class="eyebrow">Próbkowanie i estymacja</p>
     <h1>Populacja generalna i schematy losowania</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h3 id="pojecia-podstawowe">Pojęcia podstawowe</h3>
-<ul>
-<li><strong>Populacja generalna</strong> — zbiór wszystkich jednostek objętych badaniem; <strong>próba</strong> — jej losowo wybrany podzbiór, na podstawie którego wnioskujemy o populacji.</li>
-<li><strong>Operat losowania</strong> — kompletna lista jednostek populacji, z której faktycznie losujemy (np. rejestr adresowy).</li>
-<li><strong>Estymator nieobciążony</strong> — estymator, którego wartość oczekiwana równa się szacowanemu parametrowi: \(E(\hat\theta)=\theta\).</li>
-</ul>
-<h3 id="symbole">Symbole</h3>
-<ul>
-<li><code>N</code>  — liczebność populacji generalnej, \(n\) — liczebność próby,</li>
-<li><code>y_i</code>  — wartość badanej cechy dla \(i\)-tej jednostki; \(\mu=\frac1N\sum_i y_i\) — średnia w populacji, \(\bar y\) — średnia z próby (estymator \(\mu\)),</li>
-<li><code>σ²</code>  — wariancja populacji, \(\sigma\) — odchylenie standardowe,</li>
-<li><code>π_i</code>  — prawdopodobieństwo inkluzji \(i\)-tej jednostki (trafienia do próby),</li>
-<li><code>C(N,n)</code>  — symbol Newtona, liczba sposobów wyboru \(n\) elementów z \(N\) bez powtórzeń.</li>
-</ul>
-<h2 id="losowanie-proste-ze-zwracaniem">Losowanie proste ze zwracaniem</h2>
-<p>Polega na zwróceniu każdej jednostki z powrotem do populacji po jej wylosowaniu, zezwalając na możliwość wielokrotnego wylosowania jej do próby. Każde losowanie jest niezależne od pozostałych i prawdopodobieństwo wylosowania jest zawsze równe \(\frac{1}{N}\). </p>
-<p>Wartość oczekiwaną i wariancję średniej z próby definiujemy</p>
-<div class="mathblock">\[E(\bar{y})=\mu, \quad Var(\bar y)= \frac{\sigma^2}{n}\]</div>
-<p>Estymator średniej jest nieobciążony, a jego wariancja maleje odwrotnie proporcjonalnie do liczebności próby.</p>
-<h2 id="losowanie-proste-bez-zwracania">Losowanie proste bez zwracania</h2>
-<p>Jednostka nie wraca do populacji po jej wylosowaniu, więc może trafić do próby maksymalnie raz. Prawdopodobieństwo inkluzji każdej jednostki wynosi \(\pi_i = \frac{n}{N}\).</p>
-<div class="mathblock">\[E(\bar{y})=\mu, \quad Var(\bar y)= \frac{\sigma^2}{n}(1- \frac{n}{N})\]</div>
-<p>Czynnik \(\left(1-\frac{n}{N}\right)\) to poprawka na skończoność populacji (FPC, ang. Finite Population Correction). Gdy próba stanowi większy odsetek populacji, „wyczerpujemy” jej zmienność i wariancja estymatora się zmniejsza. (Jeśli <code>σ²</code> liczymy z mianownikiem <code>N</code>, ścisły mnożnik ma postać \(\frac{N-n}{N-1}\), natomiast przy wariancji <code>S²</code> z mianownikiem <code>N-1</code> zapis <code>(1-n/N)S²/n</code> jest dokładny. Dla dużych \(N\) zachodzi \(\frac{N-n}{N-1}\approx 1-\frac{n}{N}\).)</p>
-<p>Losowanie proste bez zwracania jest zawsze <strong>co najmniej</strong> tak samo efektywne jak ze zwracaniem (wariancja estymatora jest mniejsza lub równa). </p>
-<p>Losowanie proste (SRS, ang. Simple Random Sampling) wymaga operatu losowania, ale <strong>nie zakłada jednorodności populacji</strong>. Nie wykorzystuje dodatkowej wiedzy o strukturze populacji, co jednocześnie stanowi o jego sile (prostota, brak dodatkowych założeń) i słabości (nie optymalizuje precyzji, gdy populacja ma rozpoznawalną strukturę).</p>
-<h2 id="losowanie-warstwowe">Losowanie warstwowe</h2>
-<p>Polega na podzieleniu populacji na \(L\) rozłącznych i wyczerpujących podpopulacji (warstw) \(U_1,U_2,\dots,U_L\) o liczebnościach \(N_1,N_2,\dots,N_L\), a następnie niezależnym losowaniu próby z każdej warstwy (np. region, grupa wiekowa). Indeks \(h\) numeruje warstwę: \(\sigma_h^2\) — jej wariancja wewnętrzna, \(\bar y_h\) — średnia z próby w warstwie, \(n_h\) — liczebność podpróby.</p>
-<p>Estymator średniej populacji w losowaniu warstwowym jest średnią ważoną średnich warstwowych:</p>
-<div class="mathblock">\[\bar y_{st} = \sum_{h=1}^{L}W_h\cdot\bar y_h,\]</div>
-<p>gdzie \(W_h=\frac{N_h}{N}\). Estymator ten jest nieobciążony, a jego wariancja wynosi</p>
-<div class="mathblock">\[Var(\bar y_{st})=\sum_{h=1}^{L}W_h^2\cdot \frac{\sigma^2_h}{n_h}\left(1-\frac{n_h}{N_h}\right).\]</div>
-<p>Wariancja estymatora zależy od wariancji wewnątrzwarstwowych \(\sigma^{2}_h\), a nie od wariancji całej populacji. </p>
-<h3 id="metody-alokacji-proby-do-warstw">Metody alokacji próby do warstw</h3>
-<p>Mając ustaloną łączną liczebność próby \(n\), musimy zdecydować ile jednostek przydzielić do każdej warstwy.</p>
-<ol>
-<li>Alokacja równomierna: \(n_h = \frac{n}{L}\), każda warstwa dostaje tyle samo jednostek,</li>
-<li>Alokacja proporcjonalna: \(n_h=n\cdot W_h\), każda warstwa jest reprezentowana w próbie proporcjonalnie do swojego udziału w populacji,</li>
-<li>Alokacja Neymana: \(n_h=n\cdot\dfrac{W_h\cdot\sigma_h}{\sum_h W_h\cdot\sigma_h}\), przydziela więcej jednostek warstwom które są jednocześnie większe i bardziej zróżnicowane.</li>
-</ol>
-<h2 id="losowanie-systematyczne">Losowanie systematyczne</h2>
-<p>Losowanie systematyczne polega na wybraniu punktu startowego \(r\) losowo z przedziału \([1,2,...,k]\), gdzie \(k=\frac{N}{n}\) zaokrąglone do liczby całkowitej to interwał losowania, a następnie dobraniu co \(k\)-tej jednostki z operatu: \(r,r+k, r+2k, ...\) trafiają do próby.</p>
-<p>Prawdopodobieństwo inkluzji każdej jednostki wynosi \(\pi_i=\frac{1}{k}=\frac{n}{N}\) przy dokładnym interwale <code>N = n k</code>; przy zaokrąglonym <code>k</code> jest to przybliżenie zależne od procedury. Nie jest jednak równoważne losowaniu prostemu, ponieważ istnieje tylko \(k\) możliwych prób a nie \(\binom{N}n\). </p>
-<p>Jeśli operat jest uporządkowany <strong>losowo</strong> (brak struktury) — losowanie systematyczne daje wyniki zbliżone do SRS. Jeśli operat jest uporządkowany <strong>według badanej cechy</strong> (np. firmy posortowane od najmniejszej do największej) — losowanie systematyczne działa jak <strong>ukryte losowanie warstwowe</strong>. Jeśli jednak operat ma <strong>strukturę periodyczną</strong> (cykliczną) zbieżną z interwałem <em>k</em> — losowanie systematyczne może dać obciążoną próbę.</p>
-<h2 id="losowanie-grupowe">Losowanie grupowe</h2>
-<p>W losowaniu grupowym jednostkami losowania <strong>pierwszego stopnia</strong> nie są poszczególne elementy populacji, lecz ich <strong>naturalne skupienia</strong> — grupy (klastry), np. szkoły, gminy.</p>
-<p>Oznaczenia grupowe/wielostopniowe:</p>
-<ul>
-<li><code>M</code>  — liczba wszystkich grup, \(m\) — liczba wylosowanych grup,</li>
-<li><code>B</code>  — liczebność jednej grupy, \(b\) — liczebność podpróby losowanej w grupie,</li>
-<li><code>σ_b²</code>  — wariancja <strong>między</strong> grupami, \(\sigma_w^2\) — wariancja <strong>wewnątrz</strong> grup,</li>
-<li><code>ρ</code>  — korelacja wewnątrzklasowa (podobieństwo jednostek w tej samej grupie),</li>
-<li><code>c_1</code>  — koszt włączenia grupy, \(c_2\) — koszt zbadania jednostki w grupie.</li>
-</ul>
-<h3 id="losowanie-grupowe-jednostopniowe">Losowanie grupowe jednostopniowe</h3>
-<p>Losujemy \(m\) grup, a następnie badamy <strong>wszystkie</strong> jednostki w wylosowanych grupach. Precyzja zależy od zmienności <strong>między</strong> grupami \(\sigma_b^2\): schemat jest efektywny, gdy grupy są wewnętrznie zróżnicowane (małe \(\rho\)), a mało efektywny, gdy jednostki w grupie są do siebie podobne.</p>
-<h3 id="losowanie-wielostopniowe">Losowanie wielostopniowe</h3>
-<p>Jest uogólnieniem losowania grupowego. Zamiast badać <strong>wszystkie</strong> jednostki w wylosowanych grupach, w każdej z nich <strong>wykonujemy kolejne losowanie</strong>. </p>
-<p>Przykład klasycznego losowania dwustopniowego w badaniu gospodarstw domowych w Polsce:</p>
-<ol>
-<li><strong>I stopień</strong> — losujemy gminy (jednostki losowania I stopnia),</li>
-<li><strong>II stopień</strong> — w wylosowanych gminach losujemy konkretne gospodarstwa domowe.</li>
-</ol>
-<p>Gdy korelacja wewnątrzklasowa \(\rho\) jest duża (jednostki w grupie są podobne), efektywniej jest losować więcej grup z mniejszą liczbą jednostek w każdej - bo kolejne jednostki z tej samej grupy wnoszą mało nowych informacji. Zachodzi problem optymalizacyjny: jeśli dodawanie grup jest drogie (np. koszty dojazdu do nowej gminy), opłaca się badać więcej jednostek w mniejszej liczbie grup; jeśli ρ jest duże, opłaca się dodawać grupy nawet kosztem mniejszej podpróby w każdej z nich.</p>
-<h1>Porównanie schematów losowania</h1>
-<p>Efektywność schematu oceniamy efektem projektu (DEFF, ang. Design Effect) — stosunkiem wariancji estymatora przy danym schemacie do wariancji przy SRS o tej samej liczebności \(n\):</p>
-<div class="mathblock">\[DEFF = \frac{Var_{\text{schemat}}(\bar y)}{Var_{SRS}(\bar y)}.\]</div>
-<p>\(DEFF<1\) — schemat efektywniejszy od SRS, \(DEFF>1\) — mniej efektywny.</p>
-<h2 id="tabela-syntetyczna">Tabela syntetyczna</h2>
-<div class="viz-mount" data-viz="v00"></div>
 
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Schemat</th>
-<th>DEFF</th>
-<th>Kiedy najefektywniejszy</th>
-<th>Wymaga operatu</th>
-<th>Główna zaleta</th>
-<th>Główna wada</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>SRS (proste)</strong></td>
-<td>= 1 (ref.)</td>
-<td>Brak silnej znanej struktury lub zmiennej stratyfikacyjnej</td>
-<td>Tak, kompletny</td>
-<td>Prostota, brak dodatkowych założeń</td>
-<td>Nie wykorzystuje struktury populacji</td>
-</tr>
-<tr>
-<td><strong>Warstwowe</strong></td>
-<td>≤ 1 (proporcjonalna/Neymana)</td>
-<td>Warstwy wewnętrznie jednorodne, duża zmienność między warstwami</td>
-<td>Tak, z informacją o warstwach</td>
-<td>Zysk precyzji vs. SRS przy dobrej alokacji</td>
-<td>Wymaga znajomości zmiennej stratyfikacyjnej (i \(\sigma_h\) przy Neymanie)</td>
-</tr>
-<tr>
-<td><strong>Systematyczne</strong></td>
-<td>≈ 1 lub &lt; 1</td>
-<td>Operat uporządkowany wg cechy (ukryta stratyfikacja)</td>
-<td>Tak, uporządkowany</td>
-<td>Prostota realizacji, dobre pokrycie populacji</td>
-<td>Ryzyko periodyczności; brak formalnej estymacji wariancji</td>
-</tr>
-<tr>
-<td><strong>Grupowe</strong></td>
-<td>&gt; 1 (zwykle)</td>
-<td>Grupy wewnętrznie zróżnicowane (niskie ρ); ograniczenia kosztowe</td>
-<td>Tylko lista grup</td>
-<td>Niski koszt, brak potrzeby operatu całej populacji</td>
-<td>Mniejsza precyzja niż SRS (rośnie z ρ i B)</td>
-</tr>
-<tr>
-<td><strong>Wielostopniowe</strong></td>
-<td>&gt; 1 (zwykle)</td>
-<td>Populacja zhierarchizowana, duża, rozproszona geograficznie</td>
-<td>Lista jednostek na każdym stopniu</td>
-<td>Wykonalność dużych badań krajowych</td>
-<td>Złożona estymacja wariancji; mniejsza precyzja niż SRS</td>
-</tr>
-</tbody></table></div>
-<h2 id="tabela-szczegolowa-wariancja-estymatora-sredniej">Tabela szczegółowa: wariancja estymatora średniej</h2>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Schemat</th>
-<th><code>Var(ybar)</code></th>
-<th>Uwagi</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>SRS ze zwracaniem</strong></td>
-<td><code>σ²/n</code></td>
-<td>Brak FPC — jednostki wracają do populacji</td>
-</tr>
-<tr>
-<td><strong>SRS bez zwracania</strong></td>
-<td><code>σ²/n · (1 - n/N)</code></td>
-<td>FPC istotna gdy  <code>f = n/N &gt; 0,05</code></td>
-</tr>
-<tr>
-<td><strong>Warstwowe (proporcjonalne)</strong></td>
-<td><code>(1/n) Σ_h W_h σ_h² · (1 - n/N)</code></td>
-<td><code>≤</code>  SRS; eliminuje zmienność między warstwami</td>
-</tr>
-<tr>
-<td><strong>Grupowe (równe grupy)</strong></td>
-<td><code>(1/m)(1 - m/M) σ_b²</code></td>
-<td>Zależy od zmienności <strong>między</strong> grupami  <code>σ_b²</code></td>
-</tr>
-<tr>
-<td><strong>Wielostopniowe (2 stopnie)</strong></td>
-<td><code>(1/m)(1 - m/M)σ_b² + (1/(mb))(1 - b/B)σ_w²</code></td>
-<td>Dwa komponenty: między- i wewnątrzgrupowy</td>
-</tr>
-</tbody></table></div>
-<p>Uwagi: FPC \((1-n/N)\) w wierszu warstwowym obowiązuje dla alokacji proporcjonalnej (dla Neymana FPC działa per-warstwa: \(1-n_h/N_h\)). Wzór grupowy zakłada, że w wylosowanych grupach badamy wszystkie jednostki.</p>
-<h2 id="kluczowe-zaleznosci-do-zapamietania">Kluczowe zależności do zapamiętania</h2>
-<p><strong>Warstwowe vs. SRS — skąd zysk precyzji.</strong> Wariancję populacji rozkładamy na część wewnątrz- i między-warstwową (\(\mu_h\) — średnia w warstwie \(h\)):</p>
-<div class="mathblock">\[\sigma^2 = \underbrace{\sum_{h=1}^{L} W_h\,\sigma_h^2}_{\text{wewnątrz warstw}} + \underbrace{\sum_{h=1}^{L} W_h(\mu_h-\mu)^2}_{\text{między warstwami}}.\]</div>
-<p>Stratyfikacja z alokacją proporcjonalną „usuwa” składnik między-warstwowy:</p>
-<div class="mathblock">\[Var(\bar{y}_{SRS}) - Var(\bar{y}_{prop}) = \frac{1}{n}\sum_{h=1}^{L} W_h(\mu_h - \mu)^2 \ge 0.\]</div>
-<p>Im bardziej warstwy różnią się średnimi, tym większy zysk — dlatego chcemy warstw jednorodnych wewnątrz, a różnych między sobą.</p>
-<p><strong>Grupowe vs. SRS (efekt projektu):</strong></p>
-<div class="mathblock">\[DEFF = 1 + (B - 1)\rho\]</div>
-<p>Strata rośnie z wielkością grup (\(B\)) i korelacją wewnątrzklasową (\(\rho\)).</p>
-<p><strong>Optymalna wielkość podpróby w losowaniu wielostopniowym:</strong></p>
-<div class="mathblock">\[b_{opt} = \sqrt{\frac{c_1}{c_2} \cdot \frac{1-\rho}{\rho}}\]</div>
-<p>Kompromis między kosztem dodania grupy (\(c_1\)) a kosztem jednostki w grupie (\(c_2\)) (wzór zakłada model kosztów \(C(m, b) = c_1 m + c_2 m b\); bez tego założenia formuła nie ma sensu).</p>
-<h2 id="regula-decyzyjna-wybor-schematu">Reguła decyzyjna: wybór schematu</h2>
-<p><pre><code>1. Czy masz kompletny operat?
-   ├─ TAK → Czy znasz strukturę populacji (zmienną korelującą z Y)?
-   │        ├─ TAK → WARSTWOWE
-   │        └─ NIE → Czy operat jest uporządkowany wg cechy?
-   │                 ├─ TAK → SYSTEMATYCZNE
-   │                 └─ NIE → SRS
-   └─ NIE → Czy istnieje lista grup/klastrów?
-            ├─ TAK → GRUPOWE / WIELOSTOPNIOWE
-            └─ NIE → Rozważ metody nielosowe (z ograniczeniami wnioskowania)</code></pre></p>
+    <p><strong>Metoda reprezentacyjna</strong> polega na tym, że zamiast badać całą populację, badamy jej losowo wybraną <strong>próbę</strong> i z niej wnioskujemy o całości. <strong>Populacja generalna</strong> to zbiór wszystkich jednostek objętych badaniem, próba to jej podzbiór, a <strong>operat losowania</strong> — kompletna lista jednostek, z której faktycznie losujemy (np. rejestr adresowy). Kluczowe jest <strong>prawdopodobieństwo inkluzji</strong> \(\pi_i\) — szansa, że jednostka trafi do próby; to ono decyduje, jak później ważyć obserwacje. Dobry estymator jest <strong>nieobciążony</strong>: \(E(\hat\theta)=\theta\).</p>
 
+    <h2 id="parametry-rodzaje-badan">Parametry i rodzaje badań</h2>
+    <p>Badanie może być <strong>pełne (wyczerpujące)</strong> — spis obejmujący każdą jednostkę populacji (np. spis powszechny) — albo <strong>reprezentacyjne (częściowe)</strong>, oparte na próbie. Spis jest kosztowny, dlatego w praktyce dominują badania reprezentacyjne. Szacujemy w nich <strong>parametry populacji</strong>: średnią \(\mu\), wariancję \(\sigma^2\), proporcję (frakcję) oraz sumę (wartość globalną). To, <em>jak</em> losujemy próbę, wprost przekłada się na precyzję tych szacunków — i temu służą schematy losowania.</p>
+
+    <h2 id="losowanie-proste">Losowanie proste (SRS)</h2>
+    <p>Każda jednostka ma równą szansę trafienia do próby. W wariancie <strong>ze zwracaniem</strong> jednostka wraca do populacji i może zostać wylosowana wielokrotnie; kolejne losowania są niezależne, a \(Var(\bar y)=\sigma^2/n\). W wariancie <strong>bez zwracania</strong> jednostka trafia do próby najwyżej raz, prawdopodobieństwo inkluzji wynosi \(\pi_i=n/N\), a wariancja jest mniejsza o poprawkę na skończoność populacji (FPC):</p>
+    <div class="mathblock">\[Var(\bar y)=\frac{\sigma^2}{n}\left(1-\frac{n}{N}\right).\]</div>
+    <p>Czynnik \(\left(1-\frac{n}{N}\right)\) staje się istotny, gdy próba stanowi znaczący odsetek populacji. SRS jest prosty i nie zakłada nic o strukturze populacji — co jest zarazem jego siłą i słabością: nie wykorzystuje wiedzy, która mogłaby poprawić precyzję.</p>
+
+    <h2 id="losowanie-warstwowe">Losowanie warstwowe</h2>
+    <p>Dzielimy populację na rozłączne <strong>warstwy</strong> (np. regiony, grupy wiekowe) i losujemy niezależnie z każdej. Estymator to średnia ważona średnich warstwowych \(\bar y_{st}=\sum_h W_h\,\bar y_h\), gdzie \(W_h=N_h/N\). Zysk precyzji bierze się stąd, że wariancja zależy tylko od zmienności <strong>wewnątrz</strong> warstw — chcemy więc warstw jednorodnych wewnątrz, a różniących się między sobą. Przy ustalonej liczebności próby najlepszą precyzję daje <strong>alokacja Neymana</strong>, która przydziela więcej jednostek warstwom większym i bardziej zróżnicowanym.</p>
+
+    <h2 id="losowanie-systematyczne">Losowanie systematyczne</h2>
+    <p>Losujemy punkt startowy \(r\) z przedziału \([1,k]\), gdzie interwał \(k=N/n\), i bierzemy co \(k\)-tą jednostkę. Jest proste i daje dobre pokrycie populacji. Gdy operat jest uporządkowany <strong>według badanej cechy</strong>, działa jak ukryta stratyfikacja i bywa efektywniejsze od SRS. <strong>Pułapka</strong>: jeśli operat ma strukturę cykliczną zbieżną z interwałem \(k\), próba może być obciążona.</p>
+
+    <h2 id="losowanie-grupowe">Losowanie grupowe i wielostopniowe</h2>
+    <p>Tu jednostką losowania nie są pojedyncze elementy, lecz ich naturalne skupienia — <strong>grupy (klastry)</strong>, np. szkoły, gminy. W losowaniu <strong>grupowym</strong> losujemy grupy i badamy wszystkie jednostki w wylosowanych; w <strong>wielostopniowym</strong> w wylosowanych grupach losujemy dalej (np. gminy, a w nich gospodarstwa domowe). Zaleta jest praktyczna: nie potrzeba operatu całej populacji, wystarczy lista grup, co obniża koszt dużych badań krajowych. Ceną jest zwykle niższa precyzja niż w SRS: strata rośnie z wielkością grupy i z podobieństwem jednostek w tej samej grupie, bo podobne obserwacje wnoszą mało nowej informacji.</p>
+
+    <h2 id="porownanie">Porównanie schematów</h2>
+    <div class="viz-mount" data-viz="v00"></div>
+    <p>Efektywność schematu mierzymy <strong>efektem planu losowania (DEFF)</strong> — stosunkiem jego wariancji do wariancji SRS o tej samej liczebności \(n\): \(DEFF<1\) oznacza schemat lepszy, \(DEFF>1\) gorszy od SRS. Regułę wyboru można streścić tak: znamy strukturę populacji → warstwowe; operat uporządkowany wg cechy → systematyczne; brak przesłanek → SRS; brak operatu, ale są klastry → grupowe lub wielostopniowe.</p>
+    <p><strong>Zdanie zamykające</strong>: sam schemat losowania to jednak dopiero połowa sprawy — musi mu odpowiadać estymator, bo przy nierównych prawdopodobieństwach inkluzji \(\pi_i\) zwykła średnia zawodzi i obserwacje trzeba ważyć.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#losowanie-proste-ze-zwracaniem">Losowanie proste ze zwracaniem</a></li>
-<li><a href="#losowanie-proste-bez-zwracania">Losowanie proste bez zwracania</a></li>
-<li><a href="#losowanie-warstwowe">Losowanie warstwowe</a></li>
-<li><a href="#losowanie-systematyczne">Losowanie systematyczne</a></li>
-<li><a href="#losowanie-grupowe">Losowanie grupowe</a></li>
-<li><a href="#tabela-syntetyczna">Tabela syntetyczna</a></li>
-<li><a href="#tabela-szczegolowa-wariancja-estymatora-sredniej">Tabela szczegółowa: wariancja estymatora średniej</a></li>
-<li><a href="#kluczowe-zaleznosci-do-zapamietania">Kluczowe zależności do zapamiętania</a></li>
-<li><a href="#regula-decyzyjna-wybor-schematu">Reguła decyzyjna: wybór schematu</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#parametry-rodzaje-badan">Parametry i rodzaje badań</a></li>
+      <li><a href="#losowanie-proste">Losowanie proste (SRS)</a></li>
+      <li><a href="#losowanie-warstwowe">Losowanie warstwowe</a></li>
+      <li><a href="#losowanie-systematyczne">Losowanie systematyczne</a></li>
+      <li><a href="#losowanie-grupowe">Losowanie grupowe i wielostopniowe</a></li>
+      <li><a href="#porownanie">Porównanie schematów</a></li>
+    </ol>
+  </nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

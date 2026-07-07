@@ -20,86 +20,41 @@
     <p class="eyebrow">Optymalizacja i zarządzanie projektami</p>
     <h1>Metody sieciowe: CPM i PERT</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="1-siec-projektu-jako-dag">1. Sieć projektu jako DAG</h2>
-<p><strong>Graf skierowany acykliczny (DAG, Directed Acyclic Graph)</strong>: \(G = (V, E)\), gdzie \(V\) to zbiór wierzchołków, \(E \subseteq V \times V\) to zbiór łuków skierowanych, w którym nie istnieje cykl skierowany. Umownie sieć projektu normalizuje się do DAG-a z jednym źródłem (start) i jednym ujściem (koniec) — surowa sieć czynności może mieć wiele źródeł/ujść przed dodaniem sztucznych węzłów start/koniec.</p>
-<p><strong>Czynność (activity)</strong> — zadanie zużywające czas \(t \geq 0\) i ewentualnie zasoby. <strong>Zdarzenie (event)</strong> — punkt w czasie wyznaczający początek/koniec czynności.</p>
-<p>Dwie konwencje reprezentacji:</p>
-<ul>
-<li><strong>AOA (Activity-On-Arrow)</strong> — czynność na łuku, zdarzenie w wierzchołku. Wymaga <strong>czynności pozornych (dummy)</strong> o czasie \(0\), gdy dwie czynności mają tę samą parę zdarzeń lub gdy zależności logiczne nie układają się w prosty łuk.</li>
-<li><strong>AON (Activity-On-Node)</strong> — czynność w wierzchołku, łuk reprezentuje relację następstwa. Nie wymaga dummy. Nowoczesne narzędzia (MS Project, Primavera P6) używają AON.</li>
-</ul>
-<p><strong>Typy zależności precedencji</strong>: FS (Finish-Start, koniec poprzednika ≤ start następnika — domyślna), SS (Start-Start), FF (Finish-Finish), SF (Start-Finish, rzadka). Z opóźnieniem (lag, dodatnie) lub wyprzedzeniem (lead, ujemne lag). Klasyczny CPM/PERT obsługuje tylko FS bez lagów.</p>
-<p><strong>Porządek topologiczny</strong> \(\pi: V \to \{1, \ldots, n\}\) — numeracja taka, że \((u, v) \in E \Rightarrow \pi(u) < \pi(v)\). Cały algorytm CPM (Critical Path Method) to przejście w porządku topologicznym (forward) i w odwrotnym (backward).</p>
-<h2 id="2-algorytm-cpm-deterministyczny">2. Algorytm CPM (deterministyczny)</h2>
-<p>CPM zakłada <strong>deterministyczne</strong> czasy trwania \(t_{ij}\) czynności. Cel: wyznaczyć minimalny czas projektu i ścieżkę krytyczną.</p>
-<p>Rozdzielamy dwa poziomy: <strong>moment zdarzenia</strong> (\(E_i\) — najwcześniejszy, \(L_i\) — najpóźniejszy dopuszczalny; indeks pojedynczego węzła) oraz <strong>atrybuty czynności</strong> \((i,j)\): \(ES_{ij}\) (Earliest Start), \(EF_{ij}\) (Earliest Finish), \(LS_{ij}\) (Latest Start), \(LF_{ij}\) (Latest Finish).</p>
-<p><strong>Forward pass</strong> (najwcześniejsze momenty zdarzeń):</p>
-<div class="mathblock">\[E_j = \max_{(i,j)\in E}\{E_i + t_{ij}\}, \qquad E_{\text{start}} = 0.\]</div>
-<p>Dla czynności \((i,j)\): \(ES_{ij} = E_i\), \(EF_{ij} = E_i + t_{ij}\).</p>
-<p><strong>Backward pass</strong> (najpóźniejsze dopuszczalne momenty zdarzeń):</p>
-<div class="mathblock">\[L_i = \min_{(i,j)\in E}\{L_j - t_{ij}\}, \qquad L_{\text{end}} = E_{\text{end}}\ (\text{lub narzucony } T_d).\]</div>
-<p>Dla czynności \((i,j)\): \(LF_{ij} = L_j\), \(LS_{ij} = L_j - t_{ij}\). Backward pass startuje od \(L_{\text{end}} = E_{\text{end}}\), gdzie \(T_d\) to opcjonalny narzucony termin dyrektywny (deadline).</p>
-<p><strong>Złożoność</strong>: \(O(|V| + |E|)\) — dwa przejścia po topologicznie posortowanym DAG-u. Najdłuższa ścieżka w grafie ważonym jest w ogólnym przypadku NP-trudna, ale w DAG rozwiązywalna w czasie liniowym.</p>
-<h2 id="3-zapasy-czasowe-i-sciezka-krytyczna">3. Zapasy czasowe i ścieżka krytyczna</h2>
-<div class="viz-mount" data-viz="v15"></div>
 
-<p>Trzy rodzaje <strong>zapasu (float, slack)</strong> dla czynności \((i,j)\):</p>
-<ul>
-<li><strong>Zapas całkowity</strong> \(TF_{ij} = L_j - E_i - t_{ij}\) (równoważnie \(= LS_{ij} - ES_{ij} = LF_{ij} - EF_{ij}\)) — maksymalne opóźnienie czynności bez przesunięcia końca projektu. Zapas <strong>zdarzenia</strong> to osobna wielkość \(S_i = L_i - E_i\) (nie mylić z \(TF\) czynności).</li>
-<li><strong>Zapas swobodny</strong> \(FF_{ij} = E_j - E_i - t_{ij}\) — opóźnienie nie wpływa na najwcześniejsze starty następników.</li>
-<li><strong>Zapas niezależny</strong> \(IF_{ij} = \max\{0, E_j - L_i - t_{ij}\}\) — opóźnienie dopuszczalne nawet przy najpóźniejszym poprzedniku i najwcześniejszym następniku.</li>
-</ul>
-<p>Zachodzi: \(IF \leq FF \leq TF\).</p>
-<p><strong>Ścieżka krytyczna</strong> — droga od źródła do ujścia, na której wszystkie czynności mają \(TF = 0\); równoważnie: ścieżka o maksymalnej długości w DAG-u ważonym czasami \(t_{ij}\). Czas trwania projektu \(T^* = \max_{P}\sum_{(i,j) \in P} t_{ij}\). Ścieżek krytycznych może być więcej niż jedna. Przy narzuconym deadline wcześniejszym niż \(T^*\) zapasy stają się ujemne — &quot;krytyczność&quot; rozszerza się na ścieżkę o najmniejszym (najbardziej ujemnym) zapasie.</p>
-<h2 id="4-pert-model-probabilistyczny">4. PERT — model probabilistyczny</h2>
-<p>PERT (Program Evaluation and Review Technique) traktuje czas każdej czynności jako <strong>zmienną losową</strong> \(T_{ij}\) — funkcję mierzalną \(\Omega \to \mathbb{R}\), opisaną dystrybuantą \(F(x) = \Pr(T \leq x)\).</p>
-<p><strong>Rozkład beta</strong> na \([a, b]\): \(X \sim \text{Beta}(\alpha, \beta)\) z gęstością \(f(x) \propto (x-a)^{\alpha-1}(b-x)^{\beta-1}\) — ma 4 parametry (\(a, b, \alpha, \beta\)). PERT domyka układ dodatkowym założeniem \(\alpha + \beta = 6\) (rozstęp \(b-a\) obejmuje ok. 6 odchyleń standardowych), co redukuje model do <strong>trzech oszacowań eksperckich</strong>: \(a\) — czas optymistyczny, \(m\) — najbardziej prawdopodobny (moda), \(b\) — pesymistyczny. Stąd bierze się waga 4 dla mody we wzorze na \(t_e\).</p>
-<p><strong>Wzory PERT</strong> (przybliżenia momentów rozkładu beta):</p>
-<p><strong>Uwaga o ścieżce:</strong> ścisły losowy czas projektu jest maksimum czasów wszystkich ścieżek. Suma po ścieżce krytycznej wyznaczonej z wartości oczekiwanych to klasyczne przybliżenie PERT, a nie pełny model stochastyczny.</p>
-<div class="mathblock">\[t_e = \mathbb{E}[T] \approx \frac{a + 4m + b}{6}, \quad \sigma^2 = \text{Var}(T) \approx \left(\frac{b - a}{6}\right)^2\]</div>
-<p>Założenie \(\sigma \approx (b-a)/6\) to analogia do reguły \(6\sigma\) rozkładu normalnego.</p>
-<p><strong>Ostrzeżenie</strong>: wzory \(t_e, \sigma^2\) to heurystyka momentów — są ścisłe tylko przy dodatkowym założeniu \(\alpha + \beta = 6\), nie wynikają z samego rozkładu beta.</p>
-<p><strong>Czas projektu</strong> \(T = \sum T_i\) po czynnościach na ścieżce krytycznej. Z <strong>niezależności</strong> zmiennych losowych: \(\mathbb{E}[T] = \sum t_{e,i}\), \(\text{Var}(T) = \sum \sigma_i^2\). Z <strong>CTG (Centralne Twierdzenie Graniczne)</strong> dla niezależnych zmiennych o skończonej wariancji:</p>
-<div class="mathblock">\[\frac{T - \mathbb{E}[T]}{\sqrt{\text{Var}(T)}} \xrightarrow{d} \mathcal{N}(0, 1)\]</div>
-<p>Stąd \(\Pr(T \leq T_d) = \Phi\left(\frac{T_d - \mathbb{E}[T]}{\sqrt{\text{Var}(T)}}\right)\), gdzie \(\Phi\) to dystrybuanta standardowego rozkładu normalnego, a \(T_d\) to narzucony termin dyrektywny (deadline) — data, do której harmonogram ma się zmieścić.</p>
-<p><strong>Założenia CTG dla PERT</strong>: (1) <strong>niezależność</strong> czasów na ścieżce krytycznej (rzadko prawda — wspólne zasoby, krytyczny pracownik na wielu czynnościach); (2) <strong>skończona wariancja</strong>; (3) <strong>wystarczająco wiele</strong> czynności na ścieżce (heurystyka \(n \geq 30\)). Dla krótkich ścieżek aproksymacja nieadekwatna; dodatkowo merge bias z subkrytycznych ścieżek powoduje niedoszacowanie.</p>
-<p><strong>Merge bias</strong> — klasyczny PERT systematycznie <strong>zaniża</strong> oczekiwany czas projektu. Mechanizm: z <strong>nierówności Jensena</strong> dla funkcji wypukłej \(\max\): \(\mathbb{E}[\max(X, Y)] \geq \max(\mathbb{E}X, \mathbb{E}Y)\). PERT sumuje wariancje tylko po ścieżce krytycznej wyznaczonej z wartości oczekiwanych, ignorując ścieżki subkrytyczne, które z dużym prawdopodobieństwem mogą stać się rzeczywistymi krytycznymi. Symulacja Monte Carlo (losowanie czasów z rozkładów beta i obliczanie \(T_{\text{proj}}\)) nie ma tej wady.</p>
-<h2 id="5-time-cost-trade-off-crashing">5. Time-cost trade-off (crashing)</h2>
-<p>Każda czynność ma parę: czas normalny \(t^N\) z kosztem \(c^N\) oraz czas skrócony \(t^C\) z kosztem \(c^C > c^N\). <strong>Cost slope</strong> = \(\frac{c^C - c^N}{t^N - t^C}\) — koszt jednostkowy skrócenia.</p>
-<p>Procedura: iteracyjnie skracaj czynność o najmniejszym cost slope <strong>na bieżącej ścieżce krytycznej</strong>, dopóki nie pojawi się nowa ścieżka krytyczna albo nie wyczerpie się limit budżetu/skracania. Ścieżka krytyczna nie jest niezmiennikiem — po każdym crash trzeba ją przeliczyć.</p>
-<p>Alternatywnie jako LP (Linear Programming):</p>
-<div class="mathblock">\[\min \sum_{(i,j)\in E} c_{ij}(t_{ij})\ \text{ p.w. }\ \tau_j - \tau_i \geq t_{ij},\quad \tau_{\text{start}} = 0,\quad t_{ij}^{\min} \leq t_{ij} \leq t_{ij}^{\max},\quad \tau_{\text{end}} \leq T_d,\]</div>
-<p>gdzie \(\tau_i \geq 0\) to moment zajścia zdarzenia \(i\) (zmienna decyzyjna), \(t_{ij}\) — wybrany czas trwania czynności (druga zmienna decyzyjna), a \(c_{ij}(\cdot)\) — liniowo malejąca funkcja kosztu skrócenia.</p>
-<h2 id="6-wykres-gantta-i-ograniczenia-metod-sieciowych">6. Wykres Gantta i ograniczenia metod sieciowych</h2>
-<p><strong>Wykres Gantta</strong> — wizualizacja harmonogramu w osi czasu (paski dla czynności), bez jawnej reprezentacji zależności logicznych. Sieć CPM/PERT eksponuje strukturę precedencji. Współczesne narzędzia (MS Project, Primavera) łączą obie reprezentacje, kolorując ścieżkę krytyczną.</p>
-<p><strong>Brak modelu zasobów</strong> — CPM/PERT zakładają nieograniczone zasoby. <strong>RCPSP (Resource-Constrained Project Scheduling Problem)</strong> — zadanie z ograniczeniami zasobowymi, NP-trudne; wynik może być dłuższy niż ścieżka krytyczna. <strong>CCPM (Critical Chain Project Management, Goldratt)</strong> zastępuje ścieżkę krytyczną <strong>łańcuchem krytycznym</strong> uwzględniającym zasoby i wprowadza bufory (project buffer, feeding buffers).</p>
-<p><strong>GERT (Graphical Evaluation and Review Technique)</strong> — rozszerzenie dopuszczające pętle (powtarzanie czynności) i rozgałęzienia probabilistyczne (czynność wykonywana z prawdopodobieństwem \(p\)). CPM/PERT zakładają deterministyczną topologię i jednokrotne wykonanie.</p>
-<h2 id="7-typowe-zastosowania">7. Typowe zastosowania</h2>
-<ul>
-<li><strong>Budownictwo, projekty powtarzalne</strong> — CPM, czasy oszacowane z danych historycznych.</li>
-<li><strong>Projekty unikalne, R&amp;D (Research &amp; Development)</strong> — PERT (program rakiet Polaris, US Navy 1958, geneza metody).</li>
-<li><strong>IT, hurtownie danych</strong> — czynności typu ekstrakcja źródeł, ETL (Extract-Transform-Load), modelowanie wymiarów, UAT (User Acceptance Testing); ścieżka krytyczna identyfikuje wąskie gardło wdrożenia.</li>
-<li><strong>Orkiestracja danych (Airflow, Dagster)</strong> — DAG zadań z czasami wykonania to strukturalnie sieć CPM; ścieżka krytyczna runu = longest path w aktualnym wykonaniu.</li>
-<li><strong>EVM (Earned Value Management)</strong> — CPM dostarcza baseline harmonogramu; EVM liczy SPI (Schedule Performance Index) i CPI (Cost Performance Index).</li>
-</ul>
-<h2 id="8-powiazania-z-innymi-zagadnieniami">8. Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="14_optymalizacja_wielokryterialna.html">Optymalizacja wielokryterialna</a></strong> — time-cost trade-off to dwukryterialny problem MOO (Multi-Objective Optimization); cost slope = parametr skalaryzacji liniowej.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory</a></strong> — wzór \(t_e = (a+4m+b)/6\) to estymator wartości oczekiwanej z trzech oszacowań; suma niezależnych zmiennych + CTG daje przedział ufności na termin zakończenia.</li>
-<li><strong><a href="00_schematy_losowania.html">Populacja generalna</a></strong> — rozkład beta jako model populacji czasów wykonania; CTG jako fundament wnioskowania probabilistycznego.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong> — klasyfikacja zadań jako krytyczne/niekrytyczne, predykcja ryzyka opóźnienia.</li>
-<li><strong><a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong> — wyłącznie analogia kierunku propagacji po DAG-u; mechanizm jest różny (backward pass w CPM to programowanie dynamiczne, backpropagation to reguła łańcuchowa dla gradientów).</li>
-</ul>
+    <h2 id="dag">Sieć projektu jako DAG</h2>
+    <p>Metody sieciowe modelują projekt jako <strong>graf skierowany acykliczny (DAG, Directed Acyclic Graph)</strong> \(G=(V,E)\): węzły i łuki, bez cykli skierowanych, znormalizowany do jednego źródła (start) i jednego ujścia (koniec). <strong>Czynność</strong> to zadanie zużywające czas \(t\ge 0\) i zasoby; <strong>zdarzenie</strong> to punkt w czasie wyznaczający początek lub koniec czynności. W dominującej dziś konwencji <strong>AON (Activity-On-Node)</strong> czynność znajduje się w węźle, a łuk oznacza następstwo. Ponieważ graf jest acykliczny, można go ustawić w <strong>porządku topologicznym</strong> — każdy poprzednik przed swoim następnikiem. To właśnie ten porządek sprawia, że cały CPM sprowadza się do dwóch przejść po grafie.</p>
+
+    <h2 id="cpm">Algorytm CPM</h2>
+    <p><strong>CPM (Critical Path Method)</strong> zakłada <strong>deterministyczne</strong> czasy trwania \(t_{ij}\) i szuka minimalnego czasu projektu. <strong>Przejście w przód (forward pass)</strong> liczy najwcześniejsze momenty zdarzeń, idąc w porządku topologicznym:</p>
+    <div class="mathblock">\[E_j=\max_{(i,j)\in E}\{E_i+t_{ij}\}, \qquad E_{\text{start}}=0.\]</div>
+    <p>Bierzemy maksimum, bo czynność ruszy dopiero wtedy, gdy skończą się <em>wszystkie</em> poprzedzające. <strong>Przejście wstecz (backward pass)</strong> idzie od końca, w porządku odwrotnym, i liczy najpóźniejsze dopuszczalne momenty:</p>
+    <div class="mathblock">\[L_i=\min_{(i,j)\in E}\{L_j-t_{ij}\}, \qquad L_{\text{end}}=E_{\text{end}}.\]</div>
+    <p>Dwa liniowe przejścia po posortowanym DAG-u w zupełności wystarczają.</p>
+
+    <h2 id="sciezka">Zapasy czasowe i ścieżka krytyczna</h2>
+    <div class="viz-mount" data-viz="v15"></div>
+    <p><strong>Zapas całkowity</strong> czynności to \(TF_{ij}=L_j-E_i-t_{ij}\) — o ile można ją opóźnić bez przesunięcia końca projektu. <strong>Ścieżka krytyczna</strong> to droga od startu do końca, na której wszystkie czynności mają \(TF=0\); równoważnie: najdłuższa ścieżka w grafie ważonym czasami, a jej długość to minimalny czas projektu. Ścieżek krytycznych może być kilka.</p>
+    <p><strong>Przykład rachunkowy</strong>: mając tabelę czynności z poprzednikami i czasami, robimy forward pass, żeby poznać \(E\) każdego zdarzenia i czas całości, potem backward pass dla \(L\), a na końcu czynności o zerowym zapasie układają się w ścieżkę krytyczną. Opóźnienie czynności krytycznej opóźnia cały projekt; czynność z zapasem trzech dni można przesunąć o trzy dni bez szkody dla terminu.</p>
+
+    <h2 id="pert">PERT — czasy niepewne</h2>
+    <p><strong>PERT (Program Evaluation and Review Technique)</strong> rozszerza CPM na niepewne czasy: traktuje czas czynności jako zmienną losową. Ekspert podaje <strong>trzy oszacowania</strong> — optymistyczne \(a\), najbardziej prawdopodobne \(m\) i pesymistyczne \(b\) — z których przybliża się wartość oczekiwaną i wariancję:</p>
+    <div class="mathblock">\[t_e=\frac{a+4m+b}{6}, \qquad \sigma^2=\left(\frac{b-a}{6}\right)^2.\]</div>
+    <p>Modzie przypisuje się wagę 4, ponieważ to scenariusz najbardziej prawdopodobny. Czas projektu sumujemy po ścieżce krytycznej — wartości oczekiwane i wariancje dodają się — i przy założeniu niezależności czynności można z rozkładu normalnego oszacować prawdopodobieństwo dotrzymania narzuconego terminu \(T_d\).</p>
+
+    <h2 id="crashing">Time-cost trade-off (crashing)</h2>
+    <p><strong>Crashing</strong> odpowiada na pytanie, jak skrócić projekt najtaniej. Każda czynność ma czas normalny i skrócony za wyższy koszt; <strong>cost slope</strong> to koszt skrócenia o jednostkę czasu. Skracamy zawsze najtańszą czynność <strong>na bieżącej ścieżce krytycznej</strong> — i po każdym kroku przeliczamy ścieżkę, bo skracanie potrafi przenieść krytyczność na inną drogę.</p>
+
+    <h2 id="ograniczenia">Ograniczenia i zastosowania</h2>
+    <p><strong>Pułapka</strong>: CPM/PERT zakładają <strong>nieograniczone zasoby</strong>. Realny harmonogram z ograniczeniami zasobowymi bywa dłuższy niż sama ścieżka krytyczna. Zastosowania sięgają od budownictwa (CPM na danych historycznych) po projekty badawcze (PERT, geneza w programie rakiet Polaris); tę samą strukturę mają DAG-i zadań w narzędziach typu Airflow czy Dagster, w których najdłuższa droga jest ścieżką krytyczną wykonania.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#1-siec-projektu-jako-dag">1. Sieć projektu jako DAG</a></li>
-<li><a href="#2-algorytm-cpm-deterministyczny">2. Algorytm CPM (deterministyczny)</a></li>
-<li><a href="#3-zapasy-czasowe-i-sciezka-krytyczna">3. Zapasy czasowe i ścieżka krytyczna</a></li>
-<li><a href="#4-pert-model-probabilistyczny">4. PERT — model probabilistyczny</a></li>
-<li><a href="#5-time-cost-trade-off-crashing">5. Time-cost trade-off (crashing)</a></li>
-<li><a href="#6-wykres-gantta-i-ograniczenia-metod-sieciowych">6. Wykres Gantta i ograniczenia metod sieciowych</a></li>
-<li><a href="#7-typowe-zastosowania">7. Typowe zastosowania</a></li>
-<li><a href="#8-powiazania-z-innymi-zagadnieniami">8. Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+<li><a href="#dag">Sieć projektu jako DAG</a></li>
+<li><a href="#cpm">Algorytm CPM</a></li>
+<li><a href="#sciezka">Zapasy czasowe i ścieżka krytyczna</a></li>
+<li><a href="#pert">PERT — czasy niepewne</a></li>
+<li><a href="#crashing">Time-cost trade-off (crashing)</a></li>
+<li><a href="#ograniczenia">Ograniczenia i zastosowania</a></li></ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

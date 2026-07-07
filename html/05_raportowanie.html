@@ -20,107 +20,61 @@
     <p class="eyebrow">Big Data i systemy rozproszone</p>
     <h1>Techniki raportowania</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Raport to ustrukturyzowana prezentacja danych przekształconych w informację dla odbiorcy decyzyjnego. Cztery osie projektowe: <strong>forma</strong>, <strong>świeżość</strong>, <strong>sterowanie</strong>, <strong>odbiorca</strong> (rozwinięte w tabeli niżej) — wyznaczają wybór technologii.</p>
-<h2 id="definicje">Definicje</h2>
-<div class="viz-mount" data-viz="v05"></div>
 
-<p><strong>Miara</strong> — wielkość liczbowa raportowana; <strong>addytywna</strong> (sumuje się po wszystkich wymiarach, np. sprzedaż) lub <strong>póładdytywna</strong> (sumuje się po niektórych wymiarach, ale nie po czasie, np. stan magazynu / saldo konta). <strong>Wymiar</strong> — atrybut kategoryczny do agregacji (region, czas). <strong>KPI (Key Performance Indicator)</strong> — skalarna funkcja miar \(\text{KPI} = g(M_1, \ldots, M_k)\), gdzie \(M_1,\ldots,M_k\) to miary, a \(g:\mathbb{R}^k\to\mathbb{R}\) (np. konwersja \(=\) transakcje/sesje, czyli \(g(a,b)=a/b\)).</p>
-<p><strong>Funkcja agregująca</strong> \(f:\mathcal{M}(D)\to\mathbb{R}\) odwzorowuje multizbiór wartości kolumny w liczbę; \(D\) to dziedzina wartości agregowanej miary, \(\mathcal{M}(D)\) — zbiór skończonych multizbiorów nad \(D\). Duplikaty są istotne: \(\text{SUM}(1,1,1)=3\neq\text{SUM}(1)=1\) (dziedziną jest multizbiór, nie zbiór).</p>
-<p>Klasy Graya (taksonomia kostki danych):</p>
-<ul>
-<li><strong>distributive</strong> (SUM, MIN, COUNT) — wynik globalny liczy się z wyników cząstkowych ⇒ można pre-agregować i cachować;</li>
-<li><strong>algebraic</strong> (AVG) — potrzebna stała liczba agregatów pomocniczych (para <code>sum, count</code>);</li>
-<li><strong>holistic</strong> (MEDIAN, COUNT DISTINCT) — brak dokładnej pre-agregacji w stałej pamięci (istnieją aproksymacje, np. HyperLogLog).</li>
-</ul>
-<p>Stąd sumę można cachować, mediany nie; średnia globalna to \(\dfrac{\sum_i \text{sum}_i}{\sum_i \text{count}_i}\neq \dfrac{1}{g}\sum_{i=1}^{g}\text{mean}_i\) (gdzie \(g\) = liczba grup) — średnia ze średnich zawodzi przy nierównych licznościach grup i dlatego AVG jest agregatem algebraicznym.</p>
-<p><strong>Funkcja okienkowa</strong> — agregacja na partycji wierszy (<code>PARTITION BY</code>) z ramką (<code>ROWS BETWEEN</code>); umożliwia rankingi, sumy kroczące, porównania rok-do-roku (<code>LAG</code>) bez kolapsu wierszy.</p>
-<p><strong>Determinizm</strong> (własność obliczenia) — ten sam wsad + ten sam kod + to samo środowisko ⇒ ten sam wynik. Wymaga wersjonowania <strong>czterech</strong> elementów: kodu, danych, środowiska (zależności), losowości (seed). <strong>Repeatability</strong> (własność procesu) — ten sam zespół powtarza ten sam eksperyment na tym samym stanowisku.</p>
-<p><strong>Reproducibility</strong> w sensie naukowym (definicja ACM) — odtworzenie wyniku przez <strong>inny zespół na innym systemie/środowisku</strong> — najbardziej restrykcyjne z tych pojęć.</p>
-<h2 id="typologia-raportow">Typologia raportów</h2>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Oś</th>
-<th>Warianty</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Forma</td>
-<td>pixel-perfect (faktury) · dashboard interaktywny · raport literacki (kod+narracja) · ad-hoc query</td>
-</tr>
-<tr>
-<td>Świeżość</td>
-<td>statyczny · batch (nightly) · live (streaming)</td>
-</tr>
-<tr>
-<td>Sterowanie</td>
-<td>predefiniowany (centralny) · self-service (użytkownik klika)</td>
-</tr>
-<tr>
-<td>Odbiorca</td>
-<td>operacyjny (godziny, detal) · taktyczny (KPI, tygodnie) · strategiczny (trendy, kwartały)</td>
-</tr>
-</tbody></table></div>
-<p>Ten temat = narzędzia <strong>programistyczne</strong> (Jupyter, Quarto, Streamlit, LaTeX), w opozycji do ekosystemu BI (Business Intelligence — Power BI, Tableau; omawiane w <a href="08_porownanie_narzedzi.html">Porównaniu narzędzi</a>).</p>
-<h2 id="literate-programming-jupyter-r-markdown-quarto">Literate programming — Jupyter / R Markdown / Quarto</h2>
-<p>Idea Knutha: <strong>kod + narracja + wynik w jednym dokumencie</strong>.</p>
-<ul>
-<li><strong>Jupyter</strong> — interaktywny interfejs do Pythona/R/Julia (kernels), format <code>.ipynb</code> (JSON — JavaScript Object Notation). Eksport <code>nbconvert</code> → HTML (HyperText Markup Language), PDF (Portable Document Format, przez LaTeX), slajdy.</li>
-<li><strong>R Markdown</strong> — <code>.Rmd</code> z chunkami R; <code>knitr</code> + Pandoc; wyjścia <code>html_document</code>, <code>pdf_document</code>, <code>word_document</code>.</li>
-<li><strong>Quarto</strong> — następca R Markdown działający z Pythonem, R, Julią, Observable; CLI (Command Line Interface) <code>quarto render</code>. Pliki <code>.qmd</code> (lepszy diff w git), wsparcie dla książek, slajdów (<code>reveal.js</code>), matematyki.</li>
-</ul>
-<p><strong>Pułapka Jupytera</strong>: stan kernela ≠ kolejność komórek (komórki uruchamiane poza kolejnością). Lekarstwo: „Restart &amp; Run All&quot; lub renderowanie z CLI (<code>quarto render</code>, <code>papermill</code>, <code>jupyter nbconvert --execute</code>).</p>
-<h2 id="parametryzacja-i-automatyzacja">Parametryzacja i automatyzacja</h2>
-<p>Raport parametryzowany — szablon z wejściami (region, miesiąc) generujący warianty.</p>
-<ul>
-<li><strong>Papermill</strong> — wykonuje notatnik z parametrami: <code>papermill report.ipynb out.ipynb -p region "EU"</code>.</li>
-<li><strong>Quarto params</strong> — sekcja <code>params:</code> w nagłówku YAML (YAML Ain&#39;t Markup Language); dostęp zależny od języka: <code>params$region</code> w R, <code>params['region']</code> w Pythonie.</li>
-<li><strong>Orkiestracja</strong>: <code>cron</code> (proste), <strong>Airflow</strong> / <strong>Prefect</strong> / <strong>Dagster</strong> (zależności, monitoring).</li>
-<li><strong>Dystrybucja</strong>: push (mail, Slack) vs pull (portal); alerty progowe (exception reporting — wyślij gdy KPI przekroczy próg).</li>
-</ul>
-<h2 id="latex-dla-raportow-naukowych">LaTeX dla raportów naukowych</h2>
-<p>System składu Knutha; <code>.tex</code> → PDF. Mocne strony: typografia matematyczna, automatyczne odnośniki, bibliografia (<code>biblatex</code>). Klasy: <code>article</code>, <code>report</code>, <code>beamer</code> (slajdy). Częsta ścieżka: Quarto/R Markdown → LaTeX → PDF (autor pisze Markdown, jakość wyjścia LaTeX-owa); czysty LaTeX zostaje dla prac dyplomowych i publikacji.</p>
-<h2 id="interaktywne-dashboardy">Interaktywne dashboardy</h2>
-<ul>
-<li><strong>Streamlit</strong> — model „skrypt re-runuje się od góry przy każdej interakcji&quot;; cache <code>@st.cache_data</code>. Najszybszy do prototypów.</li>
-<li><strong>Plotly Dash</strong> — model callback-owy (jak React); produkcyjny, dla złożonych aplikacji.</li>
-<li><strong>Shiny</strong> (R, od 2022 też Python) — reaktywny model obliczeń, standard w R.</li>
-<li><strong>Voilà</strong> — konwertuje notatnik Jupyter w aplikację webową (widgety <code>ipywidgets</code>).</li>
-</ul>
-<p>Wybór: prototyp eksploracyjny → Streamlit; produkcyjny dashboard → Dash; ekosystem R → Shiny.</p>
-<h2 id="pixel-perfect-i-raporty-regulacyjne">Pixel-perfect i raporty regulacyjne</h2>
-<p>Gdy wymagany dokładny układ (faktury, sprawozdania regulacyjne — np. MiFID, Markets in Financial Instruments Directive; ESEF, European Single Electronic Format):</p>
-<ul>
-<li><strong>ReportLab</strong> — Python, niskopoziomowa kontrola PDF;</li>
-<li><strong>WeasyPrint</strong> — HTML + CSS (Cascading Style Sheets) → PDF;</li>
-<li><strong>JasperReports</strong> / <strong>Crystal Reports</strong> / <strong>SSRS</strong> (SQL Server Reporting Services) — silniki korporacyjne z designerem.</li>
-</ul>
-<p>Format <strong>XBRL</strong> (eXtensible Business Reporting Language) — XML do sprawozdawczości, odbiorcą jest parser.</p>
-<h2 id="dobre-praktyki">Dobre praktyki</h2>
-<ul>
-<li><strong>Reproducibility</strong> — zamrożenie środowiska (<code>requirements.txt</code> / <code>renv.lock</code>, Docker), <code>set_seed()</code>, dane wersjonowane (snapshot ID lub narzędzia typu DVC — Data Version Control).</li>
-<li><strong>Single source of truth dla metryk</strong> — semantic layer (np. dbt metrics); bez niego każdy dział liczy „revenue&quot; inaczej.</li>
-<li><strong>Bezpieczeństwo</strong> — Row-Level Security (RLS — filtr wierszy zależny od użytkownika), audyt dostępu, podpis raportów regulacyjnych.</li>
-<li><strong>Świeżość i wydajność</strong> — etykieta „dane na dzień X&quot;, pre-agregacje (materialized views), kolumnowe formaty (Parquet); nie pchaj zapytań ad-hoc na detal z dashboardu.</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a> / <a href="09_porownanie_modelowania.html">Porównanie modelowania</a></strong> — kostki OLAP (Online Analytical Processing) i operacje (drill-down, roll-up, slice, pivot) to formalna podstawa raportów wielowymiarowych.</li>
-<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong> — Power BI / Tableau / Looker to gałąź low-code, alternatywna do programistycznej.</li>
-<li><strong><a href="04_wizualizacja.html">Wizualizacja</a></strong> — wykresy są budulcem każdego raportu; te same biblioteki (Matplotlib, Plotly) zasilają dashboardy.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong> — jakość raportu = jakość ETL (Extract, Transform, Load); czyszczenie poprzedza prezentację.</li>
-</ul>
+    <p><strong>Raport</strong> to ustrukturyzowana prezentacja danych przekształconych w informację dla odbiorcy decyzyjnego. To zagadnienie dotyczy narzędzi <strong>programistycznych</strong> (Jupyter, Quarto, Streamlit, LaTeX), w przeciwieństwie do gotowych platform BI (Business Intelligence — Power BI, Tableau). Wybór technologii wyznaczają cztery osie projektowe: forma, świeżość, sposób sterowania i odbiorca.</p>
 
+    <h2 id="definicje">Podstawowe pojęcia</h2>
+    <div class="viz-mount" data-viz="v05"></div>
+    <p><strong>Miara</strong> to wielkość liczbowa, którą raportujemy (sprzedaż, saldo), a <strong>wymiar</strong> to atrybut kategoryczny, po którym agregujemy (region, czas). <strong>KPI</strong> (Key Performance Indicator) to skalarna funkcja miar — np. konwersja jako transakcje podzielone przez sesje (transakcje/sesje).</p>
+    <p>Kluczowa intuicja: nie każdą agregację da się policzyć równie tanio. Sumę czy licznik można <strong>wstępnie agregować i buforować</strong> (zapisywać w pamięci podręcznej), bo wynik globalny składa się z wyników cząstkowych; średniej wystarczy przechowywać parę (suma, licznik).</p>
+    <p><strong>Reproducibility</strong> (odtwarzalność) to fundament raportowania: ten sam wsad ma dawać ten sam wynik. Wymaga wersjonowania czterech rzeczy — kodu, danych, środowiska (zależności) i losowości (seed).</p>
+
+    <h2 id="typologia">Typologia raportów</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Oś</th><th>Warianty</th></tr></thead>
+      <tbody>
+        <tr><td>Forma</td><td>pixel-perfect (faktury) · dashboard interaktywny · raport literacki (kod+narracja) · ad-hoc</td></tr>
+        <tr><td>Świeżość</td><td>statyczny · batch (nocny) · live (streaming)</td></tr>
+        <tr><td>Sterowanie</td><td>predefiniowany (centralny) · self-service (użytkownik klika)</td></tr>
+        <tr><td>Odbiorca</td><td>operacyjny (detal, godziny) · taktyczny (KPI, tygodnie) · strategiczny (trendy, kwartały)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="literate">Literate programming</h2>
+    <p>Idea Knutha: <strong>kod, narracja i wynik w jednym dokumencie</strong>. To rdzeń „programistycznego" raportowania.</p>
+    <ul>
+      <li><strong>Jupyter</strong> — interaktywny notatnik (<code>.ipynb</code>) dla Pythona/R; eksport za pomocą <code>nbconvert</code> do HTML, PDF (poprzez LaTeX) czy slajdów.</li>
+      <li><strong>R Markdown / Quarto</strong> — Quarto to następca R Markdown, wielojęzyczny (Python, R, Julia). Jedno polecenie <code>quarto render</code> buduje z tego samego źródła HTML, PDF, książki i slajdy.</li>
+    </ul>
+    <p><strong>Pułapka Jupytera</strong>: stan kernela nie musi odpowiadać kolejności komórek — uruchamiane poza kolejnością dają wynik nie do odtworzenia. Lekarstwo: „Restart &amp; Run All" albo renderowanie z linii poleceń (<code>papermill</code>, <code>quarto render</code>).</p>
+
+    <h2 id="automatyzacja">Parametryzacja i automatyzacja</h2>
+    <p>Raport parametryzowany to szablon z wejściami (region, miesiąc), z którego generujemy warianty. <strong>Papermill</strong> wykonuje notatnik z podanymi parametrami; Quarto ma sekcję <code>params</code> w nagłówku YAML. Harmonogramem steruje prosty <code>cron</code> albo orkiestrator (Airflow, Prefect). Dystrybucja bywa <em>push</em> (mail, Slack) lub <em>pull</em> (portal), często z alertami progowymi: wyślij tylko wtedy, gdy KPI przekroczy próg.</p>
+    <p><strong>Typowy proces</strong>: surowe dane → analiza w Pythonie/R → raport w Quarto lub Jupyterze → parametry (np. region) → automatyczne generowanie i rozesłanie odbiorcom.</p>
+
+    <h2 id="dashboardy">Dashboardy i pixel-perfect</h2>
+    <p>Gdy raport ma być <strong>interaktywny</strong>, sięgamy po dashboardy: <strong>Streamlit</strong> (skrypt wykonuje się ponownie od góry przy każdej interakcji) do szybkich prototypów, <strong>Plotly Dash</strong> (model callbacków) do produkcji, <strong>Shiny</strong> w ekosystemie R.</p>
+    <p>Gdy z kolei liczy się <strong>dokładny układ</strong> (faktury, sprawozdania regulacyjne), używa się generatorów pixel-perfect: <strong>WeasyPrint</strong> (HTML + CSS → PDF), <strong>ReportLab</strong> albo czystego LaTeX-a dla prac dyplomowych.</p>
+
+    <h2 id="praktyki">Dobre praktyki</h2>
+    <ul>
+      <li><strong>Reproducibility</strong> — zamrożenie środowiska (<code>requirements.txt</code>, Docker), stały seed, wersjonowane dane.</li>
+      <li><strong>Single source of truth dla metryk</strong> — wspólna warstwa semantyczna (np. dbt); bez niej każdy dział liczy „przychód" inaczej.</li>
+      <li><strong>Bezpieczeństwo i świeżość</strong> — filtrowanie wierszy zależne od użytkownika, audyt dostępu, uczciwa etykieta „dane na dzień X".</li>
+    </ul>
+    <p><strong>Zdanie zamykające</strong>: raport to ostatnie ogniwo łańcucha danych — jest tylko tak dobry, jak poprzedzający go ETL i wizualizacja; narzędzia programistyczne dają nad nim pełną kontrolę i odtwarzalność, których brakuje klikanym platformom BI.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#definicje">Definicje</a></li>
-<li><a href="#typologia-raportow">Typologia raportów</a></li>
-<li><a href="#literate-programming-jupyter-r-markdown-quarto">Literate programming — Jupyter / R Markdown / Quarto</a></li>
-<li><a href="#parametryzacja-i-automatyzacja">Parametryzacja i automatyzacja</a></li>
-<li><a href="#latex-dla-raportow-naukowych">LaTeX dla raportów naukowych</a></li>
-<li><a href="#interaktywne-dashboardy">Interaktywne dashboardy</a></li>
-<li><a href="#pixel-perfect-i-raporty-regulacyjne">Pixel-perfect i raporty regulacyjne</a></li>
-<li><a href="#dobre-praktyki">Dobre praktyki</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#definicje">Podstawowe pojęcia</a></li>
+      <li><a href="#typologia">Typologia raportów</a></li>
+      <li><a href="#literate">Literate programming</a></li>
+      <li><a href="#automatyzacja">Parametryzacja i automatyzacja</a></li>
+      <li><a href="#dashboardy">Dashboardy i pixel-perfect</a></li>
+      <li><a href="#praktyki">Dobre praktyki</a></li>
+    </ol>
+  </nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

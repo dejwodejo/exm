@@ -20,87 +20,50 @@
     <p class="eyebrow">Bezpieczeństwo IT</p>
     <h1>Autoryzacja, dostęp i podpis cyfrowy</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p>Po triadzie CIA (Confidentiality, Integrity, Availability — <a href="16_bezpieczenstwo_it.html">Bezpieczeństwo IT</a>) ten temat formalizuje <strong>kto i czego może dotykać</strong> oraz <strong>jak udowodnić autorstwo</strong> dokumentu. Trzy filary: modele kontroli dostępu, kryptograficzny podpis, infrastruktura zaufania (PKI).</p>
-<h2 id="aaa-authentication-authorization-accounting-z-identyfikacja">AAA (Authentication, Authorization, Accounting) — z identyfikacją</h2>
-<p>Skrót AAA formalnie obejmuje trzy fazy (uwierzytelnianie, autoryzacja, accounting); identyfikację wyróżnia się jako fazę wstępną. Cztery rozdzielne fazy:</p>
-<ul>
-<li><strong>Identyfikacja</strong> — deklaracja tożsamości (login, numer karty). Sama w sobie niczego nie weryfikuje.</li>
-<li><strong>Uwierzytelnianie (AuthN, authentication)</strong> — weryfikacja tej deklaracji dowodem.</li>
-<li><strong>Autoryzacja (AuthZ, authorization)</strong> — decyzja, czy uwierzytelniony podmiot ma prawo wykonać operację na zasobie.</li>
-<li><strong>Accounting</strong> — rejestracja zdarzeń (audit log).</li>
-</ul>
-<p>Można być zidentyfikowanym i nieuwierzytelnionym; uwierzytelnionym i nieautoryzowanym. Pomylenie AuthN z AuthZ to klasyczne źródło luk (np. nadużywanie OAuth do logowania — patrz niżej).</p>
-<p><strong>Czynniki uwierzytelniania</strong> — trzy kategorie: <em>coś wiesz</em> (hasło, PIN), <em>coś masz</em> (token, klucz prywatny, karta kryptograficzna), <em>coś czym jesteś</em> (biometria). <strong>MFA (Multi-Factor Authentication)</strong> wymaga czynników z <strong>różnych</strong> kategorii — dwa hasła to nie MFA. SMS (Short Message Service) jako &quot;coś masz&quot; jest podatny na SIM-swap (Subscriber Identity Module); NIST SP 800-63B (National Institute of Standards and Technology, Special Publication) obniżył jego poziom asercji. Phishing-resistant MFA: <strong>FIDO2/WebAuthn</strong> (Fast IDentity Online 2 / Web Authentication — klucze sprzętowe wiążące poświadczenie z domeną).</p>
-<h2 id="modele-kontroli-dostepu">Modele kontroli dostępu</h2>
-<p><strong>Macierz kontroli dostępu Lampsona</strong> \(A: S \times O \to 2^R\) — formalizm referencyjny: dla każdej pary podmiot \(s \in S\) × obiekt \(o \in O\) przechowujemy podzbiór praw z \(R\) (read, write, execute, …); \(2^R\) to zbiór wszystkich podzbiorów praw. Dwie reprezentacje: <strong>ACL (Access Control List)</strong> — kolumna macierzy przy obiekcie (&quot;kto może zrobić co z tym plikiem&quot;); <strong>capability</strong> — wiersz przy podmiocie (&quot;co ten podmiot może zrobić&quot;). Capabilities łatwo delegować, trudniej globalnie odebrać.</p>
-<p>Cztery modele różnią się tym, <strong>kto i na jakiej podstawie</strong> ustala prawa:</p>
-<ul>
-<li><strong>DAC (Discretionary Access Control)</strong> — właściciel zasobu nadaje uprawnienia (POSIX — Portable Operating System Interface — <code>rwx</code>, NTFS — New Technology File System — ACL). Podatny na trojany (proces dziedziczy uprawnienia użytkownika).</li>
-<li><strong>MAC (Mandatory Access Control)</strong> — system narzuca politykę na podstawie etykiet poufności/integralności; właściciel <strong>nie</strong> może jej zmienić (SELinux, systemy wojskowe). Wymaga <strong>kraty bezpieczeństwa</strong> \((L, \leq)\) — częściowego porządku etykiet, w którym operacja join \(\sqcup\) (najmniejsza etykieta dominująca oba argumenty) wyznacza wypadkowy poziom poufności informacji łączonej z wielu źródeł.</li>
-<li><strong>RBAC (Role-Based Access Control)</strong> — uprawnienia przypisane do <strong>ról</strong>, a użytkownicy do ról (dwa oddzielne przypisania: użytkownik–rola i uprawnienie–rola). Wspiera <strong>SoD (Separation of Duties)</strong> — ten sam użytkownik nie może łączyć ról konfliktowych. Standard NIST / ANSI (American National Standards Institute) INCITS (InterNational Committee for Information Technology Standards) 359.</li>
-<li><strong>ABAC (Attribute-Based Access Control)</strong> — decyzja na podstawie atrybutów podmiotu, zasobu, akcji i kontekstu (czas, lokalizacja, IP — Internet Protocol). Wyrażana jako reguły, np. w XACML (eXtensible Access Control Markup Language). Bardziej elastyczny niż RBAC, ale trudniejszy do audytu.</li>
-</ul>
-<p>Klasyczne modele MAC: <strong>Bell-LaPadula</strong> chroni <strong>poufność</strong> (&quot;no read up, no write down&quot;); <strong>Biba</strong> dualnie chroni <strong>integralność</strong> (&quot;no read down, no write up&quot;). Modele wzajemnie sprzeczne — w czystej postaci nie da się stosować obu naraz na tym samym strumieniu.</p>
-<h2 id="kryptograficzne-fundamenty-podpisu">Kryptograficzne fundamenty podpisu</h2>
-<div class="viz-mount" data-viz="v17"></div>
 
-<p><strong>Funkcja skrótu kryptograficzna</strong> \(h: \{0,1\}^* \to \{0,1\}^\ell\) (\(\ell\) = długość skrótu w bitach) z trzema własnościami: preimage, second-preimage, collision resistance (pełna definicja w <a href="16_bezpieczenstwo_it.html">Bezpieczeństwie IT</a>). Paradoks urodzin → atak kolizyjny w \(O(2^{\ell/2})\), więc SHA-1 (Secure Hash Algorithm) odrzucony, SHA-256 i SHA-3 standardem.</p>
-<p><strong>Kryptografia asymetryczna</strong> — para \((pk, sk)\) klucz publiczny/prywatny. Bezpieczeństwo opiera się o problem trudny: faktoryzacja w <strong>RSA (Rivest-Shamir-Adleman)</strong>, logarytm dyskretny w \(\mathbb{Z}_p^*\) w <strong>DSA (Digital Signature Algorithm)</strong>, <strong>ECDLP (Elliptic Curve Discrete Logarithm Problem)</strong> w grupie punktów krzywej eliptycznej w <strong>ECDSA / EdDSA</strong>.</p>
-<p><strong>Schemat podpisu cyfrowego</strong> — trójka algorytmów \((\text{Gen}, \text{Sign}, \text{Verify})\), gdzie \(\text{Verify}(pk, m, \sigma) \to \{\text{accept}, \text{reject}\}\), z poprawnością i bezpieczeństwem <strong>EUF-CMA (Existential Unforgeability under Chosen Message Attack)</strong> — atakujący widzący dowolne podpisy nie umie sfałszować podpisu nowej wiadomości.</p>
-<p><strong>Mechanizm</strong> (RSA): moduł \(N\), klucz publiczny \((e,N)\), prywatny \((d,N)\), gdzie \(ed \equiv 1 \pmod{\varphi(N)}\). Podpis kluczem <strong>prywatnym</strong>: \(\sigma = h(m)^d \bmod N\). Weryfikacja kluczem <strong>publicznym</strong>: sprawdza \(\sigma^e \bmod N \stackrel{?}{=} h(m)\) — poprawność wynika z \(\sigma^e = h(m)^{ed} \equiv h(m) \pmod{N}\), czyli klucz publiczny odwraca operację prywatnego. Podpisuje się hash, nie cały dokument (wydajność, wymóg formalny algorytmów).</p>
-<p>Pułapka: ECDSA wymaga <strong>losowego, jednorazowego</strong> \(k\) dla każdego podpisu; powtórzenie \(k\) ujawnia klucz prywatny (PlayStation 3 padło dokładnie z tego powodu). EdDSA (Edwards-curve Digital Signature Algorithm, np. Ed25519) jest deterministyczne i odporne na ten błąd.</p>
-<p><strong>Integralność vs autentyczność vs niezaprzeczalność</strong>:</p>
-<ul>
-<li>Sam <strong>hash</strong> → integralność (tylko jeśli sam hash niezmodyfikowany).</li>
-<li><strong>MAC (Message Authentication Code)</strong> / <strong>HMAC (Hash-based MAC)</strong> → integralność + autentyczność, klucz symetryczny — odbiorca mógł sam wyprodukować kod, więc <strong>brak niezaprzeczalności</strong>. (Uwaga: ten MAC to <em>co innego</em> niż MAC = Mandatory Access Control z sekcji o kontroli dostępu.)</li>
-<li><strong>Podpis cyfrowy</strong> → integralność + autentyczność + <strong>niezaprzeczalność (non-repudiation)</strong>: tylko nadawca posiada klucz prywatny, więc trzecia strona może rozstrzygnąć autorstwo.</li>
-</ul>
-<h2 id="pki-i-certyfikaty">PKI i certyfikaty</h2>
-<p><strong>Certyfikat X.509</strong> = klucz publiczny + dane podmiotu (subject) + dane wystawcy (issuer) + okres ważności + zastosowania klucza (KeyUsage, ExtendedKeyUsage) + <strong>podpis CA</strong>. Bez certyfikatu klucz publiczny jest anonimowy.</p>
-<p><strong>PKI (Public Key Infrastructure)</strong> — model hierarchiczny: <strong>root CA (Certificate Authority)</strong> na szczycie, certyfikaty pośrednie, certyfikat końcowy; walidacja przez ścieżkę do <strong>trust anchor</strong>. Mechanizmy unieważnienia:</p>
-<ul>
-<li><strong>CRL (Certificate Revocation List)</strong> — pełna lista odwołanych certyfikatów, pobierana okresowo, duża.</li>
-<li><strong>OCSP (Online Certificate Status Protocol)</strong> — zapytanie online o status pojedynczego certyfikatu; ujawnia CA, jakie strony klient odwiedza, i tworzy SPOF (Single Point of Failure).</li>
-<li><strong>OCSP Stapling</strong> — serwer dołącza świeży podpisany status w handshake TLS (Transport Layer Security); rozwiązuje oba problemy. Bez <strong>Must-Staple</strong> przeglądarki stosują <em>soft-fail</em> — niedostępność OCSP nie blokuje połączenia.</li>
-</ul>
-<p><strong>PKI vs Web of Trust</strong> — WoT (PGP — Pretty Good Privacy / GPG — GNU Privacy Guard) nie ma centralnego autorytetu; użytkownicy podpisują nawzajem swoje klucze (zaufanie tranzytywne). PKI skaluje się komercyjnie (HTTPS — HyperText Transfer Protocol Secure), WoT lepiej znosi kompromitację pojedynczego klucza, ale słabo skaluje. Kompromitacja root CA łamie całą hierarchię (DigiNotar 2011).</p>
-<h2 id="podpis-elektroniczny-eidas">Podpis elektroniczny — eIDAS</h2>
-<p><strong>Podpis elektroniczny</strong> to pojęcie <strong>prawne</strong> (eIDAS — electronic IDentification, Authentication and trust Services, rozporządzenie UE 910/2014, zmienione przez rozporządzenie (UE) 2024/1183 - eIDAS 2.0) — dowolne dane w postaci elektronicznej dołączone do innych danych jako podpis (formalnie nawet zeskanowany podpis odręczny). <strong>Podpis cyfrowy</strong> to pojęcie <strong>kryptograficzne</strong> — konkretny mechanizm asymetryczny. Każdy cyfrowy jest elektroniczny, nie odwrotnie.</p>
-<p>Trzy poziomy eIDAS:</p>
-<ul>
-<li><strong>SES (Simple Electronic Signature)</strong> — minimalna definicja, dowolna forma elektroniczna.</li>
-<li><strong>AdES (Advanced Electronic Signature)</strong> — jednoznacznie przypisany podpisującemu, umożliwia identyfikację, oparty na danych pod jego wyłączną kontrolą, wykrywa zmiany w dokumencie.</li>
-<li><strong>QES (Qualified Electronic Signature)</strong> — AdES wykonany <strong>QSCD (Qualified Signature Creation Device)</strong> na podstawie <strong>kwalifikowanego certyfikatu</strong> wydanego przez <strong>QTSP (Qualified Trust Service Provider)</strong>. Tylko QES jest w UE prawnie <strong>równoważny podpisowi odręcznemu</strong> (art. 25).</li>
-</ul>
-<p>Pieczęć elektroniczna to odpowiednik podpisu dla <strong>osoby prawnej</strong> (firmy, urzędu). <strong>Znacznik czasu (RFC — Request For Comments — 3161, TSA — Time-Stamping Authority)</strong> wiąże podpis z momentem złożenia — wymagany do długoterminowej ważności.</p>
-<p>Formaty kontenerów: <strong>PAdES</strong> (PDF Advanced Electronic Signature — PDF, Portable Document Format), <strong>XAdES</strong> (XML Advanced Electronic Signature — XML, eXtensible Markup Language; np. polski KSeF, ePUAP), <strong>CAdES</strong> (CMS Advanced Electronic Signature — CMS, Cryptographic Message Syntax; dowolne binaria). Profile: B (basic), T (timestamp), LT (long-term, embed OCSP/CRL), LTA (archive timestamp). PAdES-B traci ważność po wygaśnięciu certyfikatu.</p>
-<h2 id="autoryzacja-w-aplikacjach">Autoryzacja w aplikacjach</h2>
-<p><strong>OAuth 2.0</strong> to framework <strong>autoryzacji delegowanej</strong> — pozwala aplikacji uzyskać dostęp do zasobów użytkownika u innego dostawcy bez udostępniania hasła (access token, scopes). <strong>OIDC (OpenID Connect)</strong> to warstwa <strong>uwierzytelniania</strong> zbudowana <strong>nad</strong> OAuth 2.0 — dodaje <code>id_token</code> (JWT) z roszczeniami o tożsamości (<code>sub</code>, <code>iss</code>, <code>aud</code>, <code>exp</code>). Czysty OAuth 2.0 nie służy do logowania — token mówi tylko, że klient ma dostęp, nie kim użytkownik jest.</p>
-<p><strong>JWT (JSON Web Token)</strong> vs <strong>session cookie</strong>: JWT jest self-contained (payload podpisany przez serwer, walidacja bez storage), cookie to nieprzezroczysty identyfikator z stanem po stronie serwera. JWT trudno odwołać przed wygaśnięciem (brak globalnego state) — wymaga krótkiego TTL (Time To Live) + refresh token lub blacklisty. JWT nie jest <strong>szyfrowany</strong> — payload to base64url, czytelny dla każdego (do szyfrowania służy JWE — JSON Web Encryption).</p>
-<p>Inne mechanizmy w praktyce: <strong>Kerberos</strong> (ticket-based SSO — Single Sign-On — w domenach AD — Active Directory), <strong>SAML (Security Assertion Markup Language)</strong> (XML-based federacja w enterprise), <strong>LDAP (Lightweight Directory Access Protocol) / AD</strong> jako źródło tożsamości, <strong>HSM (Hardware Security Module)</strong> + <strong>PKCS#11 (Public-Key Cryptography Standards #11)</strong> dla kluczy CA i podpisu kwalifikowanego, <strong>karta kryptograficzna</strong> / e-dowód jako QSCD.</p>
-<h2 id="zastosowania">Zastosowania</h2>
-<ul>
-<li><strong>Bankowość online</strong> — MFA i mobilna autoryzacja (PSD2 — Payment Services Directive 2 — SCA — Strong Customer Authentication), TLS, podpis umów kredytowych.</li>
-<li><strong>E-administracja</strong> — Profil Zaufany (SES/AdES), podpis kwalifikowany (QES) w ePUAP, e-dowód/mObywatel jako QSCD.</li>
-<li><strong>Dokumenty prawne</strong> — umowy w PAdES-LT/LTA (długoterminowa ważność), e-faktura KSeF (XAdES), niezaprzeczalność jako podstawa dowodowa w sądzie.</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="16_bezpieczenstwo_it.html">Bezpieczeństwo IT</a></strong> — poprzednik: triada CIA, kryptografia, DAC/MAC w OS. Ten temat dodaje formalne modele dostępu, podpis i PKI.</li>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data vs analiza klasyczna</a> / <a href="07_mapreduce.html">MapReduce</a>, <a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong> — autoryzacja w klastrze (Kerberos, HDFS ACL, Ranger) i model uprawnień (RBAC vs ABAC, integracja z LDAP/AD/SSO) jako kryterium różnicujące narzędzia.</li>
-<li><strong><a href="05_raportowanie.html">Raportowanie</a> / <a href="13_text_mining.html">Text mining</a> / <a href="02_preprocessing.html">Preprocessing</a></strong> — RLS (Row-Level Security) w BI, DLP (Data Loss Prevention), pseudonimizacja/anonimizacja (RODO / GDPR — General Data Protection Regulation) jako polityka dostępu na poziomie danych.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a> / <a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong> — kontrola dostępu do modeli i danych treningowych, podpis artefaktów MLOps (Machine Learning Operations) dla integralności łańcucha dostaw modelu.</li>
-</ul>
+    <p>Po triadzie CIA (<a href="16_bezpieczenstwo_it.html">Bezpieczeństwo IT</a>) ten temat formalizuje <strong>kto i czego może dotykać</strong> oraz <strong>jak udowodnić autorstwo</strong> dokumentu. Trzy filary: modele kontroli dostępu, kryptograficzny podpis i infrastruktura zaufania (PKI).</p>
+
+    <h2 id="aaa">AAA i uwierzytelnianie</h2>
+    <p>Warto rozdzielić cztery fazy. <strong>Identyfikacja</strong> to sama deklaracja tożsamości (login) — niczego nie weryfikuje. <strong>Uwierzytelnianie (AuthN)</strong> sprawdza tę deklarację dowodem. <strong>Autoryzacja (AuthZ)</strong> rozstrzyga, czy uwierzytelniony podmiot ma prawo wykonać operację na zasobie. <strong>Accounting</strong> to rejestracja zdarzeń w logu audytu. Pierwszy kontrast: <strong>AuthN to nie AuthZ</strong> — można być uwierzytelnionym i nieautoryzowanym, a mylenie tych faz to klasyczne źródło luk.</p>
+    <p>Uwierzytelnianie opiera się na trzech kategoriach czynników: <em>coś wiesz</em> (hasło), <em>coś masz</em> (token, klucz prywatny), <em>coś, czym jesteś</em> (biometria). <strong>MFA</strong> wymaga czynników z <strong>różnych</strong> kategorii — dwa hasła to nie MFA. SMS jest słaby, bo jest podatny na atak SIM-swap; odporne na phishing są klucze sprzętowe <strong>FIDO2/WebAuthn</strong>, wiążące poświadczenie z domeną.</p>
+
+    <h2 id="modele">Modele kontroli dostępu</h2>
+    <p>Cztery modele różnią się tym, <strong>kto i na jakiej podstawie</strong> ustala prawa:</p>
+    <ul>
+      <li><strong>DAC</strong> — właściciel zasobu nadaje uprawnienia (POSIX <code>rwx</code>, listy ACL). Podatny na trojany, bo proces dziedziczy prawa użytkownika.</li>
+      <li><strong>MAC</strong> — politykę narzuca system na podstawie etykiet poufności; właściciel <strong>nie</strong> może jej zmienić (SELinux, systemy wojskowe).</li>
+      <li><strong>RBAC</strong> — uprawnienia wiąże się z <strong>rolami</strong>, a użytkowników z rolami. Wspiera rozdział obowiązków (ten sam człowiek nie łączy ról konfliktowych).</li>
+      <li><strong>ABAC</strong> — decyzja z atrybutów podmiotu, zasobu i kontekstu (czas, IP). Elastyczniejszy niż RBAC, ale trudniejszy do audytu.</li>
+    </ul>
+
+    <h2 id="podpis">Podpis cyfrowy</h2>
+    <div class="viz-mount" data-viz="v17"></div>
+    <p>Podpis cyfrowy stoi na dwóch elementach: <strong>funkcji skrótu</strong> (hash) i <strong>kryptografii asymetrycznej</strong> — parze kluczy publiczny/prywatny. Mechanizm: liczymy skrót dokumentu, a potem podpisujemy go kluczem <strong>prywatnym</strong>. Odbiorca weryfikuje podpis kluczem <strong>publicznym</strong>; jeśli wynik zgadza się ze skrótem policzonym z dokumentu, podpis jest prawdziwy. Podpisuje się sam skrót, nie cały dokument (wydajność).</p>
+    <p>Stąd trzy poziomy gwarancji: sam <strong>hash</strong> daje integralność; <strong>MAC/HMAC</strong> (klucz symetryczny) dodaje autentyczność, ale <strong>bez niezaprzeczalności</strong>, bo odbiorca sam mógł go wyprodukować; dopiero <strong>podpis cyfrowy</strong> daje niezaprzeczalność — tylko nadawca ma klucz prywatny, więc trzecia strona rozstrzygnie kwestię autorstwa.</p>
+
+    <h2 id="pki">PKI i certyfikaty</h2>
+    <p>Sam klucz publiczny jest anonimowy; wiąże go z tożsamością <strong>certyfikat X.509</strong>: klucz publiczny plus dane podmiotu, wystawcy i okres ważności — całość podpisana przez urząd certyfikacji (<strong>CA</strong>). <strong>PKI</strong> to hierarchia: root CA na szczycie, certyfikaty pośrednie, certyfikat końcowy; zaufanie walidujemy ścieżką do zaufanej kotwicy. Odwołania publikuje się na listach (CRL) lub sprawdza online (OCSP). Pułapka: kompromitacja root CA łamie <strong>całą</strong> hierarchię (przypadek DigiNotar, 2011).</p>
+
+    <h2 id="eidas">Podpis elektroniczny — eIDAS</h2>
+    <p>Drugi kontrast: <strong>podpis elektroniczny to nie podpis cyfrowy</strong>. Elektroniczny to pojęcie <strong>prawne</strong> (rozporządzenie eIDAS) — dowolne dane elektroniczne dołączone jako podpis, formalnie nawet skan podpisu odręcznego. Cyfrowy to konkretny <strong>mechanizm kryptograficzny</strong>. Każdy cyfrowy jest elektroniczny, nie odwrotnie. eIDAS wyróżnia trzy poziomy:</p>
+    <ul>
+      <li><strong>SES</strong> — minimalna definicja, dowolna forma elektroniczna.</li>
+      <li><strong>AdES</strong> — jednoznacznie przypisany podpisującemu, pod jego wyłączną kontrolą, wykrywa zmiany w dokumencie.</li>
+      <li><strong>QES</strong> — AdES złożony przy użyciu kwalifikowanego urządzenia i certyfikatu. Tylko QES jest w UE prawnie <strong>równoważny podpisowi odręcznemu</strong>.</li>
+    </ul>
+
+    <h2 id="aplikacje">Autoryzacja w aplikacjach</h2>
+    <p>Trzeci kontrast dotyczy aplikacji webowych: <strong>OAuth 2.0</strong> to <strong>autoryzacja delegowana</strong> (dostęp do zasobów bez ujawniania hasła), a <strong>uwierzytelnianiem</strong> zajmuje się warstwa nad nim — <strong>OIDC</strong>.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#aaa-authentication-authorization-accounting-z-identyfikacja">AAA (Authentication, Authorization, Accounting) — z identyfikacją</a></li>
-<li><a href="#modele-kontroli-dostepu">Modele kontroli dostępu</a></li>
-<li><a href="#kryptograficzne-fundamenty-podpisu">Kryptograficzne fundamenty podpisu</a></li>
-<li><a href="#pki-i-certyfikaty">PKI i certyfikaty</a></li>
-<li><a href="#podpis-elektroniczny-eidas">Podpis elektroniczny — eIDAS</a></li>
-<li><a href="#autoryzacja-w-aplikacjach">Autoryzacja w aplikacjach</a></li>
-<li><a href="#zastosowania">Zastosowania</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#aaa">AAA i uwierzytelnianie</a></li>
+    <li><a href="#modele">Modele kontroli dostępu</a></li>
+    <li><a href="#podpis">Podpis cyfrowy</a></li>
+    <li><a href="#pki">PKI i certyfikaty</a></li>
+    <li><a href="#eidas">Podpis elektroniczny — eIDAS</a></li>
+    <li><a href="#aplikacje">Autoryzacja w aplikacjach</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

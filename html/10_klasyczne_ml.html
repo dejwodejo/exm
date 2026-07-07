@@ -20,114 +20,66 @@
     <p class="eyebrow">Przygotowanie danych i modele klasyczne</p>
     <h1>Klasyczne modele uczenia maszynowego</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <p><strong>Uczenie maszynowe (ML — Machine Learning)</strong> wg Mitchella: program uczy się z doświadczenia \(E\) względem zadania \(T\) i miary jakości \(P\), jeśli \(P\) poprawia się z \(E\). Formalnie: dany zbiór treningowy \(\{(x_i, y_i)\}_{i=1}^n\) losowany IID (Independent and Identically Distributed) z rozkładu \(P(X, Y)\), <strong>klasa hipotez</strong> \(\mathcal{H}\) to zbiór dopuszczalnych funkcji \(h: \mathcal{X} \to \mathcal{Y}\). <strong>Funkcja straty</strong> \(L: \mathcal{Y} \times \mathcal{Y} \to \mathbb{R}_+\) mierzy karę za predykcję; <strong>ryzyko oczekiwane</strong> \(R(h) = \mathbb{E}[L(h(X), Y)]\) to średnia strata na rozkładzie, <strong>ryzyko empiryczne</strong> \(R_n(h) = \tfrac{1}{n}\sum_i L(h(x_i), y_i)\) — średnia strata na próbie. <strong>ERM (Empirical Risk Minimization)</strong> wybiera \(\hat h = \arg\min_{h \in \mathcal{H}} R_n(h)\).</p>
-<h2 id="typy-uczenia">Typy uczenia</h2>
-<ul>
-<li><strong>Nadzorowane</strong> — pary \((x, y)\), cel: minimalizacja \(R(h)\). Klasyfikacja: \(\mathcal{Y}\) dyskretne; regresja: \(\mathcal{Y} \subseteq \mathbb{R}\).</li>
-<li><strong>Nienadzorowane</strong> — same \(\{x_i\}\), cel: opis \(P(X)\) (klasteryzacja, redukcja wymiarów, estymacja gęstości).</li>
-<li><strong>Wzmocnienie (RL — Reinforcement Learning)</strong> — agent w środowisku Markowa (MDP — Markov Decision Process) maksymalizuje oczekiwaną sumę nagród; trade-off eksploracja vs eksploatacja, sygnał opóźniony.</li>
-<li><strong>Półnadzorowane / samonadzorowane</strong> — mała etykietowana próbka + duża nieetykietowana / pseudo-etykiety z samych \(X\).</li>
-</ul>
-<h2 id="bias-variance-tradeoff">Bias-variance tradeoff</h2>
-<div class="viz-mount" data-viz="bv"></div>
 
-<p><strong>Estymator</strong> \(\hat\theta\) to funkcja próby; <strong>obciążenie (bias)</strong> \(B(\hat\theta) = \mathbb{E}[\hat\theta] - \theta\); <strong>wariancja</strong> \(\text{Var}(\hat\theta) = \mathbb{E}[(\hat\theta - \mathbb{E}[\hat\theta])^2]\). Dla MSE (Mean Squared Error) zachodzi dekompozycja:</p>
-<div class="mathblock">\[\mathbb{E}[(Y - \hat h(X))^2] = \underbrace{(\mathbb{E}[\hat h(X)] - f^*(X))^2}_{\text{Bias}^2} + \underbrace{\text{Var}(\hat h(X))}_{\text{wariancja}} + \underbrace{\sigma^2}_{\text{szum nieredukowalny}}\]</div>
-<p>gdzie oczekiwanie oraz \(\mathbb{E}[\hat h]\) są brane po losowych zbiorach treningowych (nie po jednym modelu), \(f^*(x) = \mathbb{E}[Y \mid x]\) to optymalny predyktor Bayesa, a \(\sigma^2 = \text{Var}(Y \mid x)\) to nieredukowalny szum. <strong>Underfitting</strong> (model za prosty) — wysokie obciążenie, niska wariancja; <strong>overfitting</strong> (model za złożony) — niskie obciążenie, wysoka wariancja, duży <strong>generalization gap</strong> \(R(h) - R_n(h)\). Złożoność klasy \(\mathcal{H}\) formalizuje wymiar VC (Vapnik-Chervonenkis). Bagging redukuje wariancję (uśrednianie nieskorelowanych predyktorów), boosting redukuje bias, regularyzacja zwiększa bias, by zmniejszyć wariancję.</p>
-<h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
-<p><strong>Walidacja krzyżowa \(k\)-krotna (\(k\)-fold CV — Cross-Validation)</strong>: dziel dane na \(k\) rozłącznych foldów, trenuj na \(k-1\), waliduj na pozostałym, uśrednij; LOOCV (Leave-One-Out CV) to przypadek \(k = n\). <strong>StratifiedKFold</strong> zachowuje proporcje klas, <strong>TimeSeriesSplit</strong> dla danych szeregowych (zwykły shuffle łamie zależności czasowe), <strong>GroupKFold</strong> gdy próbki nie są niezależne. Skalowanie/imputacja/selekcja cech wykonana na całym zbiorze przed splitem prowadzi do <strong>data leakage</strong> zawyżającego wynik.</p>
-<p><strong>Macierz pomyłek (TP, FP, TN, FN — True/False Positive/Negative)</strong>:</p>
-<ul>
-<li><strong>Accuracy</strong> \(= (TP + TN)/(TP + FP + TN + FN)\) — frakcja poprawnych.</li>
-<li><strong>Precision</strong> \(= TP/(TP + FP)\) — jakość alarmów (frakcja prawdziwie pozytywnych wśród przewidzianych pozytywnych).</li>
-<li><strong>Recall</strong> \(= TP/(TP + FN)\) — kompletność (frakcja wykrytych prawdziwych pozytywnych).</li>
-<li><strong>F1</strong> \(= 2 \cdot P \cdot R / (P + R)\) — średnia harmoniczna \(P\) i \(R\), karze skrajną asymetrię.</li>
-<li><strong>Krzywa ROC (Receiver Operating Characteristic)</strong>: wykres TPR (True Positive Rate) \(= R\) względem FPR (False Positive Rate) \(= FP/(FP + TN)\) przy zmianie progu klasyfikacji; <strong>AUC (Area Under Curve)</strong> ma interpretację probabilistyczną — \(P(\text{score}(X^+) > \text{score}(X^-))\) dla losowej pary.</li>
-</ul>
-<p>Przy silnym niezbalansowaniu klas accuracy myli (klasyfikator stały „zawsze klasa większościowa&quot; osiąga wysokie accuracy przy F1 \(= 0\)); ROC jest niewrażliwa na rozkład klas (FPR rozcieńczone przez liczne negatywy), więc <strong>PR-AUC</strong> (Precision-Recall AUC) bywa bardziej informatywne.</p>
-<p><strong>Regresja</strong>: MSE \(= \tfrac{1}{n}\sum (y_i - \hat y_i)^2\), RMSE (Root Mean Squared Error) \(= \sqrt{\text{MSE}}\) (jednostka jak \(y\)), MAE (Mean Absolute Error) \(= \tfrac{1}{n}\sum |y_i - \hat y_i|\) (odporne na outliery), \(R^2 = 1 - \tfrac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}} = 1 - \tfrac{\sum_i (y_i - \hat y_i)^2}{\sum_i (y_i - \bar y)^2}\), gdzie \(\text{SS}_{\text{res}} = \sum_i (y_i - \hat y_i)^2\) to suma kwadratów reszt, a \(\text{SS}_{\text{tot}} = \sum_i (y_i - \bar y)^2\) to całkowita suma kwadratów (\(R^2 = 1\) — dopasowanie idealne, \(R^2 = 0\) — poziom modelu stałego \(\bar y\), \(R^2 < 0\) — gorzej niż średnia).</p>
-<h2 id="modele-klasyfikacji">Modele klasyfikacji</h2>
-<h3 id="k-nn-k-nearest-neighbors">k-NN (k-Nearest Neighbors)</h3>
-<p>Lazy learning: zapamiętuje cały zbiór treningowy; dla nowego \(x\) liczy odległości (np. <strong>euklidesowa</strong> \(d(x, x') = \sqrt{\sum_j (x_j - x'_j)^2}\)) do wszystkich punktów, wybiera \(k\) najbliższych i głosuje większościowo (klasyfikacja) lub uśrednia (regresja). Małe \(k\): niski bias, wysoka wariancja (granica decyzyjna szarpana); duże \(k\): odwrotnie. Wymaga skalowania cech, czuły na klątwę wymiarowości (w wysokich \(d\) stosunek \(\max/\min\) odległości \(\to 1\), odległości tracą informacyjność). Złożoność predykcji \(O(n \cdot d)\) bez struktur indeksujących (KD-tree, Ball-tree).</p>
-<h3 id="drzewa-decyzyjne">Drzewa decyzyjne</h3>
-<p>Rekurencyjny podział przestrzeni cech progami na pojedynczych zmiennych. <strong>Entropia Shannona</strong> \(H(S) = -\sum_i p_i \log_2 p_i\) (gdzie \(p_i\) to udział klasy \(i\) w zbiorze \(S\)), <strong>przyrost informacji (IG — Information Gain)</strong> \(IG(S, A) = H(S) - \sum_v \tfrac{|S_v|}{|S|} H(S_v)\) — algorytm ID3/C4.5; alternatywnie <strong>Gini</strong> \(1 - \sum_i p_i^2\) (CART — Classification And Regression Trees, szybszy obliczeniowo, w praktyce niemal nieodróżnialny). Regresja: redukcja MSE. Drzewa są niezmiennicze na monotoniczne transformacje cech (skalowanie nie pomaga), ale niestabilne — mała zmiana danych daje inną strukturę. Bez <code>max_depth</code>/<code>min_samples_leaf</code> zapamiętują zbiór treningowy.</p>
-<h3 id="random-forest-rf">Random Forest (RF)</h3>
-<p><strong>Bagging (Bootstrap Aggregating)</strong> + losowy podzbiór cech przy każdym podziale. Trenuje \(B\) drzew głębokich na próbkach bootstrap, każde rozważa \(\sqrt{p}\) (klasyfikacja) lub \(p/3\) (regresja) losowych cech w węźle, agregacja przez głosowanie/średnią. Mechanizm: dekorelacja drzew redukuje wariancję uśrednienia. Dla \(B\) drzew, z których każde ma wariancję \(\sigma^2\) i parami są skorelowane współczynnikiem \(\rho \geq 0\): \(\text{Var}(\bar h) = \rho\sigma^2 + \tfrac{1-\rho}{B}\sigma^2\). Zwiększanie \(B\) zeruje drugi człon, ale pierwszy (\(\rho\sigma^2\)) pozostaje jako podłoga — dlatego losowy podzbiór cech w węźle obniża \(\rho\) i dopiero to spycha wariancję niżej. Trudny do przeuczenia liczbą drzew, odporny na hiperparametry. Zwraca <code>feature_importances_</code> (obciążone w stronę cech wysokiej kardynalności — bezpieczniejsze: permutation importance, SHAP — SHapley Additive exPlanations).</p>
-<h3 id="gradient-boosting-gb">Gradient Boosting (GB)</h3>
-<p>Sekwencyjne dopasowanie słabych uczniów (płytkich drzew) do gradientu funkcji straty poprzedniego ansamblu: \(h_{m+1} = h_m + \nu \cdot t_m\), gdzie \(t_m \approx -\partial L / \partial h_m\), \(\nu\) to learning rate. Dla MSE \(t_m\) dopasowuje się do residuów. Redukuje bias kosztem wzrostu wariancji — przeuczy się gdy liczba drzew zbyt duża; wymaga early stopping, regularyzacji (max_depth, subsample, L1/L2 na liściach) i tuning learning rate. Implementacje: <strong>XGBoost</strong> (eXtreme Gradient Boosting — stabilny default), <strong>LightGBM</strong> (Light Gradient Boosting Machine — leaf-wise growth, histogramy, szybszy na dużych danych), <strong>CatBoost</strong> (natywna obsługa cech kategorycznych). Na wielu danych tabelarycznych gradient boosting (XGBoost/LightGBM/CatBoost) jest bardzo mocnym baseline i często wynikiem bliskim SOTA, ale nie bije uniwersalnie RF ani prostych modeli liniowych.</p>
-<h3 id="svm-support-vector-machine">SVM (Support Vector Machine)</h3>
-<ul>
-<li><strong>Cel</strong>: hiperpłaszczyzna \(w \cdot x + b = 0\) o <strong>maksymalnym marginesie</strong> \(2/\|w\|\) (szerokość pasa między klasami).</li>
-<li><strong>Hard-margin</strong> (klasy liniowo separowalne): \(\min \tfrac{1}{2}\|w\|^2\) przy \(y_i(w \cdot x_i + b) \geq 1\).</li>
-<li><strong>Soft-margin</strong> (brak separowalności): \(\min \tfrac{1}{2}\|w\|^2 + C \sum_i \xi_i\) z luzami \(\xi_i \geq 0\). \(C > 0\) to odwrotność siły regularyzacji: duże \(C\) = wąski margines i mała tolerancja błędów, małe \(C\) = szeroki margines.</li>
-<li><strong>Hinge loss</strong> \(\max(0, 1 - y_i f(x_i))\), gdzie \(f(x) = w \cdot x + b\) — równoważne sformułowanie soft-margin.</li>
-<li>Decyzja zależy tylko od <strong>wektorów wsparcia</strong> (punkty na/wewnątrz marginesu).</li>
-<li><strong>Kernel trick</strong>: \(K(x, x') = \langle \varphi(x), \varphi(x') \rangle\) liczy iloczyn skalarny w przestrzeni cech bez jawnego wyznaczania odwzorowania \(\varphi\); warunek na jądro (Mercera): \(K\) symetryczna i dodatnio półokreślona. Jądra: RBF (Radial Basis Function) \(K(x, x') = \exp(-\gamma \|x - x'\|^2)\) z \(\gamma > 0\) (szerokość jądra), wielomianowe, liniowe.</li>
-<li>Brak natywnych prawdopodobieństw (Platt scaling to post-hoc obejście).</li>
-</ul>
-<h3 id="regresja-logistyczna">Regresja logistyczna</h3>
-<p>Funkcja <strong>sigmoidalna</strong> \(\sigma(z) = 1/(1 + e^{-z})\), model \(P(Y = 1 \mid x) = \sigma(w \cdot x + b)\). Estymacja przez <strong>MLE (Maximum Likelihood Estimation)</strong>: maksymalizacja log-wiarogodności \(\sum_i [y_i \log \hat p_i + (1 - y_i) \log(1 - \hat p_i)]\), równoważna minimalizacji <strong>log-loss / cross-entropy</strong>. Granica decyzyjna liniowa, model dyskryminatywny, zwraca dobrze skalibrowane prawdopodobieństwa — <strong>przy poprawnej specyfikacji modelu</strong> (logit liniowy w cechach); przy źle dopasowanej rodzinie kalibracja zawodzi i wymaga <strong>Platta</strong> (sigmoid) lub <strong>isotonic regression</strong> post-hoc. Wieloklasowa: softmax (regresja softmaxowa) \(P(Y = k \mid x) = \tfrac{\exp(w_k \cdot x + b_k)}{\sum_{j=1}^{K} \exp(w_j \cdot x + b_j)}\) — unormowana eksponenta logitów; sigmoid to przypadek \(K = 2\).</p>
-<h3 id="naiwny-bayes-nb">Naiwny Bayes (NB)</h3>
-<p>Twierdzenie Bayesa: \(P(Y \mid X) = P(X \mid Y) P(Y) / P(X)\); <strong>klasyfikator bayesowski optymalny</strong> \(h^*(x) = \arg\max_y P(Y = y \mid x)\) minimalizuje ryzyko (ryzyko Bayesa to dolna granica błędu). Naiwny Bayes zakłada <strong>warunkową niezależność cech</strong>: \(P(x_1, \ldots, x_p \mid y) = \prod_i P(x_i \mid y)\). Założenie prawie nigdy nie zachodzi (cechy skorelowane), ale klasyfikator często działa dobrze, bo do poprawnej klasyfikacji wystarcza poprawne uporządkowanie posteriorów. Estymaty prawdopodobieństw są źle skalibrowane (skrajnie blisko 0/1). Warianty: GaussianNB, MultinomialNB (NLP — Natural Language Processing, klasyfikacja tekstu na BoW — Bag of Words), BernoulliNB.</p>
-<h3 id="lda-qda-linear-quadratic-discriminant-analysis">LDA / QDA (Linear / Quadratic Discriminant Analysis)</h3>
-<p>Model generatywny: zakłada, że cechy w każdej klasie mają rozkład gaussowski. <strong>LDA</strong> przyjmuje wspólną macierz kowariancji \(\Sigma\) dla wszystkich klas, co daje <strong>liniową</strong> funkcję dyskryminującą \(\delta_k(x) = x^\top \Sigma^{-1} \mu_k - \tfrac{1}{2}\mu_k^\top \Sigma^{-1} \mu_k + \log \pi_k\) (gdzie \(\mu_k\) to średnia klasy, \(\pi_k\) to prior); przypisanie do \(\arg\max_k \delta_k(x)\). <strong>QDA</strong> dopuszcza osobne \(\Sigma_k\) na klasę → granica <strong>kwadratowa</strong>.</p>
-<h2 id="modele-klasteryzacji">Modele klasteryzacji</h2>
-<h3 id="k-means">k-means</h3>
-<p>Minimalizuje <strong>WCSS (Within-Cluster Sum of Squares)</strong> \(J = \sum_{k=1}^K \sum_{x \in C_k} \|x - \mu_k\|^2\), gdzie \(K\) to zadana z góry liczba klastrów, \(C_k\) to zbiór punktów przypisanych do \(k\)-tego klastra, a \(\mu_k = \tfrac{1}{|C_k|}\sum_{x \in C_k} x\) to jego centroid (średnia punktów). <strong>Algorytm Lloyda</strong>: 1) przypisz każdy punkt do najbliższego centroidu, 2) zaktualizuj centroidy jako średnie klastrów, 3) powtarzaj do zbieżności. Zbiega do <strong>lokalnego</strong> minimum, wynik zależy od inicjalizacji (k-means++ wybiera punkty startowe proporcjonalnie do kwadratu odległości <strong>do najbliższego</strong> już wybranego centroidu). Zakłada klastry kuliste o podobnych wariancjach, wymaga \(K\) z góry (metoda łokcia, silhouette score), wymaga skalowania.</p>
-<h3 id="dbscan-density-based-spatial-clustering-of-applications-with">DBSCAN (Density-Based Spatial Clustering of Applications with Noise)</h3>
-<p>Klastry definiowane gęstością. Parametry: \(\varepsilon\) (promień sąsiedztwa), <code>minPts</code> (minimalna liczba punktów). <strong>Punkt rdzeniowy</strong>: ma ≥ <code>minPts</code> sąsiadów w odległości \(\varepsilon\); klaster to maksymalny zbiór gęstościowo połączonych punktów. Znajduje klastry dowolnego kształtu, oznacza <strong>outliery</strong> jako szum. Nie wymaga \(K\), ale ma problem z klastrami o różnej gęstości.</p>
-<h3 id="hierarchiczna-klasteryzacja">Hierarchiczna klasteryzacja</h3>
-<p><strong>Aglomeracyjna</strong>: zaczyna z \(n\) klastrami (każdy punkt osobno), iteracyjnie łączy najbliższe pary aż do jednego klastra. Wynik wizualizowany jako <strong>dendrogram</strong>, cięcie na zadanej wysokości daje klasteryzację. <strong>Linkage</strong> (funkcja odległości między klastrami): single (min — łańcuchy), complete (max — kuliste), average, <strong>Ward</strong> (minimalizuje wzrost wariancji wewnątrzklastrowej). Złożoność czasowa \(O(n^2)\)–\(O(n^3)\); pamięć zwykle <code>O(n²)</code>. Dzielące (top-down) rzadziej stosowane.</p>
-<h2 id="regularyzacja">Regularyzacja</h2>
-<p>Cel: kontrola złożoności przez karę na normę wag — zwiększa bias, by zredukować wariancję. Funkcja celu \(J(w) = R_n(w) + \lambda \cdot \Omega(w)\), gdzie \(R_n(w)\) to ryzyko empiryczne (dopasowanie), \(\Omega(w)\) to kara na normę wag (złożoność), a \(\lambda \geq 0\) to hiperparametr siły regularyzacji: \(\lambda = 0\) to brak kary, większe \(\lambda\) silniej ściąga wagi do zera (prostszy model, większy bias, mniejsza wariancja).</p>
-<ul>
-<li><strong>L1 (Lasso — Least Absolute Shrinkage and Selection Operator)</strong>: \(\Omega(w) = \|w\|_1 = \sum |w_i|\) — geometria <strong>cross-polytope</strong> w \(\mathbb{R}^p\) (w 2D diament, w 3D oktaedr): ostre wierzchołki leżą na osiach współrzędnych, gdzie część wag \(= 0\), stąd wagi dokładnie zerowe → <strong>selekcja cech</strong>. Interpretacja jako MAP (Maximum A Posteriori) z priorem Laplace&#39;a.</li>
-<li><strong>L2 (Ridge)</strong>: \(\Omega(w) = \|w\|_2^2 = \sum w_i^2\) — wagi małe, ale niezerowe; stabilizuje przy współliniowości. Interpretacja jako MAP z priorem gaussowskim.</li>
-<li><strong>ElasticNet</strong>: \(\alpha \|w\|_1 + (1 - \alpha) \|w\|_2^2\) — kombinacja.</li>
-</ul>
-<p>W regresji logistycznej parametr <code>C</code> w sklearn to <strong>odwrotność</strong> siły regularyzacji (\(C = 1/\lambda\)); w SVM parametr \(C\) ma to samo znaczenie (małe \(C\) = silna regularyzacja = duży margines).</p>
-<h2 id="kluczowe-rozroznienia">Kluczowe rozróżnienia</h2>
-<ul>
-<li><strong>Generatywne</strong> (NB, LDA — Linear Discriminant Analysis) modelują rozkład łączny \(P(x, y) = P(x \mid y) P(y)\); <strong>dyskryminatywne</strong> (regresja logistyczna, SVM, drzewa) modelują \(P(y \mid x)\) lub bezpośrednio granicę. Generatywne mniej danych do osiągnięcia asymptotycznego błędu, ale większy bias przy złej specyfikacji rozkładu (Ng &amp; Jordan 2002).</li>
-<li><strong>Parametryczne</strong> (regresja logistyczna, NB) — stała liczba parametrów; <strong>nieparametryczne</strong> (k-NN, drzewa, SVM-RBF) — liczba parametrów rośnie z \(n\). „Nieparametryczny&quot; \(\neq\) „bez parametrów&quot;.</li>
-<li><strong>Lazy</strong> (k-NN — uczenie = zapamiętanie) vs <strong>eager</strong> (drzewa, SVM, regresja — kompresja do modelu).</li>
-<li><strong>Skalowanie cech wymagane</strong>: SVM, k-NN, k-means, regresja z regularyzacją, PCA (Principal Component Analysis). <strong>Niewrażliwe</strong>: drzewa, RF, GB (porównują wartość z progiem).</li>
-<li><strong>Klasyczny ML vs deep learning (DL)</strong>: klasyczny ML — ręcznie projektowane cechy, dane tabelaryczne, interpretowalność; DL — uczenie reprezentacji end-to-end z surowych danych (obraz, tekst, dźwięk), miliony parametrów, GPU (Graphics Processing Unit). Twierdzenie <strong>NFL (No Free Lunch)</strong> — żaden algorytm nie jest globalnie najlepszy.</li>
-</ul>
-<h2 id="feature-engineering-pipeline-39-y-tuning">Feature engineering, pipeline&#39;y, tuning</h2>
-<ul>
-<li><strong>Encoding cech kategorycznych</strong>: OneHot dla niskiej kardynalności, TargetEncoder dla wysokiej, OrdinalEncoder gdy faktyczny porządek.</li>
-<li><strong>Niezbalansowane klasy</strong>: <code>class_weight='balanced'</code>, SMOTE (Synthetic Minority Over-sampling Technique) — wykonane w <code>imblearn.pipeline.Pipeline</code>, by uniknąć leakage.</li>
-<li><strong>scikit-learn Pipeline + ColumnTransformer</strong> łączy preprocessing i model w jeden estymator z <code>fit</code>/<code>predict</code> — <code>cross_val_score</code> refittuje preprocessing na każdym foldzie, eliminując leakage.</li>
-<li><strong>Tuning hiperparametrów</strong>: GridSearchCV (małe przestrzenie, ≤3 hiperparametry), RandomizedSearchCV (większe), Optuna / BayesSearchCV (drogie modele, TPE — Tree-structured Parzen Estimator).</li>
-<li><strong>Reprodukowalność</strong>: <code>random_state</code> w splicie, modelu i CV.</li>
-<li><strong>Baseline</strong>: zacznij od <code>DummyClassifier</code>/<code>DummyRegressor</code> (dolne ograniczenie), potem regresja logistyczna lub RF (sanity check), dopiero potem boosting i tuning.</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: regresja logistyczna = pojedynczy neuron z sigmoidem; SVM z RBF odpowiada płytkiej sieci; różnica głównie w głębokości i sposobie ekstrakcji cech (ręcznie vs end-to-end).</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja liniowa</a></strong>: regresja liniowa i logistyczna to fundament klasycznego ML; L1/L2, MNK (Metoda Najmniejszych Kwadratów), \(R^2\) przenoszą się dosłownie.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: skalowanie, imputacja, encoding warunkują działanie k-NN, SVM, regresji z regularyzacją; pipeline&#39;y zapobiegają leakage.</li>
-<li><strong><a href="09_porownanie_modelowania.html">Porównanie koncepcji modelowania</a></strong>: dwie kultury Breimana — modelowanie statystyczne (inferencja) vs ML (predykcja, CV, bias-variance) — bezpośrednio mapowane.</li>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory</a></strong>: trening = estymacja parametrów; MLE leży u podstaw regresji logistycznej i NB; obciążenie/wariancja estymatora \(\Leftrightarrow\) bias-variance modelu.</li>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a></strong>: PCA, LDA, klasteryzacja jako pomost między wielowymiarową statystyką a uczeniem nienadzorowanym/redukcją wymiarów przed klasyfikatorem.</li>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data vs klasyczna</a></strong>: klasyczne ML zakłada dane w pamięci; przy Big Data — Spark MLlib, online learning, distributed boosting.</li>
-<li><strong><a href="13_text_mining.html">Text mining</a></strong>: NB, SVM, regresja logistyczna na BoW i TF-IDF (Term Frequency – Inverse Document Frequency) były standardem przed embeddingami.</li>
-<li><strong><a href="08_porownanie_narzedzi.html">Porównanie narzędzi</a></strong>: scikit-learn, caret (R), XGBoost, LightGBM — ekosystem klasycznego ML.</li>
-<li><strong><a href="04_wizualizacja.html">Wizualizacja Python</a></strong>: krzywa ROC, macierz pomyłek, krzywe uczenia, ważności cech to diagnostyka modeli ML.</li>
-<li><strong><a href="00_schematy_losowania.html">Schematy losowania</a></strong>: stratyfikacja w CV, GroupKFold, próbkowanie zbalansowane (SMOTE) — przeniesienie pojęć schematów losowania do ML.</li>
-</ul>
+    <p><strong>Uczenie maszynowe (ML — Machine Learning)</strong> wg Mitchella: program uczy się z doświadczenia \(E\) względem zadania \(T\), jeśli miara jakości \(P\) rośnie wraz z \(E\). W praktyce sprowadza się to do <strong>minimalizacji ryzyka empirycznego (ERM — Empirical Risk Minimization)</strong>: szukamy hipotezy \(\hat h\), która na zbiorze treningowym daje najmniejszą średnią stratę, licząc, że przełoży się to na nowe dane.</p>
+
+    <h2 id="typy-uczenia">Typy uczenia</h2>
+    <ul>
+      <li><strong>Nadzorowane</strong> — pary \((x, y)\); klasyfikacja, gdy etykiety dyskretne, regresja, gdy liczbowe.</li>
+      <li><strong>Nienadzorowane</strong> — same \(\{x_i\}\), cel to struktura danych: klasteryzacja, redukcja wymiarów.</li>
+      <li><strong>Wzmocnienie (RL)</strong> — agent maksymalizuje sumę nagród (eksploracja a eksploatacja).</li>
+    </ul>
+
+    <h2 id="bias-variance-tradeoff">Bias-variance</h2>
+    <div class="viz-mount" data-viz="bv"></div>
+    <p>Błąd predykcji to suma obciążenia, wariancji i nieredukowalnego szumu. Model za prosty ma wysokie obciążenie (<strong>underfitting</strong>), za złożony — wysoką wariancję (<strong>overfitting</strong>). Im wierniej model odwzorowuje próbę treningową, tym mocniej łapie jej przypadkowy szum, dlatego minimum błędu testowego leży <em>pomiędzy</em> modelem zbyt prostym a zbyt złożonym, nie na skraju. Bagging redukuje wariancję, boosting — obciążenie, regularyzacja wymienia jedno na drugie.</p>
+
+    <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
+    <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
+    <p>Dla klasyfikacji z macierzy pomyłek liczymy accuracy, <strong>precyzję</strong> \(TP/(TP+FP)\), <strong>czułość (recall)</strong> \(TP/(TP+FN)\) i ich średnią harmoniczną <strong>F1</strong>; krzywa ROC i pole pod nią (AUC) opisują jakość rankingu niezależnie od progu. Przy silnie niezrównoważonych klasach accuracy myli (stały klasyfikator większościowy: wysokie accuracy, F1 \(= 0\)), więc sięga się po F1 lub PR-AUC. Dla regresji: RMSE (w jednostkach \(y\)), MAE (odporne na wartości odstające) oraz \(R^2\).</p>
+
+    <h2 id="modele">Przegląd modeli</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Model</th><th>Intuicja</th><th>Zaleta</th><th>Wada</th></tr></thead>
+        <tbody>
+          <tr><td>k-NN</td><td>głos \(k\) najbliższych sąsiadów</td><td>prosty, nieliniowy</td><td>wolna predykcja, wrażliwy na skalę i wymiarowość</td></tr>
+          <tr><td>Drzewo decyzyjne</td><td>rekurencyjny podział progami cech</td><td>interpretowalne, bez skalowania</td><td>niestabilne, łatwo przeucza</td></tr>
+          <tr><td>Random Forest</td><td>uśrednienie wielu zdekorelowanych drzew</td><td>redukuje wariancję, odporny</td><td>mniej interpretowalny</td></tr>
+          <tr><td>Gradient Boosting</td><td>drzewa sekwencyjnie na błędach poprzednika</td><td>zwykle najmocniejszy na danych tabelarycznych</td><td>wolniejszy trening, wymaga strojenia</td></tr>
+          <tr><td>SVM</td><td>hiperpłaszczyzna o maksymalnym marginesie</td><td>skuteczny w wysokich wymiarach, jądra</td><td>wolny na dużym \(n\), bez prawdopodobieństw</td></tr>
+          <tr><td>Regresja logistyczna</td><td>liniowa granica przez sigmoidę</td><td>skalibrowane prawdopodobieństwa, interpretowalna</td><td>tylko granice liniowe</td></tr>
+          <tr><td>Naiwny Bayes</td><td>Bayes + niezależność cech</td><td>szybki, dobry w NLP</td><td>naiwne założenie, źle skalibrowany</td></tr>
+          <tr><td>k-means</td><td>\(K\) klastrów kulistych, min. WCSS</td><td>szybki, skalowalny</td><td>wymaga \(K\) z góry, klastry kuliste</td></tr>
+          <tr><td>DBSCAN</td><td>klastry definiowane gęstością</td><td>dowolny kształt, wykrywa szum</td><td>trudność przy różnej gęstości</td></tr>
+          <tr><td>Hierarchiczna</td><td>dendrogram łączeń</td><td>nie wymaga \(K\), wizualna</td><td>kosztowna, \(O(n^2)\)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="regularyzacja">Regularyzacja</h2>
+    <p>Regularyzacja kontroluje złożoność, dokładając do funkcji celu karę na wagi: \(J(w) = R_n(w) + \lambda\,\Omega(w)\). <strong>L1 (Lasso)</strong> zeruje część wag, więc pełni rolę selekcji cech; <strong>L2 (Ridge)</strong> ściąga wagi ku zeru bez zerowania i stabilizuje przy współliniowości. Większe \(\lambda\) to prostszy model: więcej obciążenia, mniej wariancji.</p>
+
+    <h2 id="kluczowe-rozroznienia">Kluczowe rozróżnienia</h2>
+    <ul>
+      <li><strong>Generatywne</strong> (NB, LDA) modelują rozkład łączny \(P(x, y)\); <strong>dyskryminatywne</strong> (regresja logistyczna, SVM, drzewa) — \(P(y \mid x)\) lub samą granicę.</li>
+      <li><strong>Parametryczne</strong> mają stałą liczbę parametrów; <strong>nieparametryczne</strong> (k-NN, drzewa) rosną z danymi.</li>
+      <li><strong>Lazy</strong> (k-NN — uczenie to zapamiętanie) kontra <strong>eager</strong> (reszta — kompresja do modelu).</li>
+      <li><strong>Skalowania wymagają</strong> metody odległościowe i gradientowe (SVM, k-NN, k-means, regresja z regularyzacją); drzewa nie.</li>
+      <li><strong>Klasyczny ML</strong> — ręcznie projektowane cechy, dane tabelaryczne, interpretowalność; <strong>deep learning</strong> — reprezentacje uczone end-to-end. Twierdzenie <strong>NFL (No Free Lunch)</strong>: żaden algorytm nie jest globalnie najlepszy.</li>
+    </ul>
+
+    <p><strong>Zdanie zamykające</strong>: klasyczne modele i <a href="11_sieci_neuronowe.html">sieci neuronowe</a> różnią się głównie tym, czy cechy projektujemy ręcznie, czy uczą się end-to-end — regresja logistyczna to w istocie pojedynczy neuron z sigmoidą.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#typy-uczenia">Typy uczenia</a></li>
-<li><a href="#bias-variance-tradeoff">Bias-variance tradeoff</a></li>
-<li><a href="#walidacja-i-metryki">Walidacja i metryki</a></li>
-<li><a href="#modele-klasyfikacji">Modele klasyfikacji</a></li>
-<li><a href="#modele-klasteryzacji">Modele klasteryzacji</a></li>
-<li><a href="#regularyzacja">Regularyzacja</a></li>
-<li><a href="#kluczowe-rozroznienia">Kluczowe rozróżnienia</a></li>
-<li><a href="#feature-engineering-pipeline-39-y-tuning">Feature engineering, pipeline&#39;y, tuning</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#typy-uczenia">Typy uczenia</a></li>
+    <li><a href="#bias-variance-tradeoff">Bias-variance</a></li>
+    <li><a href="#walidacja-i-metryki">Walidacja i metryki</a></li>
+    <li><a href="#modele">Przegląd modeli</a></li>
+    <li><a href="#regularyzacja">Regularyzacja</a></li>
+    <li><a href="#kluczowe-rozroznienia">Kluczowe rozróżnienia</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

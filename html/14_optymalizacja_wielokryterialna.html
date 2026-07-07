@@ -20,107 +20,46 @@
     <p class="eyebrow">Optymalizacja i zarządzanie projektami</p>
     <h1>Optymalizacja wielokryterialna</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="sformulowanie-problemu">Sformułowanie problemu</h2>
-<p>Zadanie optymalizacji <strong>jednokryterialnej</strong>: \(\min_{x \in X} f(x)\), gdzie \(X \subseteq \mathbb{R}^n\) to <strong>zbiór dopuszczalny</strong> (zbiór wartości decyzji spełniających ograniczenia), \(f: \mathbb{R}^n \to \mathbb{R}\) to skalarna funkcja celu.</p>
-<p>Zadanie <strong>MOO (Multi-Objective Optimization, optymalizacja wielokryterialna)</strong>: \(\min_{x \in X} F(x) = (f_1(x), \ldots, f_k(x))\), gdzie \(k \geq 2\), \(F: \mathbb{R}^n \to \mathbb{R}^k\). Pojawiają się dwa zbiory:</p>
-<ul>
-<li><strong>przestrzeń decyzji</strong> \(X \subseteq \mathbb{R}^n\) — kandydaci na rozwiązanie,</li>
-<li><strong>przestrzeń kryteriów</strong> \(Y = F(X) \subseteq \mathbb{R}^k\) — obrazy decyzji w wartościach celów.</li>
-</ul>
-<p>Powód, dla którego MOO wymaga osobnego aparatu: \(\mathbb{R}^k\) dla \(k \geq 2\) nie ma porządku liniowego, więc nie istnieje pojedyncze &quot;minimum&quot; wektora kryteriów. Trzeba zdefiniować częściowy porządek — relację dominacji.</p>
-<h2 id="dominacja-i-pareto-optymalnosc">Dominacja i Pareto-optymalność</h2>
-<p><strong>Dominacja słaba</strong>: \(y^1 \leq y^2 \iff \forall i\ y^1_i \leq y^2_i\). <strong>Dominacja Pareto</strong>: \(y^1 \preceq y^2 \iff y^1 \leq y^2 \land y^1 \neq y^2\) (co najmniej jedna współrzędna ostro mniejsza). <strong>Dominacja silna</strong>: \(y^1 < y^2 \iff \forall i\ y^1_i < y^2_i\).</p>
-<p><em>Uwaga: konwencje nazewnicze różnią się między źródłami (Miettinen, Ehrgott) — powyższe definicje stosować spójnie wewnątrz tej notatki.</em></p>
-<p><strong>Rozwiązanie Pareto-optymalne (efektywne)</strong>: \(x^* \in X\) jest Pareto-optymalne, gdy nie istnieje \(x \in X\) takie, że \(F(x) \preceq F(x^*)\). Innymi słowy: nie da się poprawić żadnego kryterium bez pogorszenia innego.</p>
-<p><strong>Słabo Pareto-optymalne</strong>: nie istnieje \(x \in X\) z \(F(x) < F(x^*)\) (silna nierówność po wszystkich współrzędnych). Klasa szersza niż Pareto-optymalność — każde Pareto jest słabo Pareto, ale słabo Pareto może być zdominowane na płaskim fragmencie frontu.</p>
-<p><strong>Właściwie Pareto-optymalne (Geoffrion)</strong>: punkt <code>x*</code> jest Pareto-optymalny i nie dopuszcza nieograniczonych trade-offów. Istnieje <code>M &gt; 0</code> takie, że jeśli poprawiamy jedno kryterium kosztem pogorszenia innego, stosunek <code>poprawa / pogorszenie</code> jest ograniczony przez <code>M</code>. To wyklucza punkty, w których arbitralnie małe pogorszenie jednego celu kupuje dowolnie dużą poprawę innego.</p>
-<p><strong>Zbiór Pareto</strong> \(P \subseteq X\) — zbiór rozwiązań efektywnych. <strong>Front Pareto</strong> \(PF = F(P) \subseteq \mathbb{R}^k\) — ich obrazy w przestrzeni kryteriów. Centralny obiekt MOO.</p>
-<p><strong>Własności frontu</strong>: \(PF\) jest z reguły \((k{-}1)\)-wymiarową hiperpowierzchnią; dla MOO wypukłego jest spójny, dla niewypukłego lub MILP (Mixed-Integer Linear Programming, programowanie liniowe całkowitoliczbowe mieszane) może być <strong>rozłączny</strong> (odcinki rozdzielone &quot;lukami&quot;). Dla czysto dyskretnych zadań obraz celu jest skończony; dla MILP z ciągłymi zmiennymi front może zawierać odcinki lub ściany. (Sama skalaryzacja przez Weierstrassa gwarantuje jedynie niepustość zbioru rozwiązań efektywnych.)</p>
-<p><strong>Punkt idealny</strong> \(y^I_i = \min_{x \in X} f_i(x)\) (zwykle nieosiągalny — minima różnych kryteriów osiągane w różnych \(x\)). <strong>Punkt nadir</strong> \(y^N_i = \max_{x \in P} f_i(x)\) — najgorsza wartość \(f_i\) na froncie. <strong>Punkt antyidealny</strong> to maksima po całym \(X\) (nie po froncie) i jest zwykle gorszy niż nadir. Nadir dla \(k > 2\) nie sprowadza się do pojedynczych optymalizacji jednokryterialnych — szacuje się go z <strong>macierzy wymian (payoff matrix)</strong> \(T_{ij} = f_j(x^{(i)})\), gdzie \(x^{(i)}\) minimalizuje \(f_i\): nadir to maksimum po kolumnie \(y^N_j \approx \max_i T_{ij}\), a punkt idealny to przekątna \(y^I_j = T_{jj}\).</p>
-<h2 id="taksonomia-metod-wedlug-momentu-artykulacji-preferencji">Taksonomia metod według momentu artykulacji preferencji</h2>
-<p>Klasyczna taksonomia (Hwang-Masud, 1979) porządkuje metody MOO według tego, <strong>kiedy</strong> decydent wyraża preferencje:</p>
-<ul>
-<li><strong>Bez artykulacji preferencji</strong> — algorytm zwraca jeden neutralny kompromis bez udziału decydenta: metoda kryterium globalnego (global criterion method) \(\min_x \|F(x) - y^I\|\) (odległość od punktu idealnego). Generacja <em>całego</em> frontu bez preferencji (NSGA-II, pełna siatka \(\varepsilon\)) należy do a-posteriori — front sam w sobie nie jest wyborem.</li>
-<li><strong>A-priori</strong> — preferencje znane przed optymalizacją, jeden przebieg, wynik = jeden punkt: goal programming, leksykograficzne, suma ważona z ustalonym \(w\).</li>
-<li><strong>A-posteriori</strong> — najpierw aproksymacja frontu, potem wybór: ε-ograniczenia z parametryzacją \(\varepsilon\), suma ważona z siatką \(w\), NSGA-II + decyzja na froncie (TOPSIS, knee-point).</li>
-<li><strong>Interaktywne</strong> — iteracja decydent ↔ algorytm; w każdej iteracji prezentowane rozwiązania, decydent uściśla preferencje (punkty referencyjne, klasy kryteriów do poprawy / dopuszczalnego pogorszenia): metoda Wierzbickiego, <strong>NIMBUS</strong> (interaktywna metoda klasyfikacji kryteriów), <strong>STEM (Step Method; Benayoun)</strong>, <strong>Zionts-Wallenius</strong>. Nie wymaga znajomości pełnej funkcji użyteczności, tylko jej kawałkowego zarysu.</li>
-</ul>
-<p>Wybór klasy zależy od dostępności decydenta i kosztu ewaluacji \(F\): drogie \(F\) + dostępny decydent → interaktywne; tanie \(F\) + późny wybór → a-posteriori.</p>
-<h2 id="metody-skalaryzacji-ciagle-moo">Metody skalaryzacji (ciągłe MOO)</h2>
-<div class="viz-mount" data-viz="v14"></div>
 
-<p><strong>Suma ważona</strong>: \(\min_x \sum_i w_i f_i(x)\), \(w_i > 0\), \(\sum w_i = 1\) (wagi \(w_i\) — wspólny symbol wag skalaryzacji w całej tej sekcji). Każde globalne rozwiązanie przy dodatnich wagach jest Pareto-optymalne; właściwa efektywność wymaga dodatkowych założeń regularności/wypukłości. W przypadku <strong>MOO wypukłego</strong> (\(X\) wypukły, każde \(f_i\) wypukłe) każde właściwie Pareto-optymalne rozwiązanie odpowiada pewnemu \(w\) (z twierdzenia o oddzielaniu hiperpłaszczyzną). Pełna równoważność (każde Pareto \(\leftrightarrow\) pewne \(w\)) <strong>wymaga wypukłości</strong> zbioru \(X\) i każdej \(f_i\) (twierdzenie Geoffriona). <strong>Pułapka</strong>: dla niewypukłego frontu suma ważona pomija punkty leżące we wklęsłych fragmentach — geometrycznie hiperpłaszczyzna o normalnej \(w\) styka się z \(Y\) tylko w punktach otoczki wypukłej. W zadaniach całkowitoliczbowych \(Y\) praktycznie nigdy nie jest wypukłe.</p>
-<p><strong>Metoda ε-ograniczeń (Haimes)</strong>: \(\min_x f_j(x)\) p.w. \(f_i(x) \leq \varepsilon_i\) dla \(i \neq j\). Generuje cały front, włącznie z fragmentami niewypukłymi — nie wymaga wypukłości. Każde Pareto-optymalne \(x^*\) uzyskiwalne dla pewnego wektora \(\varepsilon\).</p>
-<p><strong>Metryka Czebyszewa (L∞)</strong>: \(\min_x \max_i w_i(f_i(x) - y^I_i)\). Pokrywa cały front (w tym niewypukły), ale generuje też rozwiązania słabo Pareto.</p>
-<p><strong>Programowanie kompromisowe Yu</strong>: \(\min_x \left(\sum_i w_i^p (f_i(x) - y^I_i)^p\right)^{1/p}\) — uogólnia sumę ważoną (\(p = 1\)) i Czebyszewa (\(p \to \infty\)). Wraz ze wzrostem \(p\) rośnie kara za maksymalne odchylenie kosztem sumy odchyleń; zmiana \(w\) i \(p\) jednocześnie nie gwarantuje pokrycia całego niewypukłego frontu; do pełniejszego generowania punktów niewspieranych używa się zwłaszcza ε-ograniczeń lub ważonej/augmentowanej metryki Czebyszewa.</p>
-<p><strong>Funkcja osiągnięcia Wierzbickiego (achievement scalarizing function)</strong>: \(s(F, \bar{y}) = \max_i [w_i(f_i - \bar{y}_i)] + \rho \sum_i w_i(f_i - \bar{y}_i)\), \(\rho > 0\) małe, \(\bar{y}\) — punkt referencyjny (aspiracja). Składnik \(\rho\)-augmentowany eliminuje słabo Pareto, zostawiając tylko właściwie Pareto-optymalne. Działa też dla \(\bar{y}\) spoza zbioru osiągalnego.</p>
-<p><strong>Programowanie celowe (goal programming, Charnes–Cooper)</strong>: \(\min \sum_i w_i (d_i^+ + d_i^-)\) przy \(f_i(x) - d_i^+ + d_i^- = g_i\), \(d_i^\pm \geq 0\), gdzie \(g_i\) to poziomy aspiracji. Warianty: <strong>Archimedesowy</strong> (suma ważona odchyleń, jak wyżej), <strong>pre-emptive / leksykograficzny</strong> (priorytety między kryteriami, każde dominujące poprzednie), <strong>MINMAX / Czebyszewski</strong> (\(\min \max_i d_i\) zamiast sumy). Nie gwarantuje Pareto-optymalności — jeśli aspiracje są osiągalne, rozwiązanie może być zdominowane.</p>
-<p><strong>Optymalizacja leksykograficzna</strong>: minimalizacja \(f_1\), potem \(f_2\) na zbiorze optymalnych \(f_1\), itd. Daje punkt Pareto-optymalny, ale tylko jeden — skrajny róg frontu zgodny z hierarchią priorytetów.</p>
-<p><strong>Warunki KKT (Karush–Kuhn–Tucker) dla MOO</strong>: w \(x^*\) Pareto-optymalnym istnieją \(\lambda_i \geq 0\) (nie wszystkie zerowe; tu \(\lambda\) to mnożnik Lagrange&#39;a, nie waga) oraz \(\mu_j \geq 0\) dla ograniczeń \(g_j(x) \leq 0\) takie, że \(\sum_i \lambda_i \nabla f_i(x^*) + \sum_j \mu_j \nabla g_j(x^*) = 0\) oraz \(\mu_j g_j(x^*) = 0\) (komplementarność). <strong>Uściślenie</strong>: bez warunku regularności (constraint qualification, np. LICQ — Linear Independence CQ, Slatera dla wypukłych) to są warunki <strong>Fritza-Johna</strong>, nie KKT — KKT wymaga CQ. Sformułowanie powyżej daje warunki <strong>konieczne słabej</strong> Pareto-optymalności.</p>
-<p><strong>Programowanie liniowe wielokryterialne (Vector LP)</strong>: \(\min_{Ax \leq b, x \geq 0} Cx\) z \(C \in \mathbb{R}^{k \times n}\). Front Pareto składa się z <strong>zorientowanych ścian polytopu dopuszczalnego</strong> — algorytm parametrycznego simplexu (ADBASE, Multi-Objective Simplex; Yu-Zeleny) wylicza wszystkie efektywne wierzchołki przez systematyczne pivoting w przestrzeni baz. Wnętrze ścian również Pareto-optymalne (efektywne kombinacje wypukłe wierzchołków). Dla czysto całkowitoliczbowych modeli \(PF\) skończony; dla MILP z częścią ciągłą front może być kawałkami ciągły. ε-ograniczenia + parametryczne MILP/ILP są standardem.</p>
-<h2 id="maut-multi-attribute-utility-theory">MAUT (Multi-Attribute Utility Theory)</h2>
-<p>Teoria preferencji za MCDA (Multi-Criteria Decision Analysis, wielokryterialna analiza decyzyjna). <strong>Funkcja użyteczności</strong> \(u: \mathbb{R}^k \to \mathbb{R}\) reprezentuje preferencje decydenta. Relację preferencji \(a \succsim b\) czytamy „wariant \(a\) jest co najmniej tak dobry jak \(b\)&quot;; reprezentacja użytecznością: \(a \succsim b \iff u(F(a)) \geq u(F(b))\), gdzie wyższa użyteczność = wariant bardziej preferowany (przy minimalizacji celów \(u\) maleje względem każdego \(f_i\)). <strong>Twierdzenie reprezentacji (von Neumann-Morgenstern)</strong>: jeśli preferencje na loteriach spełniają zupełność, przechodniość, ciągłość i niezależność, to istnieje \(u\) taka, że loteria \(L_1 \succsim L_2 \iff \mathbb{E}[u(L_1)] \geq \mathbb{E}[u(L_2)]\) (jednoznaczna do transformacji afinicznej).</p>
-<p><strong>Addytywna dekompozycja</strong> (Keeney-Raiffa): gdy kryteria są <strong>wzajemnie niezależne użytecznościowo</strong> (mutual utility independence — warunek silniejszy niż niezależność preferencyjna, która wystarcza dopiero dla funkcji wartości w warunkach pewności), \(u(f_1, \ldots, f_k) = \sum_i w_i u_i(f_i)\) z funkcjami marginalnymi \(u_i\) i wagami \(w_i\) (\(\sum w_i = 1\)). Gdy występują interakcje między kryteriami, stosuje się formę <strong>multiplikatywną</strong>. Wagi MAUT mają interpretację <strong>swap weights</strong> (tempo wymiany jednostek użyteczności między kryteriami) — różni się to od wag w sumie ważonej, które są wrażliwe na skalę. Awersja do ryzyka kodowana w wklęsłości \(u_i\).</p>
-<h2 id="mcda-wybor-z-dyskretnego-zbioru-wariantow">MCDA — wybór z dyskretnego zbioru wariantów</h2>
-<p><strong>MCDA (Multi-Criteria Decision Analysis)</strong> — gdy \(X\) jest skończony (np. zbiór dostawców), a kryteria mają różne skale i wagi.</p>
-<p><strong>TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution)</strong>: (1) normalizacja macierzy decyzyjnej (np. wektorowa \(r_{ij} = x_{ij}/\sqrt{\sum_l x_{lj}^2}\)), (2) ważenie kolumn \(v_{ij} = w_j r_{ij}\), (3) wyznaczenie idealnego \(A^+\) (najlepsze wartości) i antyidealnego \(A^-\), (4) odległości euklidesowe \(D_i^+\), \(D_i^-\), (5) ranking wg \(C_i = D_i^- / (D_i^+ + D_i^-) \in [0,1]\). Wariant z najwyższym \(C_i\) wybierany.</p>
-<p><strong>Pułapka</strong>: TOPSIS i AHP <strong>podlegają rank reversal</strong> — dodanie lub usunięcie wariantu może zmienić ranking pozostałych (Belton-Gear 1983 dla AHP, Wang-Luo 2009 dla TOPSIS). ELECTRE/PROMETHEE z relacjami nieporównywalności są mniej podatne.</p>
-<p><strong>AHP (Analytic Hierarchy Process, Saaty)</strong>: hierarchia cel → kryteria → warianty. Wagi z <strong>macierzy porównań parami</strong> \(A\) (elementy w skali 1–9). Wagi \(w\) jako znormalizowany <strong>wektor własny</strong> odpowiadający największej wartości własnej \(\lambda_{max}\) (tu \(\lambda\) to wartość własna, nie waga ani mnożnik). <strong>Współczynnik spójności</strong> \(CR = CI/RI\), gdzie \(CI = (\lambda_{max} - n)/(n-1)\), a \(RI\) (Random Index) to stablicowane średnie \(CI\) dla macierzy losowych rzędu \(n\); \(CR < 0{,}1\) — macierz akceptowalnie spójna.</p>
-<p><strong>ELECTRE (Elimination Et Choix Traduisant la Réalité)</strong>: buduje <strong>relację przewyższenia</strong> &quot;a przewyższa b&quot; na podstawie <strong>wskaźnika zgodności</strong> \(C(a,b)\) (suma wag kryteriów, w których \(a\) jest co najmniej tak dobre jak \(b\)) i <strong>wskaźnika niezgodności</strong> \(D(a,b)\) (maksymalna znormalizowana różnica na korzyść \(b\)). Warunek: \(C \geq c^*\) i \(D \leq d^*\) dla zadanych progów. Dopuszcza nieporównywalność wariantów (w przeciwieństwie do TOPSIS i AHP, które dają liniowy ranking).</p>
-<p><strong>PROMETHEE (Preference Ranking Organization METHod for Enrichment Evaluations; Brans, 1986)</strong>: dla każdej pary \((a, b)\) i kryterium \(j\) liczy odchylenie \(d = f_j(a) - f_j(b)\) (znak zgodny z kierunkiem optymalizacji) i przekształca przez <strong>funkcję preferencji</strong> \(P_j(d) \in [0, 1]\). W oryginale zdefiniowano 6 typów różniących się progami obojętności \(q\) i preferencji \(p\); reprezentatywne:</p>
-<ul>
-<li><strong>V-kształtna</strong> z \(p\): \(P = \min(d/p, 1) \cdot \mathbb{1}[d > 0]\)</li>
-<li><strong>Liniowa</strong> z \(q, p\): \(P = 0\) dla \(d \leq q\), \((d-q)/(p-q)\) dla \(q < d \leq p\), \(1\) dla \(d > p\)</li>
-<li><strong>Gaussowska</strong> z \(\sigma\):  <code>P(d)=1-exp(-d²/(2σ²))</code> dla <code>d&gt;0</code>, inaczej <code>0</code></li>
-</ul>
-<p>Agregacja: \(\pi(a, b) = \sum_j w_j P_j(a, b)\). <strong>Przepływy</strong>: \(\phi^+(a) = \tfrac{1}{n-1}\sum_b \pi(a, b)\) (siła), \(\phi^-(a) = \tfrac{1}{n-1}\sum_b \pi(b, a)\) (słabość), \(\phi(a) = \phi^+(a) - \phi^-(a)\) (net flow). <strong>PROMETHEE I</strong> daje porządek częściowy z \((\phi^+, \phi^-)\) (dopuszcza nieporównywalność), <strong>PROMETHEE II</strong> — pełny porządek z \(\phi\).</p>
-<h2 id="algorytmy-ewolucyjne">Algorytmy ewolucyjne</h2>
-<p><strong>NSGA-II (Non-dominated Sorting Genetic Algorithm II)</strong>: populacja sortowana w fronty niezdominowane (front 1: punkty Pareto wśród bieżącej populacji; front 2: Pareto po usunięciu frontu 1, itd.); selekcja preferuje niższe fronty, w ramach frontu — większą <strong>crowding distance</strong> (odległość do sąsiadów w przestrzeni kryteriów, dla różnorodności). Aproksymuje cały front w jednym przebiegu, kosztem braku gwarancji optymalności.</p>
-<p><strong>SPEA2 (Strength Pareto Evolutionary Algorithm 2; Zitzler-Laumanns-Thiele, 2001)</strong>: zewnętrzne archiwum elitarne; niech &quot;\(i\) dominuje \(j\)&quot; (kierunek przeciwny do \(\preceq\) z definicji dominacji). Siła osobnika \(S(i) = |\{j : i \text{ dominuje } j\}|\) (liczba zdominowanych przez \(i\)), surowy fitness \(R(i) = \sum_{j:\, j \text{ dominuje } i} S(j)\) (suma sił dominujących \(i\)), dodatkowo gęstość przez \(k\)-tego najbliższego sąsiada w przestrzeni kryteriów.</p>
-<p><strong>MOEA/D (Multi-Objective Evolutionary Algorithm based on Decomposition; Zhang-Li, 2007)</strong>: dekomponuje MOO na \(N\) podzadań skalaryzowanych z różnymi wektorami wagowymi \(w^{(i)}\) (np. czebyszewskim) i ewoluuje populację równolegle, każdy osobnik rozwiązuje jedno podzadanie z wymianą informacji między sąsiadami w przestrzeni wag \(w\). Skalowalne na many-objective, mniej wrażliwe na liczbę kryteriów niż NSGA-II.</p>
-<p><strong>Wskaźniki jakości aproksymacji frontu</strong>:</p>
-<ul>
-<li><strong>HV (Hypervolume)</strong> — objętość obszaru zdominowanego przez zbiór punktów względem <strong>punktu odniesienia</strong>. Jedyny powszechnie używany wskaźnik <strong>strict-monotoniczny</strong> względem dominacji Pareto — jeśli \(A\) dominuje \(B\), to \(HV(A) > HV(B)\). Koszt obliczeniowy rośnie wykładniczo z \(k\).</li>
-<li><strong>GD (Generational Distance)</strong> \(= (\sum_i d_i^2 / N)^{1/2}\), gdzie \(d_i\) — odległość \(i\)-tego punktu aproksymacji do najbliższego punktu prawdziwego frontu. Mierzy zbieżność.</li>
-<li><strong>IGD (Inverted Generational Distance)</strong> — odwrotnie: dla każdego punktu prawdziwego frontu liczona odległość do najbliższego z aproksymacji. Jednocześnie zbieżność i pokrycie.</li>
-<li><strong>ε-indykator (Zitzler)</strong> — najmniejsza translacja \(\varepsilon\), by \(A + \varepsilon\) dominował \(B\).</li>
-</ul>
-<p><strong>Many-objective (\(k \geq 4\))</strong>: NSGA-II degeneruje, bo prawie wszystkie punkty stają się niezdominowane. Stosuje się <strong>NSGA-III</strong> (rozproszenie po wektorach referencyjnych), MOEA/D, <strong>AGE-MOEA (Adaptive Geometry Estimation)</strong>.</p>
-<h2 id="pulapki-praktyczne">Pułapki praktyczne</h2>
-<ul>
-<li><strong>Normalizacja kryteriów</strong> — bez sprowadzenia do wspólnej skali (np. min-max do \([0,1]\) albo do przedziału \([y^I_i, y^N_i]\)) kryterium o większych wartościach numerycznych dominuje. Zmiana jednostek \(f_i\) zmienia efektywne wagi.</li>
-<li><strong>Wagi ≠ ważność</strong> — wagi w sumie ważonej są wrażliwe na skalę; metody interaktywne (Wierzbicki, programowanie celowe) parametryzują przez punkty referencyjne, nie wagi.</li>
-<li><strong>Wybór z frontu Pareto</strong> — algorytm zwraca zbiór, decydent musi wybrać jeden punkt. Stosowane: TOPSIS na wynikowym froncie, <strong>knee-point detection</strong> (punkt o największej lokalnej krzywiźnie / minimalnej znormalizowanej odległości do prostej łączącej ekstrema frontu — &quot;punkt najlepszego kompromisu&quot;, gdzie poprawa jednego kryterium kosztuje najwięcej w innym), pseudo-weight vector.</li>
-<li><strong>Drogie ewaluacje</strong> — gdy każde wyliczenie \(f(x)\) to kosztowna symulacja, używa się surogatów (Kriging, Random Forest) i Bayesian MOO (np. qEHVI — q-Expected Hypervolume Improvement).</li>
-</ul>
-<h2 id="typowe-zastosowania">Typowe zastosowania</h2>
-<ul>
-<li><strong>Wybór dostawcy</strong> (cena vs jakość vs czas dostawy) — klasyczny MCDA przez TOPSIS lub AHP.</li>
-<li><strong>Portfel inwestycyjny Markowitza</strong> — \(\min_w w^\top \Sigma w\) przy \(w^\top \mu \geq R, w^\top \mathbf{1} = 1, w \geq 0\): minimum wariancji vs maksimum stopy zwrotu, dwukryterialny QP (Quadratic Programming); front Pareto = <strong>&quot;efficient frontier&quot;</strong> (granica efektywna).</li>
-<li><strong>VRP (Vehicle Routing Problem) wielokryterialny</strong> — koszt vs czas vs emisja CO₂.</li>
-<li><strong>Lokalizacja, alokacja zasobów</strong> — MILP (Mixed-Integer Linear Programming) z wieloma celami, rozwiązywany przez ε-ograniczenia lub ważenie leksykograficzne.</li>
-<li><strong>Hyperparameter tuning ML (Machine Learning)</strong> — dokładność vs latencja vs rozmiar modelu (np. Optuna z NSGA-II).</li>
-</ul>
-<h2 id="powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="01_estymatory_wartosci_sredniej.html">Estymatory</a></strong>: bias-variance trade-off; MSE (Mean Squared Error, błąd średniokwadratowy) \(=\) obciążenie² \(+\) wariancja jest skalaryzacją dwóch źródeł błędu.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a></strong>: SVM (Support Vector Machine, maszyna wektorów nośnych) z parametrem \(C\) to skalaryzacja &quot;margines vs błąd&quot;; tuning hiperparametrów to MOO.</li>
-<li><strong><a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: funkcja straty z regularyzacją (LASSO — Least Absolute Shrinkage and Selection Operator, weight decay) to suma ważona dopasowanie + złożoność.</li>
-<li><strong><a href="03_regresja_liniowa.html">Regresja w zastosowaniach</a></strong>: Ridge/LASSO/Elastic Net to dwukryterialność dopasowanie vs złożoność z parametrem regularyzacji.</li>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a></strong>: LDA (Linear Discriminant Analysis) Fishera maksymalizuje iloraz Rayleigha (skalaryzacja wariancji między- i wewnątrzklasowej).</li>
-</ul>
+    <h2 id="sformulowanie-problemu">Sformułowanie problemu</h2>
+    <p>W optymalizacji <strong>jednokryterialnej</strong> szukamy \(\min_{x \in X} f(x)\), gdzie \(X\) to <strong>zbiór dopuszczalny</strong> (decyzje spełniające ograniczenia), a \(f\) — skalarna funkcja celu. W <strong>optymalizacji wielokryterialnej (MOO, Multi-Objective Optimization)</strong> minimalizujemy jednocześnie wektor celów \(F(x) = (f_1(x), \ldots, f_k(x))\), \(k \geq 2\), zwykle wzajemnie sprzecznych (np. koszt kontra jakość).</p>
+    <p>Kluczowa trudność: przestrzeń \(\mathbb{R}^k\) dla \(k \geq 2\) nie ma naturalnego porządku liniowego, więc „jedno minimum” wektora nie istnieje — nie da się z góry orzec, czy \((2,5)\) jest lepsze od \((3,4)\). Dlatego w języku badań operacyjnych nie szukamy jednego optimum, lecz <strong>zbioru kompromisów</strong>, a jeden punkt wybierają dopiero preferencje decydenta.</p>
+
+    <h2 id="dominacja-i-front">Dominacja Pareto i front</h2>
+    <p>Brakujący porządek zastępujemy relacją <strong>dominacji</strong>: rozwiązanie \(x^1\) dominuje \(x^2\), gdy jest nie gorsze na każdym kryterium i ostro lepsze na co najmniej jednym. Rozwiązanie jest <strong>Pareto-optymalne (efektywne)</strong>, gdy nie jest zdominowane przez żadne inne rozwiązanie — nie da się poprawić żadnego kryterium bez pogorszenia innego.</p>
+    <p>Zbiór wszystkich rozwiązań efektywnych to <strong>zbiór Pareto</strong> (w przestrzeni decyzji), a jego obraz w przestrzeni kryteriów — <strong>front Pareto</strong>, centralny obiekt MOO. Dwa punkty orientacyjne opisują położenie frontu: <strong>punkt idealny</strong> zbiera najlepsze osiągalne wartości każdego kryterium z osobna (zwykle nieosiągalny naraz, bo minima leżą w różnych \(x\)), a <strong>punkt nadir</strong> — najgorsze wartości kryteriów na froncie. Rozpinają one „pudełko” zawierające front i służą do normalizacji kryteriów.</p>
+
+    <h2 id="metody-skalaryzacji">Metody skalaryzacji</h2>
+    <div class="viz-mount" data-viz="v14"></div>
+    <p>Aby wyznaczyć punkty frontu, MOO sprowadza się do serii zadań jednokryterialnych:</p>
+    <ul>
+      <li><strong>Suma ważona</strong>: \(\min_x \sum_i w_i f_i(x)\), \(w_i > 0\). Prosta, ale <strong>pomija punkty na wklęsłych fragmentach frontu</strong> — a te pojawiają się m.in. w zadaniach całkowitoliczbowych.</li>
+      <li><strong>Metoda ε-ograniczeń</strong>: minimalizujemy jedno kryterium, pozostałe zamieniając na ograniczenia \(f_i(x) \leq \varepsilon_i\). Przesuwając \(\varepsilon\), generujemy cały front, także fragmenty niewypukłe.</li>
+      <li><strong>Programowanie celowe (goal programming)</strong>: decydent podaje poziomy aspiracji \(g_i\), a my minimalizujemy sumę odchyleń od nich.</li>
+    </ul>
+    <p>Suma ważona i ε-ograniczenia to podejście <em>a-posteriori</em> (najpierw front, potem wybór); goal programming z ustalonymi aspiracjami — <em>a-priori</em> (preferencje znane wcześniej, jeden przebieg).</p>
+
+    <h2 id="mcda">MCDA — wybór z wariantów dyskretnych</h2>
+    <p>Gdy zbiór decyzji jest skończony (np. wybór dostawcy), stosuje się <strong>MCDA (wielokryterialną analizę decyzyjną)</strong>. <strong>TOPSIS</strong> porządkuje warianty według odległości od rozwiązania idealnego i antyidealnego — wybieramy najbliższy idealnemu. <strong>AHP</strong> wyprowadza wagi kryteriów z macierzy porównań parami i sprawdza ich spójność. <strong>Pułapka</strong>: obie metody podlegają <em>rank reversal</em> — dodanie nowego wariantu może odwrócić kolejność dotychczasowych.</p>
+
+    <h2 id="zastosowania">Typowe zastosowania</h2>
+    <ul>
+      <li><strong>Portfel Markowitza</strong> — ryzyko a stopa zwrotu; front Pareto to „granica efektywna” (efficient frontier).</li>
+      <li><strong>Wybór dostawcy</strong> — cena a jakość a czas dostawy (klasyczny MCDA).</li>
+    </ul>
+
+    <h2 id="powiazania">Powiązania z innymi zagadnieniami</h2>
+    <p>To samo napięcie „dwóch celów naraz” wraca w uczeniu maszynowym — kompromis dopasowanie a złożoność (np. <a href="01_estymatory_wartosci_sredniej.html">bias-variance</a>, <a href="03_regresja_liniowa.html">regularyzacja Ridge/LASSO</a>) to skalaryzacja tego samego problemu. Wniosek ogólny: MOO nie daje jednej odpowiedzi, lecz zbiór racjonalnych kompromisów, spośród których decydent wybiera jeden zgodnie ze swoimi preferencjami.</p>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#sformulowanie-problemu">Sformułowanie problemu</a></li>
-<li><a href="#dominacja-i-pareto-optymalnosc">Dominacja i Pareto-optymalność</a></li>
-<li><a href="#taksonomia-metod-wedlug-momentu-artykulacji-preferencji">Taksonomia metod według momentu artykulacji preferencji</a></li>
-<li><a href="#metody-skalaryzacji-ciagle-moo">Metody skalaryzacji (ciągłe MOO)</a></li>
-<li><a href="#maut-multi-attribute-utility-theory">MAUT (Multi-Attribute Utility Theory)</a></li>
-<li><a href="#mcda-wybor-z-dyskretnego-zbioru-wariantow">MCDA — wybór z dyskretnego zbioru wariantów</a></li>
-<li><a href="#algorytmy-ewolucyjne">Algorytmy ewolucyjne</a></li>
-<li><a href="#pulapki-praktyczne">Pułapki praktyczne</a></li>
-<li><a href="#typowe-zastosowania">Typowe zastosowania</a></li>
-<li><a href="#powiazania-z-innymi-zagadnieniami">Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#sformulowanie-problemu">Sformułowanie problemu</a></li>
+    <li><a href="#dominacja-i-front">Dominacja Pareto i front</a></li>
+    <li><a href="#metody-skalaryzacji">Metody skalaryzacji</a></li>
+    <li><a href="#mcda">MCDA — warianty dyskretne</a></li>
+    <li><a href="#zastosowania">Typowe zastosowania</a></li>
+    <li><a href="#powiazania">Powiązania</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

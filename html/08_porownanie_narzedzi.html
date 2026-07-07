@@ -20,145 +20,56 @@
     <p class="eyebrow">Big Data i systemy rozproszone</p>
     <h1>Porównanie metod i narzędzi</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="1-definicje-fundamentalne">1. Definicje fundamentalne</h2>
-<ul>
-<li><strong>Przetwarzanie wsadowe (batch)</strong> — funkcja \(f: D^* \to Y\), gdzie \(D\) to dziedzina pojedynczego rekordu, \(D^*\) (gwiazdka Kleene&#39;ego) to zbiór wszystkich skończonych kolekcji rekordów, a \(Y\) to przestrzeń wyników; całe wejście jest znane na starcie (rozmiar dowolny, ale skończony).</li>
-<li><strong>Przetwarzanie strumieniowe (stream)</strong> — funkcja \(f: (D\times T)^\omega \to Y^\omega\) na nieskończonej (\(\omega\) = ciąg nieskończony) sekwencji par (zdarzenie \(d\in D\), znacznik czasu \(t\in T\)). Kluczowa własność: \(f\) jest <strong>przyczynowa</strong> — \(i\)-ty element wyjścia zależy tylko od prefiksu wejścia \((d_1,t_1),\dots,(d_i,t_i)\), nie od przyszłych zdarzeń; wynik powstaje przyrostowo (on-line), a nie z całego ciągu naraz.</li>
-<li><strong>Czas zdarzenia (event time)</strong> vs <strong>czas przetwarzania (processing time)</strong> — pierwszy to moment, w którym zdarzenie zaszło; drugi to moment, w którym dotarło do systemu.</li>
-<li><strong>Watermark</strong> \(W(t)\) — niemalejąca funkcja czasu przetwarzania; \(W(t)\) to systemowa estymata lub deklarowana dolna granica event-time: system zakłada, że wszystkie zdarzenia o event-time \(\leq W(t)\) już dotarły. Zdarzenie o event-time \(e\) jest <strong>spóźnione (late)</strong>, gdy napływa już po tym, jak \(W(t)>e\).</li>
-<li><strong>Okna</strong>: tumbling (rozłączne, równe), sliding (zachodzące), session (oddzielone okresami nieaktywności).</li>
-<li><strong>OLTP</strong> (Online Transaction Processing) — wiele krótkich transakcji wierszowych (INSERT/UPDATE pojedynczych rekordów). <strong>OLAP</strong> (Online Analytical Processing) — duże agregaty po milionach wierszy.</li>
-<li><strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) — gwarancje transakcji. <strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) — luźniejsze, typowe dla NoSQL.</li>
-<li><strong>Twierdzenie CAP (Brewer)</strong>: w systemie rozproszonym nie da się zagwarantować jednocześnie wszystkich z <strong>C</strong>onsistency, <strong>A</strong>vailability, <strong>P</strong>artition tolerance. <strong>PACELC</strong> (Abadi; if <strong>P</strong>artition then <strong>A</strong>vailability vs <strong>C</strong>onsistency, <strong>E</strong>lse <strong>L</strong>atency vs <strong>C</strong>onsistency) dodaje wymiar normalnej pracy: latencja vs spójność.</li>
-<li><strong>Gwarancje dostarczenia</strong>: at-most-once (możliwa utrata), at-least-once (możliwe duplikaty), exactly-once (każde zdarzenie przetworzone dokładnie raz — najtrudniejsze, w praktyce często &quot;effectively-once&quot;).</li>
-</ul>
-<h2 id="2-osie-porownania">2. Osie porównania</h2>
-<div class="viz-mount" data-viz="v08"></div>
 
-<p>Wymiary, wzdłuż których porównujemy narzędzia:</p>
-<ul>
-<li><strong>Skala danych</strong>: GB (single-node) → TB (single-node z formatem kolumnowym) → PB (rozproszony klaster).</li>
-<li><strong>Latencja</strong>: minuty–godziny (batch) → sekundy (micro-batch) → milisekundy (true streaming) → &lt; 10 ms (OLTP).</li>
-<li><strong>Model danych</strong>: relacyjny (wiersz), kolumnowy, dokumentowy, klucz-wartość, grafowy.</li>
-<li><strong>Schemat</strong>: schema-on-write (hurtownia, RDBMS — Relational Database Management System) vs schema-on-read (data lake).</li>
-<li><strong>Tryb transformacji</strong>: ETL (Extract–Transform–Load, transformacja przed zapisem) vs ELT (transformacja w docelowej hurtowni; dominuje od czasu tanich hurtowni chmurowych).</li>
-<li><strong>Architektura zasobów</strong>: shared-memory (jeden węzeł), shared-disk (klaster + wspólny storage), shared-nothing (klaster z lokalnymi dyskami — Hadoop, Spark).</li>
-</ul>
-<h2 id="3-klasy-narzedzi">3. Klasy narzędzi</h2>
-<div class="tablewrap"><table>
-<thead>
-<tr>
-<th>Klasa</th>
-<th>Reprezentanci</th>
-<th>Kiedy stosować</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>In-memory single-node</td>
-<td>pandas, NumPy, R</td>
-<td>&lt; 10 GB, eksploracja, prototypowanie</td>
-</tr>
-<tr>
-<td>Single-node kolumnowy</td>
-<td>DuckDB, Polars (Rust + lazy)</td>
-<td>10 GB – 1 TB, OLAP bez klastra</td>
-</tr>
-<tr>
-<td>Out-of-core / lekko rozproszony</td>
-<td>Dask, Modin, Ray</td>
-<td>dane &gt;RAM, niski budżet operacyjny</td>
-</tr>
-<tr>
-<td>Rozproszony batch</td>
-<td>Hadoop MapReduce (legacy), Apache Spark</td>
-<td>TB–PB, ETL, ML (Machine Learning) batch (MLlib)</td>
-</tr>
-<tr>
-<td>Streaming</td>
-<td>Apache Flink (true streaming), Kafka Streams, Spark Structured Streaming (micro-batch)</td>
-<td>event-driven, niska latencja, CEP (Complex Event Processing)</td>
-</tr>
-<tr>
-<td>Hurtownie kolumnowe MPP (Massively Parallel Processing)</td>
-<td>BigQuery, Snowflake, Redshift, ClickHouse, Vertica</td>
-<td>analityka SQL, BI, raporty</td>
-</tr>
-<tr>
-<td>Lakehouse</td>
-<td>Delta Lake, Apache Iceberg, Apache Hudi</td>
-<td>ACID + schema evolution + time travel nad data lake</td>
-</tr>
-<tr>
-<td>Bazy NoSQL</td>
-<td>Cassandra, MongoDB, HBase, Redis, Neo4j</td>
-<td>dopasowanie modelu danych do use case</td>
-</tr>
-<tr>
-<td>NewSQL</td>
-<td>Google Spanner, CockroachDB, YugabyteDB</td>
-<td>rozproszone OLTP z gwarancjami ACID</td>
-</tr>
-<tr>
-<td>Orkiestracja</td>
-<td>Apache Airflow, Dagster, Prefect</td>
-<td>scheduler + DAG (Directed Acyclic Graph), nie silnik przetwarzania</td>
-</tr>
-<tr>
-<td>Transformacje SQL</td>
-<td>dbt (data build tool)</td>
-<td>ELT w hurtowniach, testy, lineage</td>
-</tr>
-</tbody></table></div>
-<p>Spark wyparł czysty Hadoop MapReduce dzięki: przetwarzaniu in-memory, RDD/DataFrame, DAG zamiast sztywnego map→reduce, lazy evaluation oraz optymalizatorowi Catalyst dla Spark SQL/DataFrame/Dataset (nie dla surowych RDD), lineage zamiast checkpointu na HDFS (Hadoop Distributed File System) po każdym kroku. Czysty MR jest dziś legacy; paradygmat shuffle&amp;sort został.</p>
-<h2 id="4-formaty-danych-i-gwarancje">4. Formaty danych i gwarancje</h2>
-<ul>
-<li><strong>Parquet / ORC</strong> — kolumnowe, kompresja, predicate pushdown, late materialization. Standard w analityce (BigQuery, Snowflake, Spark, lakehouse).</li>
-<li><strong>Apache Avro</strong> — wierszowy, ze schemą; standard w Kafka + Schema Registry.</li>
-<li><strong>CSV / JSON</strong> — czytelne, ale nieefektywne (brak schematu, brak kompresji kolumnowej, wolna deserializacja).</li>
-<li><strong>Vectorized execution</strong> (ClickHouse, DuckDB, Photon w Databricks) wykorzystuje SIMD (Single Instruction Multiple Data) i cache-friendliness — stąd przewaga kolumnowych silników w OLAP.</li>
-<li><strong>Exactly-once</strong> w streamingu wymaga albo idempotentnych sinków, albo transakcyjnych commitów (Kafka transactions, distributed snapshots Chandy–Lamporta we Flink, two-phase commit). Sam fakt, że narzędzie reklamuje &quot;exactly-once&quot;, nie wystarczy — sink i źródło muszą to wspierać.</li>
-</ul>
-<h2 id="5-architektury-referencyjne">5. Architektury referencyjne</h2>
-<ul>
-<li><strong>Lambda architecture</strong>: równoległa warstwa batch (Spark) + warstwa speed (Flink/Spark Streaming); duplikacja logiki, ale spójność wyników historycznych.</li>
-<li><strong>Kappa architecture</strong>: tylko streaming z replayowalnym logiem (Kafka); batch = szczególny przypadek długiego replayu. Prostsza operacyjnie w systemach event-streaming, ale nie dominuje uniwersalnie; Lambda nadal bywa sensowna przy ciężkich wsadach i niezależnej warstwie serving.</li>
-</ul>
-<p>Separacja compute/storage (object storage S3/GCS zamiast HDFS) podważyła znaczenie data locality — silniki jak Presto/Trino, Snowflake, BigQuery liczą na szybką sieć, nie na lokalny dysk.</p>
-<h2 id="6-heurystyka-decyzyjna">6. Heurystyka decyzyjna</h2>
-<p>Wybór narzędzia jest problemem decyzyjnym <strong>wielokryterialnym</strong> — kryteria: skala, latencja, budżet, kompetencje zespołu, dojrzałość ekosystemu, ryzyko vendor lock-in:</p>
-<ul>
-<li>&lt; 10 GB, batch, jeden analityk → pandas/DuckDB.</li>
-<li>10 GB – 1 TB, batch → Polars/DuckDB lokalnie albo hurtownia chmurowa + dbt.</li>
-<li><blockquote>
-<p>1 TB batch → Spark + lakehouse (Delta/Iceberg) albo BigQuery/Snowflake.</p>
-</blockquote>
-</li>
-<li>streaming z latencją &lt; 1 s → Flink lub Kafka Streams; &gt; 1 s wystarczy Spark Structured Streaming.</li>
-<li>zespół SQL-only → hurtownia + dbt; zespół Python → Spark/Polars/Dask.</li>
-<li>OLTP z silną spójnością → PostgreSQL; rozproszone OLTP → NewSQL (Spanner, CockroachDB).</li>
-</ul>
-<p>Modele kosztowe są częścią wyboru: BigQuery (per-query bytes scanned), Snowflake (per-second compute), self-hosted Spark (TCO — Total Cost of Ownership infrastruktury). Optymalizacja kosztu = partycjonowanie, klastrowanie, materialized views, dobór rozmiaru warehouse.</p>
-<h2 id="7-powiazania-z-innymi-zagadnieniami">7. Powiązania z innymi zagadnieniami</h2>
-<ul>
-<li><strong><a href="06_big_data_vs_klasyczna.html">Big Data</a></strong>: dobór narzędzia do 5V.</li>
-<li><strong><a href="07_mapreduce.html">MapReduce</a></strong>: historyczny punkt odniesienia każdego silnika.</li>
-<li><strong><a href="02_preprocessing.html">Preprocessing</a></strong>: skala decyduje (pandas vs Spark vs SQL).</li>
-<li><strong><a href="12_modele_wielowymiarowe.html">Modele wielowymiarowe</a>/<a href="09_porownanie_modelowania.html">Porównanie modelowania</a></strong>: OLAP, gwiazda/płatek → hurtownia kolumnowa.</li>
-<li><strong><a href="05_raportowanie.html">Raportowanie</a></strong>: BI (Business Intelligence — Tableau, Power BI, Looker, Superset) nad hurtownią/lakehouse.</li>
-<li><strong><a href="13_text_mining.html">Text mining</a></strong>: Spark NLP/Elasticsearch vs spaCy/NLTK lokalnie.</li>
-<li><strong><a href="10_klasyczne_ml.html">Klasyczne ML</a>/<a href="11_sieci_neuronowe.html">Sieci neuronowe</a></strong>: scikit-learn vs Spark MLlib vs TensorFlow/PyTorch (GPU).</li>
-<li><strong><a href="16_bezpieczenstwo_it.html">Bezpieczeństwo IT</a></strong>: Kerberos, RBAC (Role-Based Access Control), szyfrowanie at-rest/in-transit.</li>
-<li><strong><a href="14_optymalizacja_wielokryterialna.html">Optymalizacja wielokryterialna</a></strong>: MCDM (Multi-Criteria Decision Making) — AHP (Analytic Hierarchy Process), TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution), Pareto.</li>
-</ul>
+    <p>Narzędzi do przetwarzania i analizy danych nie porównuje się katalogowo — po nazwach — lecz po zestawie <strong>osi decyzyjnych</strong>. Dobór narzędzia to problem <strong>wielokryterialny</strong>: to samo zadanie na 5 GB i na 5 PB rozwiązuje się zupełnie inaczej, więc zaczynamy od pytania o wymagania, a nie o modę.</p>
 
+    <h2 id="osie">Osie porównania</h2>
+    <div class="viz-mount" data-viz="v08"></div>
+    <p>Wymiary, wzdłuż których zestawiamy narzędzia:</p>
+    <ul>
+      <li><strong>Skala danych</strong>: od gigabajtów na jednej maszynie, przez terabajty w formacie kolumnowym, po petabajty na klastrze rozproszonym.</li>
+      <li><strong>Opóźnienie (latencja)</strong>: od minut–godzin (batch), przez sekundy (micro-batch), po milisekundy (strumień, OLTP).</li>
+      <li><strong>Tryb przetwarzania</strong>: <strong>wsadowy (batch)</strong> — całe wejście znane na starcie; <strong>strumieniowy (stream)</strong> — dane napływają w nieskończoność, a wynik liczony jest przyrostowo, na bieżąco.</li>
+      <li><strong>Model danych</strong>: relacyjny, kolumnowy, dokumentowy, klucz-wartość, grafowy.</li>
+      <li><strong>Schemat i transformacja</strong>: schema-on-write + ETL (hurtownia) vs schema-on-read + ELT (data lake).</li>
+      <li><strong>Gwarancje</strong>: ACID (mocne, transakcyjne) vs BASE (luźniejsze, eventual consistency) — rozproszenie wymusza kompromis między spójnością a dostępnością.</li>
+      <li><strong>Koszt i kompetencje zespołu</strong>: budżet, model rozliczeń chmury, znajomość SQL vs Pythona.</li>
+    </ul>
+    <p>Te osie są sprzężone: niska latencja i mocne gwarancje na dużej skali zawsze kosztują — dlatego nie ma jednego „najlepszego” narzędzia, jest tylko dopasowanie do profilu zadania.</p>
+
+    <h2 id="klasy">Klasy narzędzi</h2>
+    <ul>
+      <li><strong>Single-node</strong> (pandas, DuckDB, Polars) — eksploracja i analityka do ok. 1 TB bez klastra.</li>
+      <li><strong>Rozproszony batch</strong> (Apache Spark) — ETL i ML na TB–PB; wyparł Hadoop MapReduce dzięki przetwarzaniu in-memory i grafowi DAG zamiast sztywnego map→reduce.</li>
+      <li><strong>Streaming</strong> (Apache Flink, Kafka Streams) — przetwarzanie zdarzeń o niskiej latencji.</li>
+      <li><strong>Hurtownie kolumnowe MPP</strong> (BigQuery, Snowflake) — analityka SQL, raporty, BI.</li>
+      <li><strong>Lakehouse</strong> (Delta Lake, Iceberg) — ACID i ewolucja schematu nad tanim data lake.</li>
+      <li><strong>NoSQL / NewSQL</strong> (Cassandra, MongoDB / CockroachDB) — dopasowanie modelu danych, rozproszone OLTP z gwarancjami ACID.</li>
+      <li><strong>Orkiestracja i transformacje</strong> (Airflow, dbt) — to nie silniki przetwarzania, lecz warstwa sterująca: harmonogram i DAG zadań oraz transformacje SQL w hurtowni.</li>
+    </ul>
+
+    <h2 id="heurystyka">Heurystyka wyboru</h2>
+    <p>Gotowa ścieżka decyzyjna, która prowadzi wprost do wyboru:</p>
+    <ul>
+      <li>&lt; 10 GB, batch, jeden analityk → pandas / DuckDB.</li>
+      <li>10 GB–1 TB, batch → Polars / DuckDB lokalnie albo hurtownia chmurowa + dbt.</li>
+      <li>TB–PB, batch → Spark + lakehouse (Delta / Iceberg) albo BigQuery / Snowflake.</li>
+      <li>streaming z latencją &lt; 1 s → Flink / Kafka Streams; &gt; 1 s wystarczy Spark Structured Streaming.</li>
+      <li>zespół SQL-only → hurtownia + dbt; zespół Python → Spark / Polars.</li>
+      <li>OLTP z silną spójnością → PostgreSQL; rozproszone OLTP → NewSQL.</li>
+    </ul>
+
+    <h2 id="synteza">Przykład, pułapka, domknięcie</h2>
+    <p><strong>Przykład</strong>: raport BI nad hurtownią kolumnową liczy się szybciej niż nad wierszowym RDBMS, bo silnik skanuje tylko potrzebne kolumny, a nie całe wiersze.</p>
+    <p><strong>Pułapka</strong>: „premature distribution” — stawianie klastra Spark dla 10 GB, które obsłuży laptop; narzut koordynacji i przesyłania danych po sieci bywa większy niż zysk z równoległości.</p>
+    <p><strong>Zdanie zamykające</strong>: dobór narzędzia to w istocie <a href="14_optymalizacja_wielokryterialna.html">optymalizacja wielokryterialna</a> — kryteria (skala, latencja, koszt, kompetencje) ważymy względem preferencji, a rozwiązaniem jest kompromis, nie jedno optimum.</p>
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#1-definicje-fundamentalne">1. Definicje fundamentalne</a></li>
-<li><a href="#2-osie-porownania">2. Osie porównania</a></li>
-<li><a href="#3-klasy-narzedzi">3. Klasy narzędzi</a></li>
-<li><a href="#4-formaty-danych-i-gwarancje">4. Formaty danych i gwarancje</a></li>
-<li><a href="#5-architektury-referencyjne">5. Architektury referencyjne</a></li>
-<li><a href="#6-heurystyka-decyzyjna">6. Heurystyka decyzyjna</a></li>
-<li><a href="#7-powiazania-z-innymi-zagadnieniami">7. Powiązania z innymi zagadnieniami</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#osie">Osie porównania</a></li>
+    <li><a href="#klasy">Klasy narzędzi</a></li>
+    <li><a href="#heurystyka">Heurystyka wyboru</a></li>
+    <li><a href="#synteza">Przykład, pułapka, domknięcie</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>

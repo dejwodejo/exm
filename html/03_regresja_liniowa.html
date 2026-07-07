@@ -20,134 +20,81 @@
     <p class="eyebrow">Przygotowanie danych i modele klasyczne</p>
     <h1>Regresja liniowa</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
-    <h2 id="czym-jest-regresja-liniowa">Czym jest regresja liniowa</h2>
-<p>Regresja prosta — jedna zmienna objaśniająca: </p>
-<div class="mathblock">\[y = \beta_0 + \beta_1 x + \varepsilon\]</div>
-<p>Regresja wieloraka — wiele zmiennych: </p>
-<div class="mathblock">\[y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \ldots + \beta_p x_p + \varepsilon\]</div>
-<p>gdzie \(\beta_0\) to wyraz wolny (intercept), \(\beta_i\) to współczynniki regresji, a \(\varepsilon\) to składnik losowy (reszta, błąd). </p>
-<p>Model jest liniowy <strong>w parametrach</strong> \(\beta\), nie w zmiennych \(x\) — możemy mieć \(x^2\) jako cechę i to nadal jest regresja liniowa, bo \(y = \beta_0 + \beta_1 x^2\) jest liniowe względem \(\beta\).</p>
-<p><div class="viz-mount" data-viz="f08"></div></p>
-<h2 id="metoda-najmniejszych-kwadratow-ols-ordinary-least-squares">Metoda najmniejszych kwadratów (OLS — Ordinary Least Squares)</h2>
-<div class="viz-mount" data-viz="v03"></div>
 
-<p>Szukamy takich \(\beta\), które minimalizują sumę kwadratów reszt:</p>
-<div class="mathblock">\[\hat{\boldsymbol{\beta}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i^\top\boldsymbol{\beta})^2\]</div>
-<p>Reszta \(e_i = y_i - \hat{y}_i\) to pionowa odległość punktu od prostej. OLS szuka prostej, dla której suma kwadratów tych odległości jest minimalna. Rozwiązanie w postaci zamkniętej (równanie normalne): \(\hat{\boldsymbol{\beta}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}\).</p>
-<p>Warunek istnienia: \(\mathbf{X}^\top\mathbf{X}\) odwracalna, równoważnie \(\text{rank}(X)=p+1\) (pełny rząd kolumnowy, brak idealnej współliniowości).</p>
-<p>Numerycznie nie odwraca się \(X^\top X\) wprost — używa się dekompozycji QR lub SVD (mniejsze błędy zaokrągleń).</p>
-<p></p>
-<p>OLS jest wrażliwy na outliery — jeden ekstremalny punkt ma kwadrat reszty, który dominuje sumę i przesuwa prostą w swoim kierunku.</p>
-<p></p>
-<h2 id="zalozenia-ols-gaussa-markowa">Założenia OLS (Gaussa-Markowa)</h2>
-<p>Od ich spełnienia zależy, czy estymatory OLS mają pożądane właściwości (BLUE — Best Linear Unbiased Estimator):</p>
-<ol>
-<li><strong>Liniowość</strong> — zależność \(y\) od \(\mathbf{x}\) jest liniowa w parametrach \(\beta\),</li>
-<li><strong>Nieskorelowane błędy</strong> — \(\text{Cov}(\varepsilon_i, \varepsilon_j) = 0\) dla \(i \neq j\) (Gauss-Markov nie wymaga niezależności, tylko nieskorelowania; niezależność jest mocniejszym warunkiem),</li>
-<li><strong>Brak idealnej współliniowości</strong> — żadna cecha nie jest liniową kombinacją innych,</li>
-<li><strong>Egzogeniczność</strong> — \(E[\varepsilon | \mathbf{X}] = 0\) (błędy mają zerową warunkową wartość oczekiwaną),</li>
-<li><strong>Homoskedastyczność</strong> — \(\text{Var}(\varepsilon | \mathbf{X}) = \sigma^2\) (stała wariancja błędów),</li>
-<li><strong>Normalność błędów</strong> (dodatkowe) — \(\varepsilon \sim N(0, \sigma^2)\), potrzebne do testów \(t\), \(F\) i przedziałów ufności.</li>
-</ol>
-<p>Jeśli 1–5 spełnione: OLS jest BLUE. Jeśli 6 też: testy statystyczne i CI są dokładne.</p>
-<p><div class="viz-mount" data-viz="v06"></div></p>
-<h3 id="wspolliniowosc-vif-variance-inflation-factor">Współliniowość (VIF — Variance Inflation Factor)</h3>
-<p>Współliniowość oznacza, że cechy są ze sobą silnie skorelowane. Mierzymy ją wskaźnikiem VIF: \(VIF_j = 1 / (1 - R^2_j)\), gdzie \(R^2_j\) to \(R^2\) z regresji cechy \(x_j\) na wszystkie pozostałe cechy. \(VIF = 1\) to brak współliniowości, \(VIF > 5\) jest niepokojące, \(VIF > 10\) to poważny problem. Współliniowość nie pogarsza predykcji modelu jako całości, ale sprawia, że poszczególne \(\hat{\beta}_i\) stają się niestabilne i trudne do interpretacji. Rozwiązania: usunięcie jednej ze skorelowanych cech, PCA (Principal Component Analysis — analiza głównych składowych), regularyzacja Ridge.</p>
-<p><div class="viz-mount" data-viz="f07"></div></p>
-<h2 id="analiza-modelu">Analiza modelu</h2>
-<h3 id="dekompozycja-wariancji-i-r2">Dekompozycja wariancji i <code>R²</code></h3>
-<p>Całkowitą wariancję \(y\) rozkładamy na część wyjaśnioną przez model i część niewyjaśnioną. Tożsamość <code>SStot = SSreg + SSres</code> oraz klasyczne <code>R²</code> w tej postaci zakładają model z wyrazem wolnym:</p>
-<div class="mathblock">\[\underbrace{\sum(y_i - \bar{y})^2}_{SS_{tot}} = \underbrace{\sum(\hat{y}_i - \bar{y})^2}_{SS_{reg}} + \underbrace{\sum(y_i - \hat{y}_i)^2}_{SS_{res}}\]</div>
-<p>\(SS_{tot}\) to łączna zmienność \(y\) wokół swojej średniej. \(SS_{reg}\) to zmienność wyjaśniona przez model (jak daleko predykcje \(\hat{y}\) odchylają się od \(\bar{y}\)). \(SS_{res}\) to zmienność niewyjaśniona (błędy modelu).</p>
-<p><div class="viz-mount" data-viz="f04"></div></p>
-<p>\(R^2 = SS_{reg} / SS_{tot} = 1 - SS_{res}/SS_{tot}\) mówi, jaki procent wariancji \(y\) model wyjaśnia. Problem: \(R^2\) zawsze rośnie (lub nie spada) przy dodawaniu nowych cech, nawet bezużytecznych. Dlatego używamy \(R^2_{adj} = 1 - \frac{(1-R^2)(n-1)}{n-p-1}\), który penalizuje za liczbę cech \(p\) i może spaść po dodaniu słabej cechy.</p>
-<p><div class="viz-mount" data-viz="f09"></div></p>
-<p>Porównanie jak wygląda wysoki, średni i niski \(R^2\) na danych:</p>
-<p><div class="viz-mount" data-viz="f03r2"></div></p>
-<h3 id="metryki-bledu">Metryki błędu</h3>
-<p>\(MSE = \frac{1}{n}\sum(y_i - \hat{y}_i)^2\) — średni kwadrat błędu (Mean Squared Error). \(RMSE = \sqrt{MSE}\) (Root Mean Squared Error) — w tych samych jednostkach co \(y\), łatwiejszy do interpretacji. \(MAE = \frac{1}{n}\sum|y_i - \hat{y}_i|\) (Mean Absolute Error) — mniej wrażliwy na outliery, bo nie podnosi błędów do kwadratu. Różnica kluczowa: MSE karze duże błędy nieproporcjonalnie mocniej (kwadrat), MAE traktuje wszystkie błędy liniowo.</p>
-<p><div class="viz-mount" data-viz="f02"></div></p>
-<h3 id="diagnostyka-reszt">Diagnostyka reszt</h3>
-<p>Reszty \(e_i = y_i - \hat{y}_i\) to okno na to, czy założenia modelu są spełnione. Trzy kluczowe wykresy:</p>
-<ol>
-<li><strong>Residuals vs Fitted</strong> (\(\hat{y}\) na osi X, \(e_i\) na osi Y) — powinien być losowy rozrzut wokół zera. Wzorzec paraboliczny sugeruje brak liniowości, lejek sugeruje heteroskedastyczność.</li>
-<li><strong>Q-Q Plot</strong> — kwantyle reszt vs kwantyle rozkładu normalnego. Punkty na prostej = reszty normalne. Odchylenia w ogonach = ciężkie ogony rozkładu.</li>
-<li><strong>Scale-Location</strong> (\(\hat{y}\) na osi X, pierwiastek z modułu reszty standaryzowanej \(\sqrt{|e_i^*|}\) na osi Y) — do oceny homoskedastyczności. Płaska linia = OK, rosnąca = heteroskedastyczność. Reszta standaryzowana: \(e_i^* = e_i/(s\sqrt{1-h_{ii}})\), gdzie \(s\) to pierwiastek estymatora wariancji reszt, a \(h_{ii}\) to leverage obserwacji \(i\) (oba zdefiniowane w sekcji o punktach wpływowych).</li>
-</ol>
-<p><div class="viz-mount" data-viz="f05"></div></p>
-<h3 id="przedzialy-ufnosci-vs-predykcji">Przedziały ufności vs predykcji</h3>
-<p>Przedział ufności (CI) dotyczy średniej warunkowej \(E[y|x]\) — niepewność co do położenia prostej. Przedział predykcji (PI) dotyczy nowej obserwacji \(y_{new}\) — obejmuje dodatkowo losowość \(\varepsilon\), więc jest zawsze szerszy. Oba rozszerzają się dalej od \(\bar{x}\) (mniej danych = większa niepewność).</p>
-<p><div class="viz-mount" data-viz="f13"></div></p>
-<h2 id="python-dwa-podejscia">Python — dwa podejścia</h2>
-<h3 id="statsmodels-ols">statsmodels.OLS</h3>
-<p>Podejście statystyczne — daje pełne podsumowanie: p-wartości współczynników, \(R^2\), test F, Durbin-Watson, przedziały ufności. Używamy do wnioskowania i diagnostyki. Wymaga ręcznego dodania kolumny jedynek dla interceptu (<code>sm.add_constant(X)</code>).</p>
-<p><div class="viz-mount" data-viz="f11"></div></p>
-<p>Co czytać z podsumowania: \(R^2\) (% wyjaśnionej wariancji), F-statistic i jej p-wartość (test łącznej istotności wszystkich cech), <code>coef</code> (wartości \(\hat{\beta}_i\)), <code>P&gt;|t|</code> (p-wartości — \(< 0.05\) oznacza istotność), Durbin-Watson (\(\approx 2\) to brak autokorelacji reszt).</p>
-<h3 id="sklearn-linearregression">sklearn.LinearRegression</h3>
-<p>Podejście ML — fit/predict, łatwa integracja z Pipeline i cross-validation. Nie daje p-wartości ani testów statystycznych. Automatycznie dodaje intercept. Nastawiony na predykcję, nie na wnioskowanie.</p>
-<h2 id="eksploracja-danych-przed-modelowaniem">Eksploracja danych przed modelowaniem</h2>
-<p>Zanim budujemy model, badamy dane: macierz korelacji (heatmapa) pokazuje zależności między cechami i ze zmienną docelową, scatter ploty pozwalają wizualnie ocenić czy zależność jest liniowa.</p>
-<p><div class="viz-mount" data-viz="f12"></div></p>
-<hr>
-<h2 id="co-robic-gdy-zalozenia-padaja">Co robić, gdy założenia padają</h2>
-<p>W prawdziwych danych założenia OLS prawie nigdy nie są idealnie spełnione. Kluczowe pytanie to nie „czy są spełnione&quot;, ale „jak bardzo są złamane i co z tym zrobić&quot;.</p>
-<h3 id="nieliniowosc-transformacje">Nieliniowość → transformacje</h3>
-<p>Jeśli residuals vs fitted pokazuje wzorzec (np. parabolę), zależność nie jest liniowa. Najczęstsze rozwiązania: transformacja \(\log(y)\) (dla danych wykładniczych/multiplikatywnych — np. ceny, wynagrodzenia), \(\sqrt{x}\) lub \(x^2\) jako dodatkowa cecha (regresja wielomianowa — nadal liniowa w \(\beta\)). Transformacja \(\log(y)\) często naprawia jednocześnie nieliniowość i heteroskedastyczność, bo stabilizuje wariancję.</p>
-<p><div class="viz-mount" data-viz="f14"></div></p>
-<h3 id="heteroskedastycznosc-robust-se">Heteroskedastyczność → robust SE</h3>
-<p>Jeśli lejek na residual plot jest widoczny, ale zależność jest liniowa, można użyć odpornych błędów standardowych Whita (heteroskedasticity-consistent SE). W <code>statsmodels</code>: <code>model.fit(cov_type='HC3')</code>. Estymatory \(\hat{\beta}\) się nie zmieniają, ale ich błędy standardowe (i p-wartości) są poprawione — uwzględniają niestałą wariancję.</p>
-<h3 id="autokorelacja-reszt">Autokorelacja reszt</h3>
-<p>Problem typowy dla danych czasowych — reszta w momencie \(t\) jest skorelowana z resztą w \(t-1\). Test Durbin-Watson: \(DW \approx 2\) to brak autokorelacji, \(DW < 1\) to silna dodatnia autokorelacja, \(DW > 3\) to ujemna. Rozwiązania: dodanie opóźnionych zmiennych (\(y_{t-1}\), \(x_{t-1}\) jako cechy), modele ARIMA (AutoRegressive Integrated Moving Average), albo błędy standardowe Newey-Westa.</p>
-<p><div class="viz-mount" data-viz="f15"></div></p>
-<h2 id="punkty-wplywowe-leverage-i-odleglosc-cooka">Punkty wpływowe — leverage i odległość Cooka</h2>
-<p>Pojedynczy outlier potrafi przesunąć prostą OLS. Formalizują to dwa pojęcia:</p>
-<p>Leverage \(h_{ii} = [X(X^\top X)^{-1}X^\top]_{ii}\) (element diagonalny macierzy kapeluszowej \(H = X(X^\top X)^{-1}X^\top\)) mierzy, jak daleko obserwacja \(i\) leży od centroidu \(\mathbf{X}\) (centrum chmury cech); średnio \(\bar h = (p+1)/n\). Wysoki leverage oznacza, że punkt jest na „krańcu&quot; rozkładu cech — ma potencjał ciągnięcia prostej, ale niekoniecznie go realizuje (jeśli leży blisko prostej). Reszta standaryzowana mówi, jak daleko punkt leży od prostej. Punkt wpływowy to taki, który ma i wysoki leverage, i dużą resztę — łączy potencjał z realizacją.</p>
-<p>Odległość Cooka łączy oba w jedną miarę: \(D_i = \dfrac{e_i^2}{(p+1)\,s^2} \cdot \dfrac{h_{ii}}{(1-h_{ii})^2}\), gdzie \(s^2 = SS_{res}/(n-p-1)\) to nieobciążony estymator wariancji reszt (uwaga: to nie metryka \(MSE = \tfrac1n\sum e_i^2\)), a \(p+1\) to liczba parametrów z interceptem. Typowe progi: \(D_i > 1\) (konserwatywny) lub \(D_i > 4/n\) (liberalny). Punkt z wysokim \(D_i\) to taki, którego usunięcie istotnie zmieni dopasowany model.</p>
-<p><div class="viz-mount" data-viz="f16"></div></p>
-<p>Wpływ wymaga jednoczesnego wysokiego leverage <strong>i</strong> dużej reszty: sam odległy leverage (punkt leżący na prostej) lub sama duża reszta blisko centroidu nie wystarczą.</p>
-<h2 id="dobor-zmiennych-i-regularyzacja">Dobór zmiennych i regularyzacja</h2>
-<h3 id="aic-bic-akaike-bayesian-information-criterion">AIC / BIC (Akaike / Bayesian Information Criterion)</h3>
-<p>W rzeczywistości mamy dziesiątki kandydatów na cechy. Kryteria informacyjne — AIC (Akaike Information Criterion) i BIC (Bayesian Information Criterion) — pozwalają porównywać modele o różnej złożoności. Niech \(k\) = liczba estymowanych parametrów \(= p\) (nachylenia) \(+\,1\) (intercept \(\beta_0\)) \(+\,1\) (wariancja \(\sigma^2\)) \(= p+2\). Wtedy (z dokładnością do stałej wspólnej dla porównywanych modeli):</p>
-<div class="mathblock">\[\text{AIC} = n\ln(SS_{res}/n) + 2k, \qquad \text{BIC} = n\ln(SS_{res}/n) + k\ln(n).\]</div>
-<p>Niższy = lepszy. Porównanie wymaga <strong>tej samej zmiennej zależnej</strong> modeli — porównanie modeli z \(\log(y)\) vs \(y\) jest niepoprawne (różne dziedziny wiarygodności). BIC karze mocniej (czynnik \(\ln n\) zamiast \(2\), dla \(n>7\)) → preferuje prostsze modele. W <code>statsmodels</code> oba dostępne w <code>model.aic</code> i <code>model.bic</code>.</p>
-<h3 id="forward-backward-selection">Forward / backward selection</h3>
-<p>Forward: zaczynamy od pustego modelu, dodajemy po jednej cesze tę, która najbardziej poprawia kryterium. Backward: zaczynamy od pełnego modelu, usuwamy po jednej cesze tę, której usunięcie najmniej pogarsza kryterium. Stepwise: kombinacja obu. Metody zachłanne — nie gwarantują optymalnego podzbioru, ale są praktyczne.</p>
-<h3 id="ridge-i-lasso">Ridge i Lasso</h3>
-<p>Regularyzacja dodaje karę za wielkość współczynników do funkcji kosztu OLS. Kara obejmuje tylko nachylenia \(\beta_1,\ldots,\beta_p\) (nie intercept \(\beta_0\)), a cechy standaryzujemy przed dopasowaniem — inaczej kara nieproporcjonalnie dotyka cech o większej skali:</p>
-<p>Ridge (\(L_2\)): \(\min_{\boldsymbol\beta} \sum_i(y_i - \hat{y}_i)^2 + \alpha \sum_{j=1}^{p} \beta_j^2\). Ściska współczynniki w stronę zera, ale nigdy dokładnie do zera. Stabilizuje \(\hat\beta_i\) niestabilne <strong>z powodu współliniowości</strong>. Ridge <strong>nie jest robustny na outliery</strong> — do tego stosuje się regresję Hubera albo kwantylową.</p>
-<p>Lasso (\(L_1\)): \(\min_{\boldsymbol\beta} \sum_i(y_i - \hat{y}_i)^2 + \alpha \sum_{j=1}^{p} |\beta_j|\). Ściska i zeruje współczynniki → automatyczna selekcja cech. Przy odpowiednim \(\alpha\) zostają tylko istotne zmienne.</p>
-<p><div class="viz-mount" data-viz="f17"></div></p>
-<p>Na wykresie widać, że prawdziwy wpływ mają tylko \(x_1\), \(x_2\), \(x_3\) (grube linie). Ridge ściska wszystkie współczynniki płynnie w stronę zera, ale żaden nie znika. Lasso przy \(\alpha \approx 1\) zeruje cechy szumowe (\(x_4\)–\(x_8\)), zostawiając tylko istotne — działa jak selektor cech. Parametr \(\alpha\) dobieramy przez cross-validation.</p>
-<h2 id="walidacja-modelu">Walidacja modelu</h2>
-<h3 id="train-test-i-cross-validation">Train/test i cross-validation</h3>
-<p>Dzielimy dane na zbiór treningowy (budowa modelu) i testowy (ocena generalizacji). Cross-validation (\(k\)-fold): dzielimy trening na \(k\) części, trenujemy \(k\) razy — za każdym razem inna część jest walidacyjna. Średni RMSE z \(k\) foldów to estymata błędu generalizacji. Typowe \(k = 5\) lub \(10\).</p>
-<h3 id="bias-variance-tradeoff">Bias-variance tradeoff</h3>
-<p>Model za prosty (mało cech / za duża regularyzacja) → wysoki bias, niski variance → underfitting. Model za złożony (za dużo cech / brak regularyzacji) → niski bias, wysoki variance → overfitting. Optimum jest pomiędzy — szukamy go po minimum RMSE na zbiorze <strong>walidacyjnym</strong> (wybór hiperparametrów na zbiorze testowym to błąd metodologiczny — leakage; testowy używamy tylko do końcowej oceny).</p>
-<p><div class="viz-mount" data-viz="f18"></div></p>
-<p>RMSE na treningu stale spada ze złożonością (model zapamiętuje dane), ale RMSE na teście ma minimum — po jego przekroczeniu zaczyna się przeuczanie.</p>
-<h2 id="interpretacja-i-ograniczenia">Interpretacja i ograniczenia</h2>
-<h3 id="co-znaczy-beta-i">Co znaczy <code>β_i</code></h3>
-<p>Surowy współczynnik \(\hat{\beta}_i\) mówi: „przy wzroście \(x_i\) o 1 jednostkę, \(y\) zmienia się o \(\hat{\beta}_i\), ceteris paribus&quot; (przy niezmienionych pozostałych cechach). Problem: jeśli cechy mają różne jednostki (m², sztuki, km), surowe \(\beta_i\) nie są porównywalne. Gdy standaryzujesz tylko cechy, współczynnik pozostaje w jednostkach <code>y</code> na 1 odchylenie standardowe cechy. Po standaryzacji zarówno cech, jak i zmiennej docelowej współczynniki mówią: „o ile odchyleń standardowych zmieni się \(y\) przy wzroście \(x_i\) o 1 odchylenie&quot; — wtedy można porównać siłę wpływu.</p>
-<p><div class="viz-mount" data-viz="f20"></div></p>
-<h3 id="korelacja-przyczynowosc">Korelacja ≠ przyczynowość</h3>
-<p>Regresja mierzy związek statystyczny, nie przyczynowy. Klasyczny przykład: sprzedaż lodów koreluje z liczbą utonięć — obie zmienne rosną latem (zmienna ukryta: temperatura). Regresja pokaże istotny \(\beta\), ale zjedzenie lodów nie powoduje utonięć.</p>
-<h3 id="kiedy-regresja-liniowa-nie-pasuje">Kiedy regresja liniowa nie pasuje</h3>
-<p>Zmienna docelowa binarna (0/1) → regresja liniowa daje predykcje poza \([0, 1]\), co jest nonsensem. Potrzeba regresji logistycznej, która modeluje prawdopodobieństwo przez funkcję sigmoid.</p>
-<p><div class="viz-mount" data-viz="f19"></div></p>
-<p>Inne przypadki: silne interakcje i nieliniowości → drzewa decyzyjne, ensemble (random forest, gradient boosting). Bardzo wiele cech przy małej próbie → regularyzacja (Lasso/Ridge) lub redukcja wymiarów (PCA). Dane czasowe z autokorelacją → modele szeregów czasowych (ARIMA, VAR — Vector AutoRegression).</p>
+    <h2 id="czym-jest">Czym jest regresja liniowa</h2>
+    <p>Regresja liniowa modeluje zależność zmiennej objaśnianej \(y\) od jednej cechy (regresja prosta) lub wielu cech (regresja wieloraka):</p>
+    <div class="mathblock">\[y = \beta_0 + \beta_1 x_1 + \ldots + \beta_p x_p + \varepsilon\]</div>
+    <p>gdzie \(\beta_0\) to wyraz wolny, \(\beta_i\) to współczynniki, a \(\varepsilon\) to składnik losowy. Kluczowa uwaga: model jest liniowy <strong>w parametrach</strong> \(\beta\), nie w zmiennych — \(x^2\) jako cecha to wciąż regresja liniowa.</p>
+    <div class="viz-mount" data-viz="f08"></div>
+
+    <h2 id="ols">Metoda najmniejszych kwadratów (OLS)</h2>
+    <div class="viz-mount" data-viz="v03"></div>
+    <p>Współczynniki dobieramy tak, by zminimalizować sumę kwadratów reszt \(e_i = y_i - \hat{y}_i\) — pionowych odległości punktów od prostej:</p>
+    <div class="mathblock">\[\hat{\boldsymbol{\beta}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i^\top\boldsymbol{\beta})^2\]</div>
+    <p>Podnoszenie reszt do kwadratu ma swoją cenę: OLS jest wrażliwy na wartości odstające, bo jeden skrajny punkt dominuje sumę i przeciąga prostą w swoim kierunku.</p>
+
+    <h2 id="zalozenia">Założenia Gaussa–Markowa</h2>
+    <p>Od ich spełnienia zależy, czy estymator OLS jest BLUE (najlepszy liniowy nieobciążony):</p>
+    <ul>
+      <li>liniowość w parametrach \(\beta\),</li>
+      <li>błędy nieskorelowane, \(\text{Cov}(\varepsilon_i,\varepsilon_j)=0\),</li>
+      <li>egzogeniczność, \(E[\varepsilon\mid X]=0\),</li>
+      <li>homoskedastyczność — stała wariancja błędów,</li>
+      <li>brak idealnej współliniowości cech.</li>
+    </ul>
+    <p>Dodatkowo normalność \(\varepsilon \sim N(0,\sigma^2)\) — potrzebna do testów \(t\), \(F\) i przedziałów ufności.</p>
+    <div class="viz-mount" data-viz="v06"></div>
+    <p>Silna współliniowość nie psuje predykcji modelu jako całości, ale destabilizuje pojedyncze \(\hat{\beta}_i\) i utrudnia ich interpretację.</p>
+    <div class="viz-mount" data-viz="f07"></div>
+
+    <h2 id="analiza">Analiza modelu: R², metryki, reszty</h2>
+    <p>Całkowitą zmienność \(y\) rozkładamy na wyjaśnioną i niewyjaśnioną. Współczynnik \(R^2 = 1 - SS_{res}/SS_{tot}\) mówi, jaki procent wariancji \(y\) model wyjaśnia. Ponieważ \(R^2\) zawsze rośnie po dodaniu cechy — nawet bezużytecznej — używamy skorygowanego \(R^2_{adj}\), który karze za liczbę cech.</p>
+    <div class="viz-mount" data-viz="f04"></div>
+    <div class="viz-mount" data-viz="f09"></div>
+    <div class="viz-mount" data-viz="f03r2"></div>
+    <p>Błąd predykcji mierzymy metrykami: RMSE (w jednostkach \(y\), karze duże błędy nieproporcjonalnie, bo przez kwadrat) oraz MAE (liniowy, mniej wrażliwy na wartości odstające).</p>
+    <div class="viz-mount" data-viz="f02"></div>
+    <p>Reszty pozwalają sprawdzić, czy założenia są spełnione. Trzy diagnostyczne wykresy: Residuals vs Fitted (losowy rozrzut = dobrze, lejek = heteroskedastyczność, łuk = nieliniowość), Q-Q plot (normalność reszt) i Scale-Location (stałość wariancji).</p>
+    <div class="viz-mount" data-viz="f05"></div>
+    <p>Przedział ufności dotyczy średniej warunkowej \(E[y\mid x]\), a przedział predykcji — pojedynczej nowej obserwacji, więc jest szerszy; oba rozszerzają się z dala od \(\bar{x}\).</p>
+    <div class="viz-mount" data-viz="f13"></div>
+
+    <h2 id="python">Python: statsmodels vs sklearn</h2>
+    <p><code>statsmodels.OLS</code> to podejście statystyczne — pełne podsumowanie: p-wartości współczynników, \(R^2\), test F, przedziały ufności; używamy go do wnioskowania i diagnostyki. <code>sklearn.LinearRegression</code> to podejście ML — fit/predict, łatwa integracja z Pipeline i walidacją krzyżową, nastawione na predykcję, bez testów statystycznych. Wybór biblioteki to w gruncie rzeczy wybór celu: wyjaśniać czy przewidywać.</p>
+    <div class="viz-mount" data-viz="f11"></div>
+    <p>Zanim zbudujemy model, eksplorujemy dane — macierz korelacji i wykresy rozrzutu pokazują, czy zależność jest liniowa.</p>
+    <div class="viz-mount" data-viz="f12"></div>
+
+    <h2 id="gdy-padaja">Gdy założenia padają</h2>
+    <p>W realnych danych założenia niemal nigdy nie są idealnie spełnione — pytanie brzmi nie „czy”, lecz „jak bardzo są złamane i co z tym zrobić”. Nieliniowość naprawiamy transformacją, np. \(\log(y)\) dla cen czy wynagrodzeń (przy okazji stabilizuje wariancję), albo cechą wielomianową. Heteroskedastyczność — odpornymi błędami standardowymi. Autokorelację reszt (typową dla danych czasowych) — opóźnionymi zmiennymi lub modelami szeregów czasowych.</p>
+    <div class="viz-mount" data-viz="f14"></div>
+    <div class="viz-mount" data-viz="f15"></div>
+    <p>Pojedyncza obserwacja o wysokiej dźwigni (leverage) <strong>i</strong> dużej reszcie jednocześnie potrafi przesunąć całą prostą — formalizuje to odległość Cooka.</p>
+    <div class="viz-mount" data-viz="f16"></div>
+
+    <h2 id="regularyzacja">Regularyzacja i walidacja</h2>
+    <p>Regularyzacja dodaje do funkcji kosztu karę za wielkość współczynników (na wystandaryzowanych cechach). Ridge (\(L_2\)) ściska je płynnie ku zeru, stabilizując oszacowania przy współliniowości; Lasso (\(L_1\)) część współczynników zeruje, działając jak automatyczny selektor cech.</p>
+    <div class="viz-mount" data-viz="f17"></div>
+    <p>Model oceniamy na wydzielonym zbiorze testowym, a hiperparametry stroimy przez walidację krzyżową (cross-validation). Model za prosty daje niedouczenie (underfitting, wysokie obciążenie/bias), za złożony — przeuczenie (overfitting, wysoka wariancja/variance); optimum leży w minimum błędu na zbiorze walidacyjnym.</p>
+    <div class="viz-mount" data-viz="f18"></div>
+
+    <h2 id="interpretacja">Interpretacja i ograniczenia</h2>
+    <p>Współczynnik \(\hat{\beta}_i\) mówi: przy wzroście \(x_i\) o jednostkę, \(y\) zmienia się o \(\hat{\beta}_i\), ceteris paribus. Surowych \(\beta\) o różnych jednostkach nie porównujemy — dopiero po standaryzacji cech można zestawić siłę ich wpływu.</p>
+    <div class="viz-mount" data-viz="f20"></div>
+    <p><strong>Najważniejsze ograniczenie</strong>: regresja mierzy związek statystyczny, nie przyczynowy — sprzedaż lodów koreluje z liczbą utonięć, bo obie rosną latem (zmienna ukryta: temperatura). Gdy \(y\) jest binarne, potrzebna jest regresja logistyczna; przy silnych nieliniowościach — drzewa i metody zespołowe. Regresja liniowa jest więc punktem wyjścia i wzorcem odniesienia dla całego klasycznego uczenia maszynowego.</p>
+    <div class="viz-mount" data-viz="f19"></div>
 
   </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol><li><a href="#czym-jest-regresja-liniowa">Czym jest regresja liniowa</a></li>
-<li><a href="#metoda-najmniejszych-kwadratow-ols-ordinary-least-squares">Metoda najmniejszych kwadratów (OLS — Ordinary Least Squares)</a></li>
-<li><a href="#zalozenia-ols-gaussa-markowa">Założenia OLS (Gaussa-Markowa)</a></li>
-<li><a href="#analiza-modelu">Analiza modelu</a></li>
-<li><a href="#python-dwa-podejscia">Python — dwa podejścia</a></li>
-<li><a href="#eksploracja-danych-przed-modelowaniem">Eksploracja danych przed modelowaniem</a></li>
-<li><a href="#co-robic-gdy-zalozenia-padaja">Co robić, gdy założenia padają</a></li>
-<li><a href="#punkty-wplywowe-leverage-i-odleglosc-cooka">Punkty wpływowe — leverage i odległość Cooka</a></li>
-<li><a href="#dobor-zmiennych-i-regularyzacja">Dobór zmiennych i regularyzacja</a></li>
-<li><a href="#walidacja-modelu">Walidacja modelu</a></li>
-<li><a href="#interpretacja-i-ograniczenia">Interpretacja i ograniczenia</a></li></ol></nav>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#czym-jest">Czym jest regresja liniowa</a></li>
+    <li><a href="#ols">Metoda najmniejszych kwadratów (OLS)</a></li>
+    <li><a href="#zalozenia">Założenia Gaussa–Markowa</a></li>
+    <li><a href="#analiza">Analiza modelu: R², metryki, reszty</a></li>
+    <li><a href="#python">Python: statsmodels vs sklearn</a></li>
+    <li><a href="#gdy-padaja">Gdy założenia padają</a></li>
+    <li><a href="#regularyzacja">Regularyzacja i walidacja</a></li>
+    <li><a href="#interpretacja">Interpretacja i ograniczenia</a></li>
+  </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
 </body></html>
