@@ -1,7 +1,7 @@
 <figure class="viz" id="f09">
   <div class="viz-head">
     <p class="viz-title">R² zawsze rośnie, R²_adj karze zbędne cechy</p>
-    <p class="viz-sub">Dokładamy do modelu kolejne predyktory. Pierwsze <b>T</b> niosą prawdziwy sygnał; wszystko powyżej to szum („cechy-śmieci"). R² pnie się monotonicznie ku 1, bo dopasowuje się nawet do przypadkowych cech. R²_adj = 1 − (1−R²)(n−1)/(n−p−1) osiąga szczyt przy prawdziwej liczbie cech, a potem spada. Przesuń suwaki liczby cech p i wielkości próby n.</p>
+    <p class="viz-sub">Dokładamy kolejne predyktory. Zwykłe R² rośnie nawet dla cech będących szumem, natomiast skorygowane R² odejmuje karę zależną od liczby cech i próby. Przesuń suwaki i porównaj przebieg obu miar.</p>
   </div>
   <div class="viz-body">
     <svg id="f09-svg" viewBox="0 0 680 360" role="img" aria-label="Wykres dwóch krzywych w funkcji liczby predyktorów p: R² rosnące monotonicznie ku 1 oraz R²_adj, które rośnie do szczytu przy prawdziwej liczbie cech, a następnie maleje; zaznaczony szczyt R²_adj oraz prawdziwa liczba cech"></svg>

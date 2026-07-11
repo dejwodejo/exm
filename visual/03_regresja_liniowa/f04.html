@@ -1,12 +1,12 @@
 <figure class="viz" id="f04">
   <div class="viz-head">
     <p class="viz-title">Dekompozycja sumy kwadratów: SS_tot = SS_reg + SS_res</p>
-    <p class="viz-sub">Odchylenie każdego punktu od średniej ȳ rozkłada się na część wyjaśnioną przez model (ŷ−ȳ) i resztę (y−ŷ). Po zsumowaniu kwadratów po wszystkich punktach: SS_tot = SS_reg + SS_res, a R² = SS_reg/SS_tot to udział wariancji wyjaśnionej.</p>
+    <p class="viz-sub">Dla punktu: y−ȳ = (ŷ−ȳ) + (y−ŷ), ale po podniesieniu do kwadratu pojawia się też wyraz mieszany. Dopiero w OLS z wyrazem wolnym znika on po zsumowaniu po wszystkich obserwacjach, więc SS_tot = SS_reg + SS_res.</p>
   </div>
   <div class="viz-body">
     <svg id="f04-svg" viewBox="0 0 700 360" role="img" aria-label="Wykres rozrzutu z linią średniej ȳ i prostą regresji ŷ; dla wyróżnionego punktu trzy kolorowe pionowe odcinki: odchylenie całkowite, wyjaśnione i reszta; obok słupek skumulowany SS_tot rozbity na SS_reg i SS_res oraz R kwadrat"></svg>
   </div>
-  <figcaption><b>Sedno:</b> całkowita zmienność y wokół średniej rozpada się na to, co model wyjaśnia (SS_reg), i to, co zostaje (SS_res); R² = SS_reg/SS_tot mówi, jaką część tej zmienności prosta przechwytuje.</figcaption>
+  <figcaption><b>Sedno:</b> dekompozycja kwadratów zachodzi łącznie dla całej próby, nie osobno dla każdego punktu; dla OLS z wyrazem wolnym R² = SS_reg/SS_tot mówi, jaką część zmienności przechwytuje model.</figcaption>
 </figure>
 <script>
 (function(){

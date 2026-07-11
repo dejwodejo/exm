@@ -1,7 +1,7 @@
 <figure class="viz" id="v11">
   <div class="viz-head">
-    <p class="viz-title">Przepływ w przód i wstecz: aktywacje a⁽ˡ⁾ i błąd δ⁽ˡ⁾</p>
-    <p class="viz-sub">Przełącz tor obliczeń. Zmień aktywację i zobacz w insecie, dlaczego sigmoid dławi gradient (maks φ′=0.25), a ReLU go zachowuje (φ′=1).</p>
+    <p class="viz-title">Przepływ w przód i wstecz</p>
+    <p class="viz-sub">Przełącz tor obliczeń i zobacz, jak aktywacje tworzą predykcję, a informacja o błędzie wraca do wcześniejszych warstw. Sigmoid może ją tłumić, ReLU zwykle przepuszcza skuteczniej.</p>
   </div>
   <div class="viz-body">
     <svg id="v11-svg" viewBox="0 0 680 340" role="img" aria-label="Diagram małej sieci neuronowej z przepływem aktywacji w przód i błędu wstecz oraz wykresem funkcji aktywacji i jej pochodnej"></svg>
@@ -13,7 +13,7 @@
       skala gradientu przez 3 warstwy: <b id="v11-read">–</b>
     </span>
   </div>
-  <figcaption><b>Sedno:</b> w przód płyną aktywacje a⁽ˡ⁾=φ(z⁽ˡ⁾) w prawo; wstecz reguła łańcuchowa niesie błąd δ⁽ˡ⁾=(W⁽ˡ⁺¹⁾ᵀδ⁽ˡ⁺¹⁾)⊙φ′(z⁽ˡ⁾) w lewo — a że każda warstwa mnoży przez φ′, sigmoid (φ′≤0.25) tłumi gradient wykładniczo, ReLU (φ′=1) nie.</figcaption>
+  <figcaption><b>Sedno:</b> w przód warstwy tworzą kolejne reprezentacje, a wstecz reguła łańcuchowa rozdziela odpowiedzialność za błąd między wagi. Wielokrotne mnożenie przez małe pochodne powoduje zanik gradientu.</figcaption>
 </figure>
 <script>
 (function(){

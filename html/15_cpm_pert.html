@@ -23,24 +23,18 @@
     <div class="note-audio"><span class="na-label">▶ Wersja audio</span><audio controls preload="metadata" src="../audio/15_cpm_pert.mp3"></audio></div>
 
     <h2 id="dag">Sieć projektu jako DAG</h2>
-    <p>Metody sieciowe modelują projekt jako <strong>graf skierowany acykliczny (DAG, Directed Acyclic Graph)</strong> \(G=(V,E)\): węzły i łuki, bez cykli skierowanych, znormalizowany do jednego źródła (start) i jednego ujścia (koniec). <strong>Czynność</strong> to zadanie zużywające czas \(t\ge 0\) i zasoby; <strong>zdarzenie</strong> to punkt w czasie wyznaczający początek lub koniec czynności. W dominującej dziś konwencji <strong>AON (Activity-On-Node)</strong> czynność znajduje się w węźle, a łuk oznacza następstwo. Ponieważ graf jest acykliczny, można go ustawić w <strong>porządku topologicznym</strong> — każdy poprzednik przed swoim następnikiem. To właśnie ten porządek sprawia, że cały CPM sprowadza się do dwóch przejść po grafie.</p>
+    <p>Metody sieciowe modelują projekt jako <strong>DAG</strong>: graf następstw bez cykli, od startu do końca. W konwencji <strong>AON</strong> węzeł jest czynnością z czasem trwania, a łuk oznacza zależność. Porządek topologiczny ustawia każdego poprzednika przed następnikiem, dlatego CPM wymaga tylko przejścia w przód i wstecz.</p>
 
     <h2 id="cpm">Algorytm CPM</h2>
-    <p><strong>CPM (Critical Path Method)</strong> zakłada <strong>deterministyczne</strong> czasy trwania \(t_{ij}\) i szuka minimalnego czasu projektu. <strong>Przejście w przód (forward pass)</strong> liczy najwcześniejsze momenty zdarzeń, idąc w porządku topologicznym:</p>
-    <div class="mathblock">\[E_j=\max_{(i,j)\in E}\{E_i+t_{ij}\}, \qquad E_{\text{start}}=0.\]</div>
-    <p>Bierzemy maksimum, bo czynność ruszy dopiero wtedy, gdy skończą się <em>wszystkie</em> poprzedzające. <strong>Przejście wstecz (backward pass)</strong> idzie od końca, w porządku odwrotnym, i liczy najpóźniejsze dopuszczalne momenty:</p>
-    <div class="mathblock">\[L_i=\min_{(i,j)\in E}\{L_j-t_{ij}\}, \qquad L_{\text{end}}=E_{\text{end}}.\]</div>
-    <p>Dwa liniowe przejścia po posortowanym DAG-u w zupełności wystarczają.</p>
+    <p><strong>CPM</strong> zakłada znane czasy czynności. W przejściu w przód najwcześniejszy start czynności jest najpóźniejszym zakończeniem jej poprzedników — czekamy na wszystkich. W przejściu wstecz od terminu końca wyznaczamy, jak późno można zacząć każdą czynność bez opóźnienia projektu.</p>
 
     <h2 id="sciezka">Zapasy czasowe i ścieżka krytyczna</h2>
     <div class="viz-mount" data-viz="v15"></div>
-    <p><strong>Zapas całkowity</strong> czynności to \(TF_{ij}=L_j-E_i-t_{ij}\) — o ile można ją opóźnić bez przesunięcia końca projektu. <strong>Ścieżka krytyczna</strong> to droga od startu do końca, na której wszystkie czynności mają \(TF=0\); równoważnie: najdłuższa ścieżka w grafie ważonym czasami, a jej długość to minimalny czas projektu. Ścieżek krytycznych może być kilka.</p>
-    <p><strong>Przykład rachunkowy</strong>: mając tabelę czynności z poprzednikami i czasami, robimy forward pass, żeby poznać \(E\) każdego zdarzenia i czas całości, potem backward pass dla \(L\), a na końcu czynności o zerowym zapasie układają się w ścieżkę krytyczną. Opóźnienie czynności krytycznej opóźnia cały projekt; czynność z zapasem trzech dni można przesunąć o trzy dni bez szkody dla terminu.</p>
+    <p><strong>Zapas całkowity</strong> mówi, o ile można opóźnić czynność bez przesunięcia końca projektu. <strong>Ścieżka krytyczna</strong> łączy czynności o zerowym zapasie; jest najdłuższą czasowo drogą od startu do końca i wyznacza minimalny czas projektu. Ścieżek krytycznych może być kilka.</p>
+    <p><strong>Przykład rachunkowy</strong>: z tabeli czynności i poprzedników liczymy najpierw najwcześniejsze, potem najpóźniejsze terminy. Czynności o zerowym zapasie tworzą ścieżkę krytyczną; czynność z zapasem trzech dni można przesunąć o trzy dni bez szkody dla terminu.</p>
 
     <h2 id="pert">PERT — czasy niepewne</h2>
-    <p><strong>PERT (Program Evaluation and Review Technique)</strong> rozszerza CPM na niepewne czasy: traktuje czas czynności jako zmienną losową. Ekspert podaje <strong>trzy oszacowania</strong> — optymistyczne \(a\), najbardziej prawdopodobne \(m\) i pesymistyczne \(b\) — z których przybliża się wartość oczekiwaną i wariancję:</p>
-    <div class="mathblock">\[t_e=\frac{a+4m+b}{6}, \qquad \sigma^2=\left(\frac{b-a}{6}\right)^2.\]</div>
-    <p>Modzie przypisuje się wagę 4, ponieważ to scenariusz najbardziej prawdopodobny. Czas projektu sumujemy po ścieżce krytycznej — wartości oczekiwane i wariancje dodają się — i przy założeniu niezależności czynności można z rozkładu normalnego oszacować prawdopodobieństwo dotrzymania narzuconego terminu \(T_d\).</p>
+    <p><strong>PERT</strong> używa trzech czasów: optymistycznego \(a\), najbardziej prawdopodobnego \(m\) i pesymistycznego \(b\). Oczekiwany czas to \((a+4m+b)/6\): najbardziej prawdopodobny wariant liczymy cztery razy, a dzielnik 6 jest sumą wag 1+4+1. Sumowanie po ścieżce krytycznej jest tylko przybliżeniem: zakłada niezależność i jedną ustaloną ścieżkę; przy kilku podobnie długich drogach zmiana ścieżki może zwiększyć czas i ryzyko.</p>
 
     <h2 id="crashing">Time-cost trade-off (crashing)</h2>
     <p><strong>Crashing</strong> odpowiada na pytanie, jak skrócić projekt najtaniej. Każda czynność ma czas normalny i skrócony za wyższy koszt; <strong>cost slope</strong> to koszt skrócenia o jednostkę czasu. Skracamy zawsze najtańszą czynność <strong>na bieżącej ścieżce krytycznej</strong> — i po każdym kroku przeliczamy ścieżkę, bo skracanie potrafi przenieść krytyczność na inną drogę.</p>

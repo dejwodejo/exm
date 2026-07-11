@@ -33,11 +33,11 @@
 
     <h2 id="bias-variance-tradeoff">Bias-variance</h2>
     <div class="viz-mount" data-viz="bv"></div>
-    <p>Błąd predykcji to suma obciążenia, wariancji i nieredukowalnego szumu. Model za prosty ma wysokie obciążenie (<strong>underfitting</strong>), za złożony — wysoką wariancję (<strong>overfitting</strong>). Im wierniej model odwzorowuje próbę treningową, tym mocniej łapie jej przypadkowy szum, dlatego minimum błędu testowego leży <em>pomiędzy</em> modelem zbyt prostym a zbyt złożonym, nie na skraju. Bagging redukuje wariancję, boosting — obciążenie, regularyzacja wymienia jedno na drugie.</p>
+    <p>Błąd predykcji wynika z obciążenia, wariancji i nieredukowalnego szumu. Model za prosty niedoucza się, a zbyt elastyczny może łapać przypadkowy szum; typowe minimum błędu walidacyjnego między nimi jest heurystyką, nie gwarancją. Bagging zmniejsza głównie wariancję przez uśrednianie słabo skorelowanych modeli, a boosting kolejno poprawia błędy poprzedników i może zmieniać zarówno bias, jak i wariancję.</p>
 
     <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
     <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
-    <p>Dla klasyfikacji z macierzy pomyłek liczymy accuracy, <strong>precyzję</strong> \(TP/(TP+FP)\), <strong>czułość (recall)</strong> \(TP/(TP+FN)\) i ich średnią harmoniczną <strong>F1</strong>; krzywa ROC i pole pod nią (AUC) opisują jakość rankingu niezależnie od progu. Przy silnie niezrównoważonych klasach accuracy myli (stały klasyfikator większościowy: wysokie accuracy, F1 \(= 0\)), więc sięga się po F1 lub PR-AUC. Dla regresji: RMSE (w jednostkach \(y\)), MAE (odporne na wartości odstające) oraz \(R^2\).</p>
+    <p>Dla klasyfikacji liczymy accuracy oraz <strong>precyzję</strong>: trafienia pozytywne podzielone przez wszystkie wskazania pozytywne, i <strong>czułość</strong>: trafienia pozytywne podzielone przez wszystkie rzeczywiste przypadki pozytywne. F1 łączy obie miary; ROC-AUC ocenia ranking. Przy niezrównoważonych klasach accuracy myli, więc lepsze bywają F1 lub PR-AUC. Dla regresji używamy RMSE, MAE i \(R^2\).</p>
 
     <h2 id="modele">Przegląd modeli</h2>
     <div class="tablewrap">
@@ -48,18 +48,18 @@
           <tr><td>Drzewo decyzyjne</td><td>rekurencyjny podział progami cech</td><td>interpretowalne, bez skalowania</td><td>niestabilne, łatwo przeucza</td></tr>
           <tr><td>Random Forest</td><td>uśrednienie wielu zdekorelowanych drzew</td><td>redukuje wariancję, odporny</td><td>mniej interpretowalny</td></tr>
           <tr><td>Gradient Boosting</td><td>drzewa sekwencyjnie na błędach poprzednika</td><td>zwykle najmocniejszy na danych tabelarycznych</td><td>wolniejszy trening, wymaga strojenia</td></tr>
-          <tr><td>SVM</td><td>hiperpłaszczyzna o maksymalnym marginesie</td><td>skuteczny w wysokich wymiarach, jądra</td><td>wolny na dużym \(n\), bez prawdopodobieństw</td></tr>
+          <tr><td>SVM</td><td>hiperpłaszczyzna o maksymalnym marginesie</td><td>skuteczny w wysokich wymiarach, jądra</td><td>wolny na dużych zbiorach, bez prawdopodobieństw</td></tr>
           <tr><td>Regresja logistyczna</td><td>liniowa granica przez sigmoidę</td><td>skalibrowane prawdopodobieństwa, interpretowalna</td><td>tylko granice liniowe</td></tr>
           <tr><td>Naiwny Bayes</td><td>Bayes + niezależność cech</td><td>szybki, dobry w NLP</td><td>naiwne założenie, źle skalibrowany</td></tr>
-          <tr><td>k-means</td><td>\(K\) klastrów kulistych, min. WCSS</td><td>szybki, skalowalny</td><td>wymaga \(K\) z góry, klastry kuliste</td></tr>
+          <tr><td>k-means</td><td>grupuje wokół zadanej liczby centrów</td><td>szybki, skalowalny</td><td>wymaga liczby klastrów z góry, preferuje klastry kuliste</td></tr>
           <tr><td>DBSCAN</td><td>klastry definiowane gęstością</td><td>dowolny kształt, wykrywa szum</td><td>trudność przy różnej gęstości</td></tr>
-          <tr><td>Hierarchiczna</td><td>dendrogram łączeń</td><td>nie wymaga \(K\), wizualna</td><td>kosztowna, \(O(n^2)\)</td></tr>
+          <tr><td>Hierarchiczna</td><td>dendrogram łączeń</td><td>nie wymaga \(K\), wizualna</td><td>koszt rośnie mniej więcej z kwadratem liczby punktów</td></tr>
         </tbody>
       </table>
     </div>
 
     <h2 id="regularyzacja">Regularyzacja</h2>
-    <p>Regularyzacja kontroluje złożoność, dokładając do funkcji celu karę na wagi: \(J(w) = R_n(w) + \lambda\,\Omega(w)\). <strong>L1 (Lasso)</strong> zeruje część wag, więc pełni rolę selekcji cech; <strong>L2 (Ridge)</strong> ściąga wagi ku zeru bez zerowania i stabilizuje przy współliniowości. Większe \(\lambda\) to prostszy model: więcej obciążenia, mniej wariancji.</p>
+    <p>Regularyzacja dodaje do błędu karę za duże wagi. <strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
 
     <h2 id="kluczowe-rozroznienia">Kluczowe rozróżnienia</h2>
     <ul>

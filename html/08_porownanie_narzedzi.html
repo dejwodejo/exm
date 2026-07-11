@@ -40,7 +40,7 @@
 
     <h2 id="klasy">Klasy narzędzi</h2>
     <ul>
-      <li><strong>Single-node</strong> (pandas, DuckDB, Polars) — eksploracja i analityka do ok. 1 TB bez klastra.</li>
+      <li><strong>Single-node</strong> (pandas, DuckDB, Polars) — eksploracja i analityka, dopóki czas i pamięć jednej maszyny są akceptowalne.</li>
       <li><strong>Rozproszony batch</strong> (Apache Spark) — ETL i ML na TB–PB; wyparł Hadoop MapReduce dzięki przetwarzaniu in-memory i grafowi DAG zamiast sztywnego map→reduce.</li>
       <li><strong>Streaming</strong> (Apache Flink, Kafka Streams) — przetwarzanie zdarzeń o niskiej latencji.</li>
       <li><strong>Hurtownie kolumnowe MPP</strong> (BigQuery, Snowflake) — analityka SQL, raporty, BI.</li>
@@ -50,7 +50,7 @@
     </ul>
 
     <h2 id="heurystyka">Heurystyka wyboru</h2>
-    <p>Gotowa ścieżka decyzyjna, która prowadzi wprost do wyboru:</p>
+    <p>Poniższe progi są tylko orientacyjne: o wyborze decydują też format danych, RAM, współbieżność, koszt i wymagany czas odpowiedzi.</p>
     <ul>
       <li>&lt; 10 GB, batch, jeden analityk → pandas / DuckDB.</li>
       <li>10 GB–1 TB, batch → Polars / DuckDB lokalnie albo hurtownia chmurowa + dbt.</li>

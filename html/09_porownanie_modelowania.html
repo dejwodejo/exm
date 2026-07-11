@@ -22,26 +22,25 @@
     <p class="subtitle">Notatka egzaminacyjna</p>
     <div class="note-audio"><span class="na-label">▶ Wersja audio</span><audio controls preload="metadata" src="../audio/09_porownanie_modelowania.mp3"></audio></div>
 
-    <p>Dane wielowymiarowe to wektor cech \(X = (X_1, \ldots, X_p)\), często z dołączoną zmienną celu \(Y\). <strong>Modelowanie</strong> to wybór rodziny opisującej \(X\), zależność \(Y|X\) albo rozkład łączny \(X,Y\). Kluczowe jest to, że o wyborze paradygmatu decyduje <em>cel</em>, a nie moda: inaczej modeluje się, gdy chcemy coś <strong>wyjaśnić</strong>, inaczej gdy <strong>przewidzieć</strong>, a jeszcze inaczej gdy <strong>zredukować wymiar</strong>, <strong>sklasyfikować</strong> czy <strong>posegmentować</strong>. Dopiero mając cel, dobieramy rodzinę modeli, jej założenia i miarę sukcesu.</p>
+    <p>Dane wielowymiarowe mają wiele cech \(X_1,\ldots,X_p\), gdzie \(p\) jest ich liczbą, oraz czasem cel \(Y\). <strong>Modelowanie</strong> opisuje cechy, ich związek z celem albo wspólny rozkład. O wyborze podejścia decyduje cel: wyjaśnianie, przewidywanie, redukcja wymiaru, klasyfikacja lub segmentacja.</p>
 
     <h2 id="dwie-kultury">Statystyka klasyczna a uczenie maszynowe</h2>
-    <p>Breiman opisał to jako <strong>dwie kultury</strong>. Kultura modelowania danych (statystyka klasyczna) zakłada znany mechanizm generujący dane — np. \(Y = X\beta + \varepsilon\) — i dąży do <strong>inferencji</strong>: estymatory, wartości p, przedziały ufności, czyli wyjaśnienie zależności. Kultura algorytmiczna (ML) traktuje mechanizm jako nieznaną czarną skrzynkę i optymalizuje <strong>predykcję</strong> na nowych danych, mierzoną walidacją krzyżową. Wspólnym językiem obu jest minimalizacja ryzyka empirycznego, czyli średniej straty na próbie. Napięcie jest rzeczywiste: model wygodny inferencyjnie bywa predykcyjnie pokonywany przez modele regularyzowane.</p>
+    <p>Breiman opisał to jako <strong>dwie kultury</strong>. Statystyka klasyczna zakłada określoną postać zależności i dąży do <strong>inferencji</strong>: wyjaśnienia współczynników i ich niepewności. ML traktuje mechanizm jako czarną skrzynkę i optymalizuje <strong>predykcję</strong> na nowych danych, mierzoną walidacją. Model wygodny do wyjaśniania nie musi najlepiej przewidywać.</p>
 
     <h2 id="osie-podzialu">Główne osie podziału</h2>
     <ul>
       <li><strong>Nadzorowane a nienadzorowane</strong> — mamy etykiety \(y_i\) czy tylko \(x_i\); predykcja celu kontra odkrywanie struktury (klasteryzacja, redukcja wymiaru).</li>
       <li><strong>Eksploracyjne a konfirmacyjne</strong> — PCA i analiza czynnikowa szukają struktury bez hipotezy (data-driven); modele konfirmacyjne, jak SEM, testują z góry zadany model teoretyczny (theory-driven).</li>
-      <li><strong>Parametryczne a nieparametryczne</strong> — skończona, stała liczba parametrów (regresja, GLM) kontra liczba rosnąca z próbą (k-NN, drzewa, lasy losowe). Pierwsze mają niską wariancję, lecz ryzyko obciążenia przy złej specyfikacji; drugie odwrotnie i wymagają dużych zbiorów danych.</li>
+      <li><strong>Parametryczne a nieparametryczne</strong> — pierwsze mają z góry ustaloną skończoną postać, a elastyczność drugich może rosnąć z próbą. „Nieparametryczne” nie znaczy „bez parametrów”; bias i wariancję nadal kontrolują np. głębokość drzewa lub liczba sąsiadów.</li>
       <li><strong>Liniowe a nieliniowe</strong> — model liniowy i GLM kontra metody jądrowe, drzewa i sieci neuronowe.</li>
       <li><strong>Dyskryminacyjne a generatywne</strong> — dyskryminacyjne modelują \(P(Y|X)\) wprost (regresja logistyczna, lasy, boosting); generatywne modelują rozkład łączny \(P(X,Y)\) i klasyfikują przez wzór Bayesa (LDA, naiwny Bayes, modele mieszanin), dzięki czemu potrafią też generować dane i radzić sobie z brakami.</li>
     </ul>
 
     <h2 id="czestosciowe-vs-bayesowskie">Częstościowe a bayesowskie</h2>
-    <p>Twierdzenie Bayesa \(P(\theta|D) \propto P(D|\theta)\,P(\theta)\) dzieli statystykę na dwa obozy. Dla <strong>częstościowca</strong> \(\theta\) to nieznana stała, estymowana metodą największej wiarygodności; dla <strong>bayesowca</strong> \(\theta\) jest zmienną losową z priorem i posteriorem. Kluczowy kontrast: przedział ufności mówi o <em>procedurze</em> (95% takich przedziałów pokryje \(\theta\)), a przedział wiarygodności wprost o <em>parametrze</em> — i mylenie ich to częsta pułapka.</p>
+    <p>Bayes aktualizuje wcześniejsze przekonanie o parametrze danymi: <strong>posterior jest proporcjonalny do likelihood razy prior</strong>. Dla częstościowca parametr jest nieznaną stałą; dla bayesowca opisujemy jego niepewność rozkładem. Przedział ufności 95% dotyczy skuteczności procedury w wielu próbach, a przedział wiarygodności — prawdopodobieństwa parametru przy danych i priorze.</p>
 
     <h2 id="bias-variance">Bias-variance jako wspólny język</h2>
-    <p>Wszystkie te paradygmaty spina jeden rachunek — rozkład błędu na obciążenie, wariancję i szum nieredukowalny:</p>
-    <div class="mathblock">\[\mathbb{E}[(Y - \hat f(X))^2] = \text{Bias}^2(\hat f) + \text{Var}(\hat f) + \sigma^2.\]</div>
+    <p>Błąd predykcji składa się z obciążenia modelu, jego wariancji między próbami i nieredukowalnego szumu danych.</p>
     <p>Modele proste mają wysokie obciążenie i niską wariancję, elastyczne — odwrotnie; sztuką jest trafić w minimum sumy. W wysokich wymiarach dokłada się <strong>klątwa wymiarowości</strong>: punkty stają się porównywalnie odległe, więc metody odległościowe zawodzą — stąd potrzeba redukcji wymiaru albo modeli rzadkich. A twierdzenie <strong>No Free Lunch</strong> przypomina, że żaden algorytm nie jest uniwersalnie najlepszy: wybór zawsze zależy od założeń o danych.</p>
 
     <h2 id="synteza">Synteza</h2>

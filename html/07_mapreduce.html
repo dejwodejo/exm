@@ -25,12 +25,11 @@
     <p><strong>MapReduce</strong> (Dean i Ghemawat, Google 2004) to model programistyczny do rozproszonego przetwarzania bardzo dużych danych na klastrze tanich maszyn. Programista pisze tylko dwie czyste funkcje — <em>map</em> i <em>reduce</em> — a framework sam zajmuje się zrównolegleniem, podziałem danych, transferem sieciowym i awariami. <strong>Celem</strong> jest więc ukrycie całej złożoności systemu rozproszonego za prostym interfejsem operującym na parach klucz-wartość. Klucz-wartość to na tyle uboga struktura, że framework może dowolnie tasować rekordy między maszynami, w ogóle nie znając ich znaczenia.</p>
 
     <h2 id="zasada">Zasada działania</h2>
-    <p>Użytkownik dostarcza dwie funkcje o sygnaturach:</p>
-    <div class="mathblock">\[\text{map}: (K_1\times V_1)\to\text{list}(K_2\times V_2),\qquad \text{reduce}: (K_2\times\text{list}(V_2))\to\text{list}(K_3\times V_3).\]</div>
+    <p>Użytkownik dostarcza dwie funkcje: <strong>map</strong> zamienia rekord wejściowy w pary klucz–wartość, a <strong>reduce</strong> dostaje klucz ze wszystkimi jego wartościami i tworzy wynik.</p>
     <div class="viz-mount" data-viz="v07"></div>
     <ol>
       <li><strong>Split</strong> — wejście (np. plik w HDFS) dzielone na bloki po ~128 MB.</li>
-      <li><strong>Map</strong> — równolegle na każdym bloku; przetwarza rekordy w pary \((k_2,v_2)\).</li>
+      <li><strong>Map</strong> — równolegle na każdym bloku; przetwarza rekordy w pary klucz–wartość.</li>
       <li><strong>Shuffle &amp; sort</strong> — zebranie wszystkich wartości o tym samym kluczu w jedną listę i przesłanie ich przez sieć do właściwego reducera.</li>
       <li><strong>Reduce</strong> — dostaje klucz i całą <em>listę</em> jego wartości, agreguje je i emituje wynik.</li>
       <li><strong>Output</strong> — zapis do HDFS (jeden plik na reducer).</li>
@@ -39,15 +38,13 @@
 
     <h2 id="mechanizmy">Trzy kluczowe mechanizmy</h2>
     <ul>
-      <li><strong>Combiner</strong> — lokalny mini-reduce u mappera, zanim dane pójdą do shuffle; dla operacji łącznych redukuje ruch sieciowy.</li>
+      <li><strong>Combiner</strong> — opcjonalny lokalny mini-reduce przed shuffle. Może wykonać się zero lub wiele razy, więc wynik nie może zależeć od jego uruchomienia; bezpieczne są np. suma, minimum i maksimum, a średnia wymaga przesłania pary suma–liczność.</li>
       <li><strong>Data locality</strong> („move computation to data”) — to kod jest wysyłany tam, gdzie fizycznie leżą dane, a nie odwrotnie. Dzięki temu wąskim gardłem przestaje być sieć, a staje się lokalny dysk węzła.</li>
       <li><strong>Fault tolerance przez re-execution</strong> — w klastrze setek maszyn awarie są normą, nie wyjątkiem. Master pinguje workery; gdy któryś milczy, jego zadania są ponownie uruchamiane na innym węźle. Wymaga to <strong>determinizmu</strong> funkcji (te same dane wejściowe zawsze dają ten sam wynik).</li>
     </ul>
 
     <h2 id="przyklad">Przykład: WordCount</h2>
-    <p>Kanoniczny „Hello World” MapReduce — zliczenie słów w korpusie:</p>
-    <div class="mathblock">\[\text{map}(doc)=\{(w,1): w\in doc\},\qquad \text{reduce}(w,[c_1,\dots,c_n])=\Big(w,\textstyle\sum_i c_i\Big).\]</div>
-    <p>Map emituje parę \((\text{słowo},1)\) dla każdego słowa, shuffle grupuje jednakowe słowa, a reduce sumuje ich liczności. Combiner (lokalna suma) mocno odciąża tu sieć.</p>
+    <p>W zliczaniu słów map emituje parę „słowo, 1” dla każdego wystąpienia, shuffle grupuje jednakowe słowa, a reduce dodaje jedynki. Combiner może bezpiecznie policzyć lokalne sumy i ograniczyć ruch sieciowy.</p>
 
     <h2 id="zastosowania">Zastosowania</h2>
     <ul>
@@ -58,7 +55,7 @@
 
     <h2 id="ograniczenia">Ograniczenia i miejsce dziś</h2>
     <p>MapReduce jest <strong>disk-heavy</strong>: między fazami dane lądują na dysku. Każda iteracja to nowe zadanie i nowy odczyt/zapis, przez co algorytmy <strong>iteracyjne</strong> (PageRank, k-means, spadek gradientu) są w czystym MR bardzo nieefektywne.</p>
-    <p><strong>Pułapka</strong>: <em>data skew</em> — gdy kilka kluczy dominuje (np. NULL w joinie, częste słowo w korpusie), jeden reducer dostaje większość pracy, a reszta czeka. Domyślny podział \(\text{hash}(k)\bmod R\) równoważy obciążenie tylko dla równomiernego rozkładu kluczy.</p>
+    <p><strong>Pułapka</strong>: <em>data skew</em> — gdy kilka kluczy dominuje, jeden reducer dostaje większość pracy, a reszta czeka. Przydział przez hash równoważy obciążenie tylko wtedy, gdy klucze są dostatecznie równomierne.</p>
     <p><strong>Zdanie zamykające</strong>: w czystej formie MapReduce jest dziś legacy — wyparty przez Spark, który trzyma dane w pamięci i modeluje obliczenie jako DAG operacji. Ale sam paradygmat <strong>shuffle &amp; sort</strong> oraz intuicje (data locality, partycjonowanie, combinery, odporność przez re-execution) stały się fundamentem wszystkich nowoczesnych silników rozproszonych.</p>
   </main>
   <nav class="toc" aria-label="Spis treści">

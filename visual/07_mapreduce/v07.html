@@ -1,7 +1,7 @@
 <figure class="viz" id="v07">
   <div class="viz-head">
     <p class="viz-title">Potok WordCount: split → map → shuffle/sort → reduce → wynik</p>
-    <p class="viz-sub">Krok po kroku prześledź, jak pary (słowo, 1) są emitowane, grupowane po kluczu i kierowane funkcją <span style="font-family:var(--mono)">part(k) mod R</span> do właściwego reducera.</p>
+    <p class="viz-sub">Krok po kroku prześledź, jak pary „słowo, 1” są emitowane, grupowane po kluczu i kierowane do właściwego reducera.</p>
   </div>
   <div class="viz-body">
     <svg id="v07-svg" viewBox="0 0 680 300" role="img" aria-label="Interaktywny diagram przepływu potoku WordCount w MapReduce"></svg>
@@ -16,7 +16,7 @@
     </label>
     <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)" id="v07-read">–</span>
   </div>
-  <figcaption><b>Sedno:</b> cała trudność MapReduce siedzi w fazie <b>shuffle &amp; sort</b> — to ona zbiera wszystkie wartości danego klucza w jedną listę (grupowanie γ) i kieruje ją przez sieć do właściwego reducera zgodnie z <span style="font-family:var(--mono)">part(k) mod R</span>. Combiner = SUM (łączny i przemienny) mógłby zsumować częściowo już po stronie mappera.</figcaption>
+  <figcaption><b>Sedno:</b> shuffle &amp; sort zbiera wszystkie wartości danego klucza i przesyła je do jednego reducera. Combiner może wcześniej policzyć lokalne sumy, bo ich ponowne sumowanie nie zmieni wyniku.</figcaption>
 </figure>
 <script>
 (function(){

@@ -15,7 +15,7 @@
       Ridge: aktywne <b id="f17-kr">5/5</b> · Lasso: aktywne <b id="f17-kl">–</b>
     </span>
   </div>
-  <figcaption><b>Sedno:</b> L₂ (Ridge) daje <i>gładkie kurczenie</i> — wszystkie współczynniki maleją, ale zostają niezerowe (stabilizacja przy współliniowości); L₁ (Lasso) daje <i>zerowanie</i> — narożniki rombu ‖β‖₁ powodują, że słabe cechy wypadają do zera, więc regularyzacja pełni rolę selekcji cech.</figcaption>
+  <figcaption><b>Sedno:</b> Ridge płynnie zmniejsza wszystkie współczynniki. Lasso może wyzerować cechę, jeśli jej dodatkowa poprawa dopasowania nie rekompensuje kary; przy cechach skorelowanych wybór jednej z nich może być niestabilny.</figcaption>
 </figure>
 <script>
 (function(){

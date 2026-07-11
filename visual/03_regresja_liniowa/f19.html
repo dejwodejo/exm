@@ -1,7 +1,7 @@
 <figure class="viz" id="f19">
   <div class="viz-head">
     <p class="viz-title">Zmienna binarna: regresja liniowa vs logistyczna</p>
-    <p class="viz-sub">Dane binarne (y ∈ {0, 1}) rozłożone wzdłuż x. Po lewej prosta OLS wychodzi poza [0, 1] — predykcje &lt; 0 i &gt; 1 nie są prawdopodobieństwami. Po prawej sigmoida σ(z) = 1/(1 + e⁻ᶻ) zawsze mieści się w [0, 1].</p>
+    <p class="viz-sub">Dla celu 0–1 prosta OLS może dawać wyniki poniżej 0 lub powyżej 1, więc nie są to prawdopodobieństwa. Sigmoida regresji logistycznej zawsze zwraca wartość od 0 do 1.</p>
   </div>
   <div class="viz-body">
     <svg id="f19-svg" viewBox="0 0 700 330" role="img" aria-label="Po lewej regresja liniowa na danych binarnych z zaznaczonymi obszarami predykcji poniżej 0 i powyżej 1; po prawej regresja logistyczna z sigmoidą mieszczącą się w przedziale od 0 do 1"></svg>

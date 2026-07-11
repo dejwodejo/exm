@@ -1,7 +1,7 @@
 <figure class="viz" id="f13">
   <div class="viz-head">
     <p class="viz-title">Przedział ufności (CI) vs przedział predykcji (PI)</p>
-    <p class="viz-sub">CI opisuje niepewność co do <i>średniej</i> odpowiedzi E[y|x] — kurczy się jak 1/√n i jest najwęższy w x̄ („kokarda”). PI opisuje niepewność co do <i>pojedynczej nowej</i> obserwacji — zawiera dodatkowo szum ε (~±2σ), więc pozostaje szeroki niezależnie od n. Przesuń suwak liczności próby n.</p>
+    <p class="viz-sub">Przedział ufności opisuje niepewność średniej odpowiedzi i zwęża się wraz z próbą. Przedział predykcji dotyczy pojedynczej nowej obserwacji, więc zawiera też jej losowy szum i pozostaje szerszy.</p>
   </div>
   <div class="viz-body">
     <svg id="f13-svg" viewBox="0 0 680 340" role="img" aria-label="Prosta regresji z dwoma pasmami: wąskie pasmo CI dla średniej, kurczące się wraz z n i najwęższe w środku, oraz szerokie pasmo PI dla nowej obserwacji, pozostające szerokie"></svg>
@@ -15,7 +15,7 @@
       w x̄: CI = <b id="f13-ci">–</b> · PI = <b id="f13-pi">–</b> · <b id="f13-rel">PI ⊃ CI</b>
     </span>
   </div>
-  <figcaption><b>Sedno:</b> CI dotyczy średniej i można go zwężać zwiększając n; PI dotyczy nowej obserwacji i jego szerokość jest ograniczona od dołu przez σ (nieredukowalny szum). Dlatego PI zawsze zawiera CI: PI ⊃ CI.</figcaption>
+  <figcaption><b>Sedno:</b> więcej danych precyzuje średnią, ale nie usuwa naturalnego rozrzutu pojedynczych wyników. Dlatego przedział predykcji jest szerszy od przedziału ufności.</figcaption>
 </figure>
 <script>
 (function(){

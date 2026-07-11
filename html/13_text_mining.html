@@ -26,15 +26,11 @@
 
     <h2 id="reprezentacje">Reprezentacje tekstu</h2>
     <p>Podstawowe pojęcia: <strong>korpus</strong> to zbiór dokumentów, <strong>dokument</strong> to jednostka tekstu, słownik \(V\) to zbiór wszystkich termów. Surowy tekst trzeba najpierw <strong>stokenizować</strong> (podzielić na słowa) i sprowadzić do formy podstawowej. Dla fleksyjnego języka polskiego <strong>stemming</strong> (heurystyczne obcinanie końcówek) niszczy znaczenie, więc standardem jest <strong>lematyzacja</strong> z użyciem słownika morfologicznego (Morfeusz2, spaCy).</p>
-    <p>Aby prowadzić obliczenia na tekście, trzeba go zamienić w wektory. <strong>BoW</strong> (<em>bag of words</em>) reprezentuje dokument jako wektor liczności termów, ignorując kolejność — „pies ugryzł człowieka” i „człowiek ugryzł psa” dają identyczne wektory. <strong>TF-IDF</strong> waży term jego rzadkością w korpusie:</p>
-    <div class="mathblock">\[\text{idf}(t)=\log\frac{N}{\text{df}(t)},\qquad \text{tfidf}(t,d)=\text{tf}(t,d)\cdot\text{idf}(t)\]</div>
-    <p>gdzie \(N\) to liczba dokumentów, a \(\text{df}(t)\) — liczba tych, które zawierają term. IDF tłumi słowa częste (stop-words), a wzmacnia rzadkie i informatywne. <strong>Embeddingi</strong> (word2vec, BERT) idą o krok dalej: to gęste wektory, w których bliskość geometryczna oddaje podobieństwo znaczeń, bo — zgodnie z hipotezą dystrybucyjną — znaczenie słowa wynika z jego kontekstów.</p>
+    <p>Aby liczyć na tekście, zamieniamy go w wektory. <strong>BoW</strong> zlicza słowa i ignoruje kolejność. <strong>TF-IDF</strong> mnoży częstość słowa w dokumencie przez jego rzadkość w całym korpusie: słowa obecne prawie wszędzie dostają małą wagę, a charakterystyczne dla niewielu dokumentów — większą. <strong>word2vec</strong> przypisuje słowu jeden wektor niezależnie od zdania, natomiast <strong>BERT</strong> tworzy wektor konkretnego wystąpienia zależny od kontekstu.</p>
 
     <h2 id="miary-podobienstwa">Miary podobieństwa</h2>
     <div class="viz-mount" data-viz="v13"></div>
-    <p>Dokumenty porównujemy <strong>podobieństwem kosinusowym</strong>:</p>
-    <div class="mathblock">\[\cos(x,y)=\frac{\langle x,y\rangle}{\|x\|\,\|y\|}\]</div>
-    <p>Jest ono niezależne od długości dokumentu, co jest kluczowe dla rzadkich wektorów BoW/TF-IDF — liczy się kierunek, nie skala. Do porównywania zbiorów słów służy współczynnik Jaccarda, a do bliskości napisów (korekta pisowni, dopasowanie przybliżone) — odległość edycyjna.</p>
+    <p>Dokumenty porównujemy <strong>podobieństwem kosinusowym</strong>, czyli zgodnością kierunku ich wektorów. Wynik 1 oznacza ten sam kierunek, 0 — brak podobieństwa kierunkowego; długość dokumentu nie dominuje wyniku. Zbiory słów porównuje Jaccard, a napisy — odległość edycyjna.</p>
 
     <h2 id="klasyfikacja">Klasyfikacja i modele tematyczne</h2>
     <p>Mając wektory, uczymy klasyfikatory. <strong>Naive Bayes</strong> to szybki punkt odniesienia (baseline) generatywny: zakłada niezależność słów w klasie — założenie fałszywe, a mimo to działa zaskakująco dobrze. Silniejsze są modele dyskryminacyjne (regresja logistyczna, SVM, BERT z głowicą klasyfikacyjną). Jakość mierzymy precyzją, czułością i F1. Bez etykiet zostaje <strong>klasteryzacja</strong> (k-means, DBSCAN) na wektorach TF-IDF lub embeddingach.</p>

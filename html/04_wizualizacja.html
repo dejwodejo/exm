@@ -45,7 +45,7 @@
       <li><strong>Obcięta oś Y</strong> — najczęstsze zniekształcenie: słupek wyolbrzymia różnice, bo jego długość przestaje odpowiadać wartości.</li>
       <li><strong>Boxplot ukrywa multimodalność</strong> — rozkład bimodalny wygląda w nim identycznie jak normalny; przy podejrzeniu dwóch szczytów użyj violin lub KDE.</li>
       <li><strong>Overplotting</strong> — miliony punktów w scatter zlewają się w czarną plamę; ratują przezroczystość (<code>alpha</code>), <code>hexbin</code>, 2D KDE lub próbkowanie.</li>
-      <li><strong>Korelacja \(\neq\) zależność</strong> — kwartet Anscombe’a to zbiory o identycznych średnich, odchyleniach i korelacji \(\rho\), lecz zupełnie różnych kształtach. Stąd zasada: <strong>rysuj, zanim policzysz</strong>.</li>
+      <li><strong>Korelacja to nie przyczynowość ani pełny opis zależności</strong> — korelacja Pearsona mierzy tylko związek liniowy: jej brak nie oznacza niezależności, a jej obecność nie dowodzi przyczyny. Kwartet Anscombe’a pokazuje zbiory o tej samej korelacji, lecz różnych kształtach; dlatego <strong>rysuj, zanim policzysz</strong>.</li>
       <li><strong>Złe palety</strong> — rainbow/jet ma nieliniową luminancję, więc tworzy fałszywe kontury; zamiast tego <strong>viridis</strong> (sekwencyjna, percepcyjnie jednorodna) lub <strong>coolwarm</strong> z <code>center=0</code> do korelacji. Dla dostępności koduj redundantnie (kolor + marker).</li>
     </ul>
 

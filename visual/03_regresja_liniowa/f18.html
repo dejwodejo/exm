@@ -16,7 +16,7 @@
       RMSE<sub>train</sub>=<b id="f18-rtr">–</b> · RMSE<sub>test</sub>=<b id="f18-rte">–</b> · <b id="f18-stat">–</b>
     </span>
   </div>
-  <figcaption><b>Sedno:</b> błąd testowy = bias² + wariancja + szum nieredukowalny — zbyt prosty model ma duży bias (niedouczenie), zbyt złożony dużą wariancję (przeuczenie); najlepszy jest stopień w dołku krzywej testowej, a nie ten z najmniejszym błędem treningowym.</figcaption>
+  <figcaption><b>Sedno:</b> zbyt prosty model niedoucza się, a zbyt złożony dopasowuje szum. Złożoność wybieramy według najmniejszego błędu walidacyjnego, nie treningowego.</figcaption>
 </figure>
 <script>
 (function(){

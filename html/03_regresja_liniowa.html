@@ -25,31 +25,31 @@
     <h2 id="czym-jest">Czym jest regresja liniowa</h2>
     <p>Regresja liniowa modeluje zależność zmiennej objaśnianej \(y\) od jednej cechy (regresja prosta) lub wielu cech (regresja wieloraka):</p>
     <div class="mathblock">\[y = \beta_0 + \beta_1 x_1 + \ldots + \beta_p x_p + \varepsilon\]</div>
-    <p>gdzie \(\beta_0\) to wyraz wolny, \(\beta_i\) to współczynniki, a \(\varepsilon\) to składnik losowy. Kluczowa uwaga: model jest liniowy <strong>w parametrach</strong> \(\beta\), nie w zmiennych — \(x^2\) jako cecha to wciąż regresja liniowa.</p>
+    <p>Tu \(y\) jest przewidywaną wielkością, \(x_1,\ldots,x_p\) to \(p\) cech, \(\beta_0\) to wyraz wolny, \(\beta_i\) — ich współczynniki, a \(\varepsilon\) — niewyjaśniony błąd. Model jest liniowy <strong>w parametrach</strong> \(\beta\), więc \(x^2\) użyte jako cecha nadal daje regresję liniową.</p>
     <div class="viz-mount" data-viz="f08"></div>
 
     <h2 id="ols">Metoda najmniejszych kwadratów (OLS)</h2>
     <div class="viz-mount" data-viz="v03"></div>
-    <p>Współczynniki dobieramy tak, by zminimalizować sumę kwadratów reszt \(e_i = y_i - \hat{y}_i\) — pionowych odległości punktów od prostej:</p>
-    <div class="mathblock">\[\hat{\boldsymbol{\beta}} = \arg\min_{\boldsymbol{\beta}} \sum_{i=1}^{n}(y_i - \mathbf{x}_i^\top\boldsymbol{\beta})^2\]</div>
+    <p>Dla obserwacji \(i\) reszta \(e_i=y_i-\hat y_i\) jest różnicą między wynikiem rzeczywistym i przewidzianym. OLS dobiera współczynniki tak, by dla wszystkich \(n\) obserwacji suma kwadratów tych reszt była najmniejsza:</p>
+    <div class="mathblock">\[\text{minimalizuj } \sum_{i=1}^{n} e_i^2\]</div>
     <p>Podnoszenie reszt do kwadratu ma swoją cenę: OLS jest wrażliwy na wartości odstające, bo jeden skrajny punkt dominuje sumę i przeciąga prostą w swoim kierunku.</p>
 
     <h2 id="zalozenia">Założenia Gaussa–Markowa</h2>
     <p>Od ich spełnienia zależy, czy estymator OLS jest BLUE (najlepszy liniowy nieobciążony):</p>
     <ul>
       <li>liniowość w parametrach \(\beta\),</li>
-      <li>błędy nieskorelowane, \(\text{Cov}(\varepsilon_i,\varepsilon_j)=0\),</li>
-      <li>egzogeniczność, \(E[\varepsilon\mid X]=0\),</li>
+      <li>błędy różnych obserwacji są nieskorelowane,</li>
+      <li>egzogeniczność — po uwzględnieniu cech błąd nie ma systematycznej dodatniej ani ujemnej wartości,</li>
       <li>homoskedastyczność — stała wariancja błędów,</li>
       <li>brak idealnej współliniowości cech.</li>
     </ul>
-    <p>Dodatkowo normalność \(\varepsilon \sim N(0,\sigma^2)\) — potrzebna do testów \(t\), \(F\) i przedziałów ufności.</p>
+    <p>Dodatkowo do testów \(t\), \(F\) i przedziałów ufności zakładamy normalny rozkład błędów.</p>
     <div class="viz-mount" data-viz="v06"></div>
     <p>Silna współliniowość nie psuje predykcji modelu jako całości, ale destabilizuje pojedyncze \(\hat{\beta}_i\) i utrudnia ich interpretację.</p>
     <div class="viz-mount" data-viz="f07"></div>
 
     <h2 id="analiza">Analiza modelu: R², metryki, reszty</h2>
-    <p>Całkowitą zmienność \(y\) rozkładamy na wyjaśnioną i niewyjaśnioną. \(SS_{res}=\sum_i(y_i-\hat y_i)^2\) to błąd modelu — suma kwadratów reszt, a \(SS_{tot}=\sum_i(y_i-\bar y)^2\) to całkowita zmienność \(y\) wokół średniej. Dlatego \(R^2 = 1 - SS_{res}/SS_{tot}\) mówi, jaki procent zmienności \(y\) model wyjaśnia. Ponieważ \(R^2\) zawsze rośnie po dodaniu cechy — nawet bezużytecznej — używamy skorygowanego \(R^2_{adj}\), który karze za liczbę cech.</p>
+    <p>\(SS_{res}=\sum_i(y_i-\hat y_i)^2\) to błąd modelu, a \(SS_{tot}=\sum_i(y_i-\bar y)^2\) — całkowita zmienność wyników wokół średniej. Indeks \(i\) wskazuje obserwację, \(y_i\) jest jej wynikiem, \(\hat y_i\) przewidywaniem, a \(\bar y\) średnią wyników. W OLS z wyrazem wolnym dopiero po zsumowaniu całej próby zachodzi \(SS_{tot}=SS_{reg}+SS_{res}\). Stąd \(R^2=1-SS_{res}/SS_{tot}\) to część zmienności wyjaśniona przez model. Ponieważ rośnie nawet po dodaniu bezużytecznej cechy, skorygowane \(R^2\) karze za ich liczbę.</p>
     <div class="viz-mount" data-viz="f04"></div>
     <div class="viz-mount" data-viz="f09"></div>
     <div class="viz-mount" data-viz="f03r2"></div>
@@ -57,7 +57,7 @@
     <div class="viz-mount" data-viz="f02"></div>
     <p>Reszty pozwalają sprawdzić, czy założenia są spełnione. Trzy diagnostyczne wykresy: Residuals vs Fitted (losowy rozrzut = dobrze, lejek = heteroskedastyczność, łuk = nieliniowość), Q-Q plot (normalność reszt) i Scale-Location (stałość wariancji).</p>
     <div class="viz-mount" data-viz="f05"></div>
-    <p>Przedział ufności dotyczy średniej warunkowej \(E[y\mid x]\), a przedział predykcji — pojedynczej nowej obserwacji, więc jest szerszy; oba rozszerzają się z dala od \(\bar{x}\).</p>
+    <p>Przedział ufności dotyczy średniego \(y\) dla danego \(x\), a przedział predykcji — pojedynczej nowej obserwacji, więc jest szerszy; oba rozszerzają się daleko od średniej wartości cechy.</p>
     <div class="viz-mount" data-viz="f13"></div>
 
     <h2 id="python">Python: statsmodels vs sklearn</h2>
@@ -74,9 +74,9 @@
     <div class="viz-mount" data-viz="f16"></div>
 
     <h2 id="regularyzacja">Regularyzacja i walidacja</h2>
-    <p>Regularyzacja dodaje do funkcji kosztu karę za wielkość współczynników (na wystandaryzowanych cechach). Ridge (\(L_2\)) ściska je płynnie ku zeru, stabilizując oszacowania przy współliniowości; Lasso (\(L_1\)) część współczynników zeruje, działając jak automatyczny selektor cech.</p>
+    <p>Regularyzacja dodaje do błędu dopasowania karę \(\lambda\) za wielkość współczynników; cechy wcześniej standaryzujemy, a wyrazu wolnego zwykle nie karzemy. Ridge (\(L_2\)) zmniejsza wszystkie współczynniki, lecz zwykle nie daje dokładnych zer. Lasso (\(L_1\)) ustawia współczynnik cechy \(j\) na zero, gdy jej poprawa dopasowania nie rekompensuje kary — wybór zależy od danych i przy cechach skorelowanych bywa niestabilny.</p>
     <div class="viz-mount" data-viz="f17"></div>
-    <p>Model oceniamy na wydzielonym zbiorze testowym, a hiperparametry stroimy przez walidację krzyżową (cross-validation). Model za prosty daje niedouczenie (underfitting, wysokie obciążenie/bias), za złożony — przeuczenie (overfitting, wysoka wariancja/variance); optimum leży w minimum błędu na zbiorze walidacyjnym.</p>
+    <p>Siłę kary \(\lambda\) i inne hiperparametry dobieramy walidacją krzyżową tylko na zbiorze treningowym; skalowanie i model zamykamy w jednym Pipeline, by uniknąć wycieku danych, a zbiór testowy zostawiamy do końcowej oceny. Model za prosty daje niedouczenie (wysokie obciążenie/bias), za złożony — przeuczenie (wysoka wariancja/variance); optimum leży w minimum błędu walidacyjnego.</p>
     <div class="viz-mount" data-viz="f18"></div>
 
     <h2 id="interpretacja">Interpretacja i ograniczenia</h2>

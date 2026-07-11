@@ -23,20 +23,19 @@
     <div class="note-audio"><span class="na-label">▶ Wersja audio</span><audio controls preload="metadata" src="../audio/14_optymalizacja_wielokryterialna.mp3"></audio></div>
 
     <h2 id="sformulowanie-problemu">Sformułowanie problemu</h2>
-    <p>W optymalizacji <strong>jednokryterialnej</strong> szukamy \(\min_{x \in X} f(x)\), gdzie \(X\) to <strong>zbiór dopuszczalny</strong> (decyzje spełniające ograniczenia), a \(f\) — skalarna funkcja celu. W <strong>optymalizacji wielokryterialnej (MOO, Multi-Objective Optimization)</strong> minimalizujemy jednocześnie wektor celów \(F(x) = (f_1(x), \ldots, f_k(x))\), \(k \geq 2\), zwykle wzajemnie sprzecznych (np. koszt kontra jakość).</p>
-    <p>Kluczowa trudność: przestrzeń \(\mathbb{R}^k\) dla \(k \geq 2\) nie ma naturalnego porządku liniowego, więc „jedno minimum” wektora nie istnieje — nie da się z góry orzec, czy \((2,5)\) jest lepsze od \((3,4)\). Dlatego w języku badań operacyjnych nie szukamy jednego optimum, lecz <strong>zbioru kompromisów</strong>, a jeden punkt wybierają dopiero preferencje decydenta.</p>
+    <p>W optymalizacji jednokryterialnej wybieramy dopuszczalną decyzję o najlepszej wartości jednego celu. W <strong>optymalizacji wielokryterialnej</strong> mamy co najmniej dwa sprzeczne cele, np. koszt i jakość. Nie istnieje naturalne jedno minimum: wariant tańszy może być gorszy jakościowo, dlatego szukamy zbioru kompromisów.</p>
 
     <h2 id="dominacja-i-front">Dominacja Pareto i front</h2>
-    <p>Brakujący porządek zastępujemy relacją <strong>dominacji</strong>: rozwiązanie \(x^1\) dominuje \(x^2\), gdy jest nie gorsze na każdym kryterium i ostro lepsze na co najmniej jednym. Rozwiązanie jest <strong>Pareto-optymalne (efektywne)</strong>, gdy nie jest zdominowane przez żadne inne rozwiązanie — nie da się poprawić żadnego kryterium bez pogorszenia innego.</p>
-    <p>Zbiór wszystkich rozwiązań efektywnych to <strong>zbiór Pareto</strong> (w przestrzeni decyzji), a jego obraz w przestrzeni kryteriów — <strong>front Pareto</strong>, centralny obiekt MOO. Dwa punkty orientacyjne opisują położenie frontu: <strong>punkt idealny</strong> zbiera najlepsze osiągalne wartości każdego kryterium z osobna (zwykle nieosiągalny naraz, bo minima leżą w różnych \(x\)), a <strong>punkt nadir</strong> — najgorsze wartości kryteriów na froncie. Rozpinają one „pudełko” zawierające front i służą do normalizacji kryteriów.</p>
+    <p>Rozwiązanie <strong>dominuje</strong> inne, gdy nie jest gorsze w żadnym kryterium i jest lepsze w co najmniej jednym. Rozwiązanie jest <strong>Pareto-optymalne</strong>, gdy żadne inne go nie dominuje — poprawa jednego celu wymaga wtedy pogorszenia innego.</p>
+    <p>Zbiór takich rozwiązań to zbiór Pareto, a odpowiadające im wartości celów tworzą <strong>front Pareto</strong>. Punkt idealny łączy najlepsze wartości każdego kryterium z osobna, zwykle nieosiągalne jednocześnie; nadir zbiera najgorsze wartości występujące na froncie.</p>
 
     <h2 id="metody-skalaryzacji">Metody skalaryzacji</h2>
     <div class="viz-mount" data-viz="v14"></div>
     <p>Aby wyznaczyć punkty frontu, MOO sprowadza się do serii zadań jednokryterialnych:</p>
     <ul>
-      <li><strong>Suma ważona</strong>: \(\min_x \sum_i w_i f_i(x)\), \(w_i > 0\). Prosta, ale <strong>pomija punkty na wklęsłych fragmentach frontu</strong> — a te pojawiają się m.in. w zadaniach całkowitoliczbowych.</li>
-      <li><strong>Metoda ε-ograniczeń</strong>: minimalizujemy jedno kryterium, pozostałe zamieniając na ograniczenia \(f_i(x) \leq \varepsilon_i\). Przesuwając \(\varepsilon\), generujemy cały front, także fragmenty niewypukłe.</li>
-      <li><strong>Programowanie celowe (goal programming)</strong>: decydent podaje poziomy aspiracji \(g_i\), a my minimalizujemy sumę odchyleń od nich.</li>
+      <li><strong>Suma ważona</strong> — cele mnożymy przez wagi ważności i dodajemy. Jest prosta, ale może pominąć wklęsłe fragmenty frontu.</li>
+      <li><strong>Metoda ε-ograniczeń</strong> — optymalizujemy jeden cel, a dla pozostałych ustalamy dopuszczalne granice ε. Każda wykonalna wartość ε wymaga osobnego rozwiązania; przy remisach potrzebne bywa dodatkowe kryterium, więc metoda nie generuje automatycznie całego frontu.</li>
+      <li><strong>Programowanie celowe</strong> — decydent podaje oczekiwane poziomy celów, a metoda minimalizuje odchylenia od nich.</li>
     </ul>
     <p>Suma ważona i ε-ograniczenia to podejście <em>a-posteriori</em> (najpierw front, potem wybór); goal programming z ustalonymi aspiracjami — <em>a-priori</em> (preferencje znane wcześniej, jeden przebieg).</p>
 

@@ -43,9 +43,9 @@
 
     <h2 id="outliery">Wartości odstające i skalowanie</h2>
     <div class="viz-mount" data-viz="v02"></div>
-    <p><strong>Outliery</strong> wykrywamy najczęściej dwiema regułami. Metoda <strong>IQR</strong> (rozstęp międzykwartylowy, \(IQR=Q3-Q1\)) uznaje za odstające punkty poza granicami \(Q1-1{,}5\cdot IQR\) i \(Q3+1{,}5\cdot IQR\); jest nieparametryczna i sama odporna na outliery. Metoda <strong>Z-Score</strong> mierzy, o ile odchyleń standardowych punkt odbiega od średniej, a próg to zwykle \(|z|>3\):</p>
+    <p><strong>Outliery</strong> wykrywamy najczęściej dwiema regułami. IQR to różnica między trzecim i pierwszym kwartylem; umowna reguła boxplotu oznacza jako odstające punkty leżące dalej niż \(1{,}5\) IQR od tych kwartyli. Z-Score mierzy odległość punktu od średniej w odchyleniach standardowych; umowny próg to zwykle \(|z|>3\):</p>
     <div class="mathblock">\[z=\frac{x-\mu}{\sigma}\]</div>
-    <p><strong>Skalowanie</strong> sprowadza cechy do porównywalnych zakresów. Standaryzacja \(x'=(x-\mu)/\sigma\) centruje na zerze i daje jednostkowe odchylenie standardowe; normalizacja min-max sprowadza wartości do przedziału \([0,1]\), ale jest wrażliwa na outliery; robust scaling używa mediany i \(IQR\), więc znosi ekstrema. Reguła: drzewa i lasy losowe nie wymagają skalowania (dzielą na progach), a metody oparte na odległości, gradientach oraz PCA — wymagają.</p>
+    <p>We wzorze \(x\) to wartość, \(\mu\) — średnia, a \(\sigma\) — odchylenie standardowe. <strong>Skalowanie</strong> sprowadza cechy do porównywalnych zakresów: standaryzacja daje średnią 0 i odchylenie 1, min-max zakres od 0 do 1, a robust scaling używa mediany i IQR. Drzewa nie potrzebują skalowania; metody odległościowe i gradientowe zwykle tak.</p>
 
     <h2 id="kodowanie">Kodowanie zmiennych kategorycznych</h2>
     <p>Modele operują na liczbach, więc kategorie trzeba przekształcić.</p>
@@ -56,10 +56,10 @@
     </ul>
 
     <h2 id="pca">PCA — przykład redukcji</h2>
-    <p><strong>PCA</strong> (Principal Component Analysis) to sztandarowy przykład etapu redukcji: obraca układ współrzędnych tak, by nowe osie (składowe główne) pokrywały się z kierunkami największej wariancji, po czym odrzuca osie o małej wariancji przy minimalnej utracie informacji. Wymaga standaryzacji, jest liniowa (nie wykryje struktury nieliniowej), a nowe składowe tracą interpretowalność.</p>
+    <p><strong>PCA</strong> obraca układ współrzędnych ku kierunkom największej wariancji, po czym odrzuca te o małej wariancji. Standaryzujemy wcześniej, gdy cechy mają różne jednostki lub skale; bez niej największe liczbowo wariancje zdominują wynik. PCA jest liniowa, a nowe składowe tracą interpretowalność.</p>
 
     <h2 id="leakage">Data leakage i pipeline</h2>
-    <p>Najgroźniejsza pułapka to <strong>data leakage</strong>: informacja ze zbioru testowego przecieka do treningu. Klasyczny błąd to policzenie \(\mu\) i \(\sigma\) na całych danych przed podziałem — model pośrednio „widzi” rozkład testu, a wyniki walidacji są zawyżone. Poprawna kolejność: <strong>podział</strong> na train/test → <strong>fit</strong> preprocessingu tylko na treningu → <strong>transform</strong> obu zbiorów tymi samymi parametrami → model → walidacja. W praktyce cały preprocessing zamyka się w <code>Pipeline</code>, co gwarantuje, że imputacja, skalowanie czy PCA nie zobaczą danych testowych.</p>
+    <p>Najgroźniejsza pułapka to <strong>data leakage</strong>: informacja z testu przecieka do treningu, np. gdy średnią i odchylenie policzymy przed podziałem danych. Najpierw oddzielamy test, a podczas walidacji krzyżowej Pipeline dopasowuje preprocessing od nowa tylko na treningowej części każdego foldu. Test pozostaje do jednej końcowej oceny.</p>
     <p><strong>Zdanie zamykające</strong>: preprocessing nie jest formalnością przed „właściwym” modelowaniem — jest kluczowy właśnie ze względu na wrażliwość algorytmów (por. klasyczne modele ML) i chroni wynik przed wyciekiem, którego żaden hiperparametr nie naprawi.</p>
   </main>
   <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>

@@ -45,7 +45,7 @@
     </ul>
 
     <h2 id="bigdata">Paradygmat Big Data</h2>
-    <p>Skoro mamy (prawie) wszystkie dane, nie trzeba zgadywać parametru populacji z próby — pytanie przesuwa się z „jaki jest parametr" na „co się wydarzy", i stąd nacisk na <strong>predykcję</strong>.</p>
+    <p>Big Data często obejmuje prawie wszystkie <em>dostępne</em> rekordy, więc nacisk przesuwa się z estymacji na <strong>predykcję</strong>. Nie jest to jednak cała populacja ani przyszłość: błąd doboru, pomiaru i zmiana rozkładu nadal wymagają oceny niepewności.</p>
     <ul>
       <li><strong>Dane</strong>: <strong>N≈all</strong> — całe dostępne dane zamiast próby.</li>
       <li><strong>Cel</strong>: przesunięcie z wnioskowania na <strong>predykcję</strong> (uczenie maszynowe, wykrywanie wzorców).</li>
@@ -56,9 +56,8 @@
     </ul>
 
     <h2 id="cap-mapreduce">Dwa pojęcia do wymienienia</h2>
-    <p><strong>Twierdzenie CAP</strong>: w systemie rozproszonym, gdy dojdzie do rozerwania sieci (partycji), można zagwarantować tylko dwie z trzech własności — spójność (<strong>C</strong>), dostępność (<strong>A</strong>), odporność na partycje (<strong>P</strong>). Ponieważ sieć zawodzi, w praktyce wybór to <strong>C albo A</strong>. Stąd: RDBMS stawiają na spójność, wiele baz NoSQL na dostępność.</p>
+    <p><strong>CAP</strong> mówi dokładniej: podczas partycji sieci trzeba poświęcić albo <strong>C</strong> — jeden aktualny obraz danych — albo <strong>A</strong> — odpowiedź na każde żądanie do działającego węzła. <strong>P</strong> oznacza tolerowanie samej partycji i w systemie rozproszonym nie jest swobodnym wyborem; poza awarią sieci można zapewniać C i A jednocześnie.</p>
     <p><strong>MapReduce</strong> — model obliczeń rozproszonych: dane dzielone na fragmenty, faza <em>map</em> przetwarza je równolegle na klastrze do par klucz–wartość, faza <em>reduce</em> agreguje wartości o tym samym kluczu.</p>
-    <div class="mathblock">\[\text{Map}: (k_1,v_1)\to[(k_2,v_2)],\qquad \text{Reduce}: (k_2,[v_2])\to[(k_3,v_3)].\]</div>
 
     <h2 id="synteza">Synteza</h2>
     <div class="viz-mount" data-viz="v06"></div>

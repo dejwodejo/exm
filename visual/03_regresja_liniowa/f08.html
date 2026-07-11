@@ -1,12 +1,12 @@
 <figure class="viz" id="f08">
   <div class="viz-head">
     <p class="viz-title">„Liniowy w parametrach", nie w zmiennych</p>
-    <p class="viz-sub">Punkty układają się wzdłuż krzywej, a dopasowany model ŷ = β₀ + β₁x + β₂x² wygina się przez nie. Choć zależność od x jest krzywoliniowa, to <b>wciąż model liniowy</b> — bo jest liniowy w parametrach β (każde β wchodzi addytywnie, jako współczynnik przy kolumnie macierzy X). Dla kontrastu po prawej: y = β₀·e^{β₁x} — parametr β₁ siedzi w wykładniku, więc modelu NIE da się zapisać jako Xβ.</p>
+    <p class="viz-sub">Dodanie cechy x² pozwala prostej regresji opisać krzywiznę. Model nadal jest liniowy, bo współczynniki występują tylko jako mnożniki cech; model staje się nieliniowy w parametrach, gdy współczynnik trafia np. do wykładnika.</p>
   </div>
   <div class="viz-body">
     <svg id="f08-svg" viewBox="0 0 700 350" role="img" aria-label="Dwa wykresy rozrzutu z dopasowanymi krzywymi: po lewej parabola ŷ = β₀ + β₁x + β₂x² opisana jako model liniowy w parametrach, po prawej krzywa wykładnicza y = β₀ e^{β₁x} opisana jako model nieliniowy w parametrach"></svg>
   </div>
-  <figcaption><b>Sedno:</b> „liniowa" w regresji liniowej odnosi się do parametrów β, nie do zmiennych x — model ŷ = β₀ + β₁x + β₂x² to zwykły OLS na rozszerzonej macierzy X = [1, x, x²] (liniowa kombinacja β), więc dopasowuje się równaniem normalnym. Natomiast y = β₀·e^{β₁x} jest nieliniowy w β (β₁ w wykładniku) i wymaga optymalizacji nieliniowej — to już NIE jest regresja liniowa.</figcaption>
+  <figcaption><b>Sedno:</b> „liniowa” odnosi się do sposobu użycia współczynników, nie do kształtu wykresu. Cechy mogą zawierać potęgi, o ile współczynniki nadal tylko je mnożą i sumują.</figcaption>
 </figure>
 <script>
 (function(){
