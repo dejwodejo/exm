@@ -49,7 +49,7 @@
     <div class="viz-mount" data-viz="f07"></div>
 
     <h2 id="analiza">Analiza modelu: R², metryki, reszty</h2>
-    <p>Całkowitą zmienność \(y\) rozkładamy na wyjaśnioną i niewyjaśnioną. Współczynnik \(R^2 = 1 - SS_{res}/SS_{tot}\) mówi, jaki procent wariancji \(y\) model wyjaśnia. Ponieważ \(R^2\) zawsze rośnie po dodaniu cechy — nawet bezużytecznej — używamy skorygowanego \(R^2_{adj}\), który karze za liczbę cech.</p>
+    <p>Całkowitą zmienność \(y\) rozkładamy na wyjaśnioną i niewyjaśnioną. \(SS_{res}=\sum_i(y_i-\hat y_i)^2\) to błąd modelu — suma kwadratów reszt, a \(SS_{tot}=\sum_i(y_i-\bar y)^2\) to całkowita zmienność \(y\) wokół średniej. Dlatego \(R^2 = 1 - SS_{res}/SS_{tot}\) mówi, jaki procent zmienności \(y\) model wyjaśnia. Ponieważ \(R^2\) zawsze rośnie po dodaniu cechy — nawet bezużytecznej — używamy skorygowanego \(R^2_{adj}\), który karze za liczbę cech.</p>
     <div class="viz-mount" data-viz="f04"></div>
     <div class="viz-mount" data-viz="f09"></div>
     <div class="viz-mount" data-viz="f03r2"></div>
