@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Techniki raportowania z użyciem narzędzi programowania wyższego rzędu</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Modelowanie i analiza danych · 3</p>
+    <h1>Techniki raportowania z użyciem narzędzi programowania wyższego rzędu</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Raport</strong> odpowiada określonemu odbiorcy na konkretne pytanie za pomocą danych, tekstu i wykresów. Programistyczne raportowanie łączy kod analizy z opisem wyniku, dzięki czemu raport można automatycznie przeliczyć po pojawieniu się nowych danych. Narzędzie dobieramy do odbiorcy, wymaganej częstotliwości aktualizacji i tego, czy wynik ma być dokumentem, czy interaktywną aplikacją.</p>
+
+    <h2 id="definicje">Podstawowe pojęcia</h2>
+    <p><strong>Miara</strong> to liczba, którą analizujemy, np. sprzedaż lub liczba zamówień. <strong>Wymiar</strong> określa sposób podziału tej liczby, np. region, produkt albo miesiąc. <strong>KPI</strong> (Key Performance Indicator — kluczowy wskaźnik efektywności) pokazuje realizację ważnego celu, np. odsetek sesji zakończonych zakupem. Jego definicja musi być jednakowa w każdym raporcie.</p>
+    <p><strong>Odtwarzalność</strong> oznacza, że z tego samego kodu, danych i parametrów można ponownie uzyskać ten sam raport. Wymaga wersjonowania kodu i definicji metryk, identyfikowalnej wersji danych, zapisanego środowiska zależności oraz kontrolowania losowości.</p>
+
+    <h2 id="typologia">Podstawowe formy raportu</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Oś</th><th>Warianty</th></tr></thead>
+      <tbody>
+        <tr><td>Dokument statyczny</td><td>PDF lub HTML z komentarzem i ustalonym zestawem wyników; dobry do cyklicznego podsumowania.</td></tr>
+        <tr><td>Dashboard</td><td>interaktywny widok z filtrami; pozwala odbiorcy samodzielnie przechodzić od ogółu do szczegółu.</td></tr>
+        <tr><td>Raport dokładnie formatowany</td><td>ma stały układ stron, np. faktura lub sprawozdanie regulacyjne.</td></tr>
+        <tr><td>Analiza ad hoc</td><td>jednorazowa odpowiedź na konkretne pytanie; może później stać się raportem cyklicznym.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="literate">Kod, opis i wynik w jednym źródle</h2>
+    <p>W podejściu <strong>literate programming</strong> kod, wyjaśnienie i wygenerowany wynik znajdują się w jednym dokumencie. Liczby i wykresy nie są wtedy ręcznie kopiowane do edytora tekstu, lecz powstają bezpośrednio z danych.</p>
+    <ul>
+      <li><strong>Jupyter</strong> jest interaktywnym notatnikiem z komórkami kodu i tekstu. Dobrze służy analizie, eksperymentom i prezentacji kolejnych kroków.</li>
+      <li><strong>Quarto</strong> renderuje dokument korzystający z Pythona, R lub Julii do HTML, PDF albo slajdów. Lepiej nadaje się do powtarzalnego budowania gotowych publikacji.</li>
+    </ul>
+    <p>W Jupyterze komórki można uruchamiać w dowolnej kolejności, więc widoczny wynik może zależeć od ukrytego stanu pamięci. Przed publikacją należy zrestartować środowisko i wykonać cały dokument od początku do końca.</p>
+
+    <h2 id="automatyzacja">Parametryzacja i automatyzacja</h2>
+    <p>Raport parametryzowany jest szablonem przyjmującym wartości takie jak miesiąc lub region. Ten sam kod może więc utworzyć wiele wersji bez ręcznego kopiowania. Harmonogram uruchamia raport cyklicznie, a gotowy plik trafia do portalu, poczty lub systemu powiadomień.</p>
+    <ol>
+      <li>Pobierz dane i sprawdź ich kompletność oraz datę aktualizacji.</li>
+      <li>Oblicz wspólnie zdefiniowane miary i przygotuj wykresy.</li>
+      <li>Wyrenderuj raport z kodu, tekstu oraz parametrów.</li>
+      <li>Sprawdź poprawność wyniku i udostępnij go właściwym odbiorcom.</li>
+      <li>Zapisz log wykonania, aby było wiadomo, z jakich danych powstał raport.</li>
+    </ol>
+
+    <h2 id="dashboardy">Dashboardy i pixel-perfect</h2>
+    <p>Do interaktywnych aplikacji w Pythonie służą m.in. <strong>Streamlit</strong> i <strong>Plotly Dash</strong>; platformy <strong>BI</strong> (Business Intelligence), takie jak Power BI i Tableau, pozwalają budować dashboardy z filtrami przy mniejszej ilości kodu. Gdy wymagany jest dokładny układ strony, dokument można wygenerować do PDF z HTML i CSS albo z systemu składu LaTeX.</p>
+
+    <h2 id="praktyki">Dobre praktyki</h2>
+    <ul>
+      <li><strong>Odtwarzalność</strong> — zapisane zależności, kontrolowana losowość oraz wersjonowany kod i dane.</li>
+      <li><strong>Jedna definicja miar</strong> — bez niej różne zespoły mogą inaczej liczyć np. przychód lub aktywnego klienta.</li>
+      <li><strong>Bezpieczeństwo</strong> — odbiorca widzi tylko dane, do których ma uprawnienia; dostęp i eksport powinny być kontrolowane.</li>
+      <li><strong>Jawna świeżość</strong> — raport pokazuje, kiedy dane zostały ostatnio zaktualizowane.</li>
+    </ul>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#definicje">Podstawowe pojęcia</a></li>
+      <li><a href="#typologia">Formy raportu</a></li>
+      <li><a href="#literate">Kod, opis i wynik</a></li>
+      <li><a href="#automatyzacja">Parametryzacja i automatyzacja</a></li>
+      <li><a href="#dashboardy">Dashboardy i pixel-perfect</a></li>
+      <li><a href="#praktyki">Dobre praktyki</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

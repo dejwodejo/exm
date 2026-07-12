@@ -299,3 +299,23 @@ h2:has(> .mark), h3:has(> .mark){ position:relative; }
 .ncard-frac.full{ color:var(--key); }
 .group h2 .group-count{ float:right; font-family:var(--mono); font-size:11px; font-weight:400; letter-spacing:0; text-transform:none; color:var(--muted); }
 .group h2 .group-count b{ color:var(--key); font-weight:400; }
+
+/* ---- whole-note status toggle (note page) ---- */
+.note-state{ display:inline-flex; align-items:center; gap:9px; margin:-14px 0 26px; padding:7px 15px;
+  font-family:var(--sans); font-size:13px; cursor:pointer; background:var(--bg2);
+  border:1px solid var(--rule); border-radius:999px; color:var(--ink2); transition:border-color .12s,color .12s,background .12s; }
+.note-state:hover{ border-color:var(--ink2); color:var(--ink); }
+.note-state .g{ font-size:15px; line-height:1; color:var(--muted); }
+.note-state[data-s="1"]{ border-color:var(--ink2); color:var(--ink); }
+.note-state[data-s="1"] .g{ color:var(--ink); }
+.note-state[data-s="2"]{ border-color:var(--key); color:var(--key); background:var(--key-bg); }
+.note-state[data-s="2"] .g{ color:var(--key); }
+.note-state:focus-visible{ outline:2px solid var(--key); outline-offset:2px; }
+
+/* ---- per-card state glyph (index) ---- */
+.ncard-state{ margin-left:auto; font-family:var(--sans); font-size:14px; color:var(--muted); padding-top:1px; }
+.ncard[data-s="1"] .ncard-state{ color:var(--ink); }
+.ncard[data-s="2"] .ncard-state{ color:var(--key); }
+.activation-plots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:1rem 0 1.25rem}
+.activation-plots>div{min-width:0}
+@media(max-width:620px){.activation-plots{grid-template-columns:1fr}}

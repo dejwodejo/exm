@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rodzaje estymatorów wartości średniej w zależności od metod reprezentacyjnych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 9</p>
+    <h1>Rodzaje estymatorów wartości średniej w zależności od metod reprezentacyjnych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>Chcemy oszacować nieznaną średnią cechy w całej populacji:</p>
+    <div class="mathblock">\[\bar Y=\frac{1}{N}\sum_{i=1}^{N}y_i\]</div>
+    <p>Nie badamy jednak wszystkich \(N\) jednostek, lecz tylko wylosowaną próbę. Dlatego sposób liczenia wyniku musi odpowiadać <strong>schematowi losowania</strong>. Jeżeli każda jednostka jest reprezentowana tak samo, wystarcza średnia z próby. Jeżeli szanse wejścia do próby są nierówne, potrzebne są wagi.</p>
+
+    <h2 id="jakosc-estymatora">Jak oceniamy estymator?</h2>
+    <p><strong>Estymator</strong> jest regułą obliczania przybliżenia parametru, a liczba otrzymana dla konkretnej próby jest jego <strong>oszacowaniem</strong>. Dobry estymator powinien przede wszystkim nie zawyżać ani nie zaniżać wyniku systematycznie oraz dawać podobne wyniki dla różnych możliwych prób.</p>
+    <ul>
+      <li><strong>Obciążenie</strong> opisuje systematyczne przesunięcie wyniku względem prawdziwej średniej.</li>
+      <li><strong>Wariancja</strong> opisuje, jak mocno wynik zmieniałby się po wylosowaniu innej próby.</li>
+      <li><strong>Błąd standardowy</strong> jest pierwiastkiem z wariancji i pokazuje typową skalę niepewności oszacowania.</li>
+    </ul>
+    <p><strong>MSE</strong> (Mean Squared Error — błąd średniokwadratowy) uwzględnia jednocześnie wariancję i obciążenie. Estymator o małym obciążeniu może więc nadal być słaby, jeśli jego wyniki są bardzo niestabilne.</p>
+
+    <h2 id="srednia-z-proby">Schemat samoważący: średnia z próby</h2>
+    <p>W <strong>schemacie samoważącym</strong> każda jednostka populacji ma takie samo prawdopodobieństwo znalezienia się w próbie. Dotyczy to na przykład losowania prostego oraz proporcjonalnego losowania warstwowego. Wtedy średnią populacji szacujemy zwykłą średnią:</p>
+    <div class="mathblock">\[\bar y=\frac{1}{n}\sum_{i\in s}y_i\]</div>
+    <p>Każda z \(n\) obserwacji ma takie samo znaczenie. Przy nierównych prawdopodobieństwach ta średnia może nadawać zbyt duży wpływ grupom częściej wybieranym do próby.</p>
+
+    <h2 id="estymator-warstwowy">Losowanie warstwowe</h2>
+    <p>W losowaniu warstwowym najpierw liczymy średnią \(\bar y_h\) osobno w każdej warstwie, a następnie łączymy wyniki zgodnie z udziałami warstw w populacji:</p>
+    <div class="mathblock">\[\hat{\bar Y}_{st}=\sum_{h=1}^{H}\frac{N_h}{N}\bar y_h\]</div>
+    <p>Znaczenie warstwy zależy więc od jej rzeczywistej liczebności \(N_h\), a nie od liczby osób pobranych z niej do próby. Pozwala to celowo wylosować więcej jednostek z małej, ważnej grupy, a później prawidłowo połączyć wyniki.</p>
+
+    <h3 id="przyklad">Przykład: nadreprezentowana warstwa</h3>
+    <p>Badamy dochody w dwóch warstwach. \(N_h\) oznacza liczebność warstwy, \(n_h\) — liczbę badanych osób, a \(\bar y_h\) — średnią z próby w tej warstwie:</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Warstwa</th><th>\(N_h\)</th><th>\(n_h\)</th><th>\(\bar y_h\)</th></tr></thead>
+      <tbody>
+        <tr><td>Biedna</td><td>800</td><td>20</td><td>2 000 zł</td></tr>
+        <tr><td>Bogata</td><td>200</td><td>80</td><td>8 000 zł</td></tr>
+      </tbody>
+    </table></div>
+    <p>Zwykła średnia wynosi \((20 \cdot 2000 + 80 \cdot 8000)/100 = 6800\) zł. Jest zawyżona, ponieważ bogata warstwa stanowi aż 80% próby, choć tylko 20% populacji. Estymator warstwowy daje:</p>
+    <div class="mathblock">\[\hat{\bar{Y}}_{st} = \tfrac{800}{1000} \cdot 2000 + \tfrac{200}{1000} \cdot 8000 = 3200 \text{ zł}\]</div>
+    <p>Wynik 3200 zł nie musi być dokładnie równy prawdziwej średniej, ale jest oszacowaniem zgodnym ze schematem losowania. Wielkość każdej warstwy została uwzględniona prawidłowo.</p>
+
+    <h2 id="estymatory-ht-hajeka">Nierówne szanse: estymatory HT i Hájeka</h2>
+    <p>Gdy jednostki mają różne prawdopodobieństwa włączenia \(\pi_i\), stosujemy wagę \(w_i=1/\pi_i\). Jednostka losowana z prawdopodobieństwem \(1/10\) otrzymuje wagę 10, ponieważ reprezentuje w populacji więcej jednostek niż obserwacja wybierana częściej.</p>
+    <p><strong>Estymator Horvitza–Thompsona (HT)</strong> szacuje średnią przez:</p>
+    <div class="mathblock">\[\hat{\bar Y}_{HT}=\frac{1}{N}\sum_{i\in s}\frac{y_i}{\pi_i}\]</div>
+    <p>Jest nieobciążony, jeżeli każda jednostka ma dodatnie, prawidłowo znane \(\pi_i\). <strong>Estymator Hájeka</strong> zamiast przez znane \(N\) dzieli ważoną sumę wartości przez sumę wag:</p>
+    <div class="mathblock">\[\hat{\bar Y}_{H}=\frac{\sum_{i\in s}y_i/\pi_i}{\sum_{i\in s}1/\pi_i}\]</div>
+    <p>Hájek może mieć niewielkie obciążenie, ale często jest stabilniejszy. W obu przypadkach bardzo duże i zróżnicowane wagi zwiększają niepewność wyniku. Wagi korygują znany schemat losowania, lecz nie naprawiają automatycznie błędów pomiaru ani pominięcia części populacji.</p>
+
+    <h2 id="zmienna-pomocnicza">Estymator ilorazowy i regresyjny</h2>
+    <p>Czasami dla całej populacji znamy średnią dodatkowej <strong>zmiennej pomocniczej</strong> \(\bar X\), która jest związana z badaną cechą \(y\). Możemy wtedy wykorzystać różnicę między znaną wartością \(\bar X\) a średnią \(\bar x\) zaobserwowaną w próbie.</p>
+    <ul>
+      <li><strong>Estymator ilorazowy</strong>, \(\hat{\bar Y}_{R}=\bar y\cdot \bar X/\bar x\), jest odpowiedni, gdy \(y\) rośnie mniej więcej proporcjonalnie do \(x\).</li>
+      <li><strong>Estymator regresyjny</strong>, \(\hat{\bar Y}_{reg}=\bar y+b(\bar X-\bar x)\), dopuszcza ogólną zależność liniową; \(b\) określa, jak silnie zmiana \(x\) wiąże się ze zmianą \(y\).</li>
+    </ul>
+    <p>Przykładowo, szacując plon, możemy użyć znanej z rejestru powierzchni pól. Jeżeli próba obejmuje pola przeciętnie mniejsze niż cała populacja, wynik zostanie skorygowany w górę. Im silniejszy związek między powierzchnią a plonem, tym większa może być poprawa precyzji.</p>
+
+    <h2 id="wybor-estymatora">Który estymator wybrać?</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Sytuacja</th><th>Właściwy estymator</th></tr></thead>
+      <tbody>
+        <tr><td>Losowanie proste lub inny schemat samoważący</td><td>średnia z próby</td></tr>
+        <tr><td>Losowanie osobno z warstw</td><td>średnia warstwowa</td></tr>
+        <tr><td>Nierówne prawdopodobieństwa włączenia, np. w schemacie wielostopniowym</td><td>Horvitza–Thompsona lub Hájeka</td></tr>
+        <tr><td>Znana zmienna pomocnicza proporcjonalna do badanej cechy</td><td>ilorazowy</td></tr>
+        <tr><td>Znana zmienna pomocnicza liniowo związana z badaną cechą</td><td>regresyjny</td></tr>
+      </tbody>
+    </table></div>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#jakosc-estymatora">Jak oceniamy estymator?</a></li>
+    <li><a href="#srednia-z-proby">Średnia z próby</a></li>
+    <li><a href="#estymator-warstwowy">Losowanie warstwowe</a></li>
+    <li><a href="#estymatory-ht-hajeka">Estymatory HT i Hájeka</a></li>
+    <li><a href="#zmienna-pomocnicza">Estymator ilorazowy i regresyjny</a></li>
+    <li><a href="#wybor-estymatora">Wybór estymatora</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

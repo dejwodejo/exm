@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optymalizacja wielokryterialna w badaniach operacyjnych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 1</p>
+    <h1>Optymalizacja wielokryterialna w badaniach operacyjnych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <h2 id="sformulowanie-problemu">Sformułowanie problemu</h2>
+    <p>W optymalizacji jednokryterialnej wybieramy decyzję dopuszczalną, która daje najlepszą wartość jednego celu. <strong>Optymalizacja wielokryterialna</strong> dotyczy co najmniej dwóch celów ocenianych jednocześnie, na przykład minimalizacji kosztu i czasu przy zachowaniu wymaganej jakości. Decyzję opisuje wektor \(x\), ograniczenia wyznaczają zbiór dopuszczalny \(X\), a funkcje \(f_1(x),\ldots,f_k(x)\) mierzą skutki decyzji:</p>
+    <p>\[\min_{x\in X}\big(f_1(x),\ldots,f_k(x)\big).\]</p>
+    <p>Zapisu nie należy rozumieć jako zwykłego minimum kilku liczb. Gdy cele są sprzeczne, jedna decyzja może być tańsza, a druga szybsza, więc bez informacji o preferencjach żadna nie jest jednoznacznie najlepsza. Najpierw usuwa się warianty bezspornie gorsze, a następnie wybiera kompromis spośród pozostałych.</p>
+
+    <h2 id="dominacja-i-front">Dominacja Pareto i front</h2>
+    <p>Przy minimalizacji decyzja \(x^A\) <strong>dominuje</strong> \(x^B\), jeżeli \(f_i(x^A)\leq f_i(x^B)\) dla każdego celu i co najmniej jedna nierówność jest ostra. Przykładowo wariant o koszcie 8 i czasie 5 dominuje wariant \((10,6)\), ale nie wariant \((7,8)\): drugi jest tańszy, lecz wolniejszy.</p>
+    <p>Rozwiązanie jest <strong>Pareto-optymalne</strong>, gdy nie istnieje rozwiązanie, które je dominuje. W takim punkcie poprawa jednego celu wymaga pogorszenia przynajmniej jednego innego. Zbiór tych decyzji nazywa się zbiorem Pareto, a odpowiadające im wektory wartości celów tworzą <strong>front Pareto</strong>. Front pokazuje dostępne kompromisy, ale sam nie wskazuje, który z nich wybrać.</p>
+    <p><strong>Punkt idealny</strong> składa się z najlepszej wartości każdego celu osiąganej osobno. Zwykle nie odpowiada jednej wykonalnej decyzji, bo minima różnych celów występują w innych punktach. <strong>Punkt nadiru</strong> opisuje najgorsze wartości poszczególnych celów wśród rozwiązań Pareto-optymalnych. Oba punkty pomagają oceniać skalę celów i jakość kompromisu, lecz dokładne wyznaczenie nadiru może wymagać poznania całego frontu.</p>
+
+    <h2 id="mcda">Wielokryterialna analiza decyzyjna (MCDA)</h2>
+    <p>Gdy decyzją jest wybór jednego z kilku gotowych wariantów, np. dostawcy, stosuje się <strong>MCDA</strong> (Multi-Criteria Decision Analysis — wielokryterialną analizę decyzyjną). Dane zapisuje się w macierzy: wiersze są wariantami, kolumny kryteriami, a oceny trzeba sprowadzić do porównywalnej skali.</p>
+    <ul>
+      <li><strong>TOPSIS</strong> (Technique for Order Preference by Similarity to Ideal Solution — metoda porządkowania według podobieństwa do rozwiązania idealnego) normalizuje oceny, uwzględnia wagi i buduje dwa sztuczne punkty: najlepszy oraz najgorszy z dostępnych wartości kryteriów. Wariant zajmuje tym wyższe miejsce, im jest bliżej punktu najlepszego i dalej od najgorszego. Ranking zależy od metody normalizacji i może zmienić się po dodaniu nowego wariantu.</li>
+      <li><strong>AHP</strong> (Analytic Hierarchy Process — metoda hierarchicznej analizy problemu) dzieli problem na cel, kryteria i warianty. Decydent porównuje parami, jak silnie jeden element jest ważniejszy od drugiego; z macierzy porównań wyznacza się wagi i sprawdza współczynnik spójności. Metoda porządkuje subiektywne oceny, ale przy wielu elementach liczba porównań szybko rośnie, a niespójne sądy wymagają ponownej oceny.</li>
+    </ul>
+    <p>Obie metody tworzą ranking na podstawie danych i jawnych preferencji. Nie jest on obiektywny w sensie niezależności od wag, skali ocen i przyjętego modelu.</p>
+
+    <h2 id="zastosowania">Typowe zastosowania</h2>
+    <ul>
+      <li><strong>Portfel Markowitza</strong> równoważy minimalizację ryzyka i maksymalizację oczekiwanej stopy zwrotu. Granica efektywna zawiera portfele, dla których nie da się zmniejszyć ryzyka bez obniżenia zwrotu.</li>
+      <li><strong>Wybór dostawcy</strong> łączy cenę, jakość i czas dostawy. Najtańszy dostawca nie musi zwyciężyć, jeżeli oszczędność nie rekompensuje opóźnień lub wad; o rankingu decydują przyjęte wagi i oceny.</li>
+    </ul>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#sformulowanie-problemu">Sformułowanie problemu</a></li>
+    <li><a href="#dominacja-i-front">Dominacja Pareto i front</a></li>
+    <li><a href="#mcda">Wielokryterialna analiza decyzyjna</a></li>
+    <li><a href="#zastosowania">Typowe zastosowania</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

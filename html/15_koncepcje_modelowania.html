@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podobieństwa i różnice w koncepcjach modelowania wielowymiarowych danych statystycznych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Modelowanie i analiza danych · 2</p>
+    <h1>Podobieństwa i różnice w koncepcjach modelowania wielowymiarowych danych statystycznych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>Dane wielowymiarowe opisują każdą obserwację wieloma cechami \(X_1,\ldots,X_p\). Czasem znamy również wynik \(Y\), który chcemy wyjaśnić lub przewidzieć. Różne koncepcje modelowania korzystają z tych samych danych, ale odpowiadają na inne pytania: co wpływa na wynik, jak dobrze można go przewidzieć albo jaka struktura występuje bez zadanego wyniku.</p>
+
+    <h2 id="wspolny-rdzen">Wspólny rdzeń modelowania</h2>
+    <p>Każde podejście wymaga określenia obserwacji, cech, celu oraz sposobu oceny. Model dopasowany do próby może opisywać przypadkowy szum, dlatego wynik sprawdzamy na nowych danych albo podajemy jego niepewność. Różnice dotyczą głównie przyjmowanych założeń, rodzaju wyniku i tego, czy ważniejsze jest wyjaśnienie mechanizmu, predykcja czy odkrycie struktury.</p>
+
+    <h2 id="wyjasnianie-predykcja">Wyjaśnianie a przewidywanie</h2>
+    <p>W modelu nastawionym na <strong>wyjaśnianie</strong> interesuje nas znaczenie współczynników: jak zmienia się oczekiwany wynik po zmianie danej cechy przy pozostałych cechach stałych. Potrzebujemy wtedy uzasadnionych założeń, błędów standardowych i przedziałów ufności. Model predykcyjny oceniamy przede wszystkim po błędzie na nowych danych. Może być bardziej złożony i mniej czytelny, jeśli daje wyraźnie lepsze przewidywania. Nie jest to jednak ścisły podział na statystykę i uczenie maszynowe — regresję można stosować predykcyjnie, a model uczenia maszynowego można objaśniać.</p>
+
+    <h2 id="osie-podzialu">Główne osie podziału</h2>
+    <ul>
+      <li><strong>Nadzorowane i nienadzorowane:</strong> w uczeniu nadzorowanym znamy oczekiwany wynik \(Y\), np. klasę klienta. Bez takiego wyniku szukamy struktury samych cech, np. klastrów albo kilku głównych kierunków zmienności.</li>
+      <li><strong>Eksploracyjne i potwierdzające:</strong> analiza eksploracyjna szuka wzorca bez jednej wcześniej ustalonej hipotezy. Analiza potwierdzająca sprawdza model określony przed zobaczeniem wyników, np. czy wskazane pytania mierzą zakładane cechy ukryte.</li>
+      <li><strong>Parametryczne i nieparametryczne:</strong> model parametryczny ma z góry ustaloną postać i liczbę współczynników, jak regresja liniowa. W modelu nieparametrycznym złożoność może rosnąć wraz z danymi, jak w drzewie lub metodzie najbliższych sąsiadów. Nie oznacza to braku ustawień.</li>
+      <li><strong>Liniowe i nieliniowe:</strong> model liniowy łączy przygotowane cechy za pomocą ważonej sumy. Drzewa i metody jądrowe mogą bezpośrednio odwzorować bardziej złożone granice i interakcje.</li>
+      <li><strong>Dyskryminacyjne i generatywne:</strong> pierwsze uczą granicy między klasami albo prawdopodobieństwa klasy dla danych cech, jak regresja logistyczna. Drugie opisują, jak dane powstają w każdej klasie, a następnie na tej podstawie klasyfikują, jak naiwny Bayes.</li>
+    </ul>
+
+    <h2 id="czestosciowe-vs-bayesowskie">Częstościowe a bayesowskie</h2>
+    <p>W podejściu <strong>częstościowym</strong> parametr jest nieznaną stałą, a niepewność wynika z tego, że inna losowa próba dałaby inny wynik. Przedział ufności ocenia procedurę: 95% tak tworzonych przedziałów zawierałoby prawdziwy parametr.</p>
+    <p>W podejściu <strong>bayesowskim</strong> początkową wiedzę o parametrze łączymy z danymi i otrzymujemy zaktualizowany rozkład niepewności. 95-procentowy przedział wiarygodności zawiera parametr z prawdopodobieństwem 95% w ramach przyjętego modelu i wiedzy początkowej. Oba podejścia mogą korzystać z podobnej postaci modelu, ale inaczej opisują niepewność.</p>
+
+    <h2 id="wielowymiarowosc">Co zmienia wiele cech?</h2>
+    <p>Więcej cech może dostarczyć informacji, ale zwiększa też ryzyko dopasowania przypadkowych zależności. Przy bardzo wielu wymiarach obserwacje stają się rzadko rozmieszczone, a odległość między nimi gorzej opisuje podobieństwo. Pomagają wtedy redukcja wymiaru, wybór cech, regularyzacja albo większa próba. Złożoność dobieramy walidacją, a nie samą jakością dopasowania na treningu.</p>
+
+    <h2 id="wybor">Jak dobrać podejście?</h2>
+    <p>Dla tych samych danych o klientach można użyć regresji logistycznej, jeśli ważna jest czytelna zależność między cechami a odejściem klienta, albo zespołu drzew, jeśli priorytetem jest trafność przewidywania. Analiza głównych składowych pomoże streścić wiele podobnych cech, a klasteryzacja — znaleźć grupy klientów bez etykiety. Najpierw wybieramy pytanie, później rodzinę modeli, a dopiero na końcu konkretny algorytm.</p>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#wspolny-rdzen">Wspólny rdzeń</a></li>
+    <li><a href="#wyjasnianie-predykcja">Wyjaśnianie a przewidywanie</a></li>
+    <li><a href="#osie-podzialu">Główne osie podziału</a></li>
+    <li><a href="#czestosciowe-vs-bayesowskie">Częstościowe a bayesowskie</a></li>
+    <li><a href="#wielowymiarowosc">Wiele cech</a></li>
+    <li><a href="#wybor">Dobór podejścia</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

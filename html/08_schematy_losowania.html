@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schematy losowania próby w metodach reprezentacyjnych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 8</p>
+    <h1>Schematy losowania próby w metodach reprezentacyjnych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>W metodzie reprezentacyjnej badamy nie całą populację, lecz jej losowo wybraną <strong>próbę</strong>, a <strong>schemat losowania</strong> — sposób, w jaki dobieramy tę próbę z <strong>operatu</strong> (kompletnej listy jednostek) — wprost decyduje o precyzji szacunków. Kluczowe jest <strong>prawdopodobieństwo inkluzji</strong> \(\pi_i\), czyli szansa wejścia jednostki \(i\) do próby; przy nierównych \(\pi_i\) obserwacje trzeba później ważyć. Poniżej cztery podstawowe schematy i reguła ich wyboru.</p>
+
+    <h2 id="losowanie-proste">Losowanie proste (SRS)</h2>
+    <p><strong>SRS</strong> (Simple Random Sampling — losowanie proste) daje każdej jednostce równą szansę. Bez zwracania każda możliwa próba (n) różnych jednostek z populacji (N) jest równie prawdopodobna, a (pi_i=n/N). Średnią populacji szacuje zwykła średnia z próby:</p>
+    <div class="mathblock">\[\bar y=\frac{1}{n}\sum_{i\in s}y_i\]</div>
+    <p>Wariancję zmniejsza poprawka (1-n/N), ponieważ przy badaniu dużej części populacji pozostaje coraz mniej niepoznanych jednostek. SRS jest dobrym punktem odniesienia, ale wymaga pełnego operatu, może przypadkowo pominąć małe podgrupy i bywa kosztowny przy przestrzennie rozproszonej populacji.</p>
+
+    <h2 id="losowanie-warstwowe">Losowanie warstwowe</h2>
+    <p>Populację dzieli się na (H) rozłącznych warstw, losuje osobno z każdej, a wyniki łączy udziałami (W_h=N_h/N):</p>
+    <div class="mathblock">\[\bar y_{st}=\sum_{h=1}^{H}W_h\bar y_h\]</div>
+    <p>Warstwowanie zwiększa precyzję, gdy warstwy różnią się poziomem badanej cechy, a jednostki wewnątrz warstwy są podobne. Oddzielne losowanie usuwa wtedy z błędu część zróżnicowania między warstwami i gwarantuje obecność ważnych małych grup.</p>
+    <ul>
+      <li><strong>Alokacja proporcjonalna</strong> przydziela próbę zgodnie z wielkością warstw i zwykle daje jednakowe wagi.</li>
+      <li><strong>Alokacja Neymana</strong> daje więcej obserwacji warstwom dużym i silnie zróżnicowanym, w których kolejna obserwacja najbardziej zmniejsza wariancję.</li>
+    </ul>
+    <p>Źle dobrane warstwy nie poprawią wyniku, a nieproporcjonalny przydział wymaga wag. Potrzebne są też aktualne dane pozwalające przypisać każdą jednostkę do warstwy przed losowaniem.</p>
+
+    <h2 id="losowanie-systematyczne">Losowanie systematyczne</h2>
+    <p>Losuje się start (r) spośród pierwszych (k) pozycji, a następnie wybiera co (k)-tą jednostkę, gdzie (k=N/n). Schemat jest szybki i równomiernie rozkłada próbę po operacie. Gdy lista jest uporządkowana według cechy związanej z wynikiem, może działać jak niejawne warstwowanie i być precyzyjniejszy od SRS.</p>
+    <p>Niebezpieczeństwem jest okresowość zgodna z interwałem. Jeśli co dziesiąta pozycja reprezentuje ten sam typ i wybieramy co dziesiątą, próba może objąć niemal wyłącznie ten typ. Wynik zależy więc od kolejności listy, a przy jednym losowym starcie trudno bez dodatkowych założeń oszacować wariancję.</p>
+
+    <h2 id="losowanie-grupowe">Losowanie grupowe i wielostopniowe</h2>
+    <p>Jednostką pierwszego losowania są naturalne grupy, np. szkoły lub gminy. W schemacie <strong>grupowym</strong> bada się wszystkie jednostki z wybranych grup, a w <strong>wielostopniowym</strong> losuje się dalej wewnątrz nich. Prawdopodobieństwo wejścia osoby jest wtedy iloczynem prawdopodobieństw na kolejnych stopniach.</p>
+    <p>Schemat obniża koszty i działa bez operatu wszystkich osób, jeśli dostępna jest lista grup. Ceną jest zwykle spadek precyzji: uczniowie jednej szkoły czy mieszkańcy jednej gminy są do siebie podobni, więc kolejne osoby z tej samej grupy wnoszą częściowo powtarzalną informację. Zwykle korzystniej losować więcej grup niż bardzo wiele osób z kilku grup.</p>
+
+    <h2 id="porownanie">Porównanie schematów</h2>
+    <p><strong>DEFF</strong> (design effect — efekt planu losowania) porównuje wariancję zastosowanego schematu z wariancją SRS o tej samej liczebności:</p>
+    <div class="mathblock">\[DEFF=\frac{\operatorname{Var}_{plan}(\hat\theta)}{\operatorname{Var}_{SRS}(\hat\theta)}\]</div>
+    <p>(DEFF=1) oznacza podobną precyzję, (DEFF&lt;1) — zysk, często dzięki dobremu warstwowaniu, a (DEFF&gt;1) — stratę, typową dla podobnych jednostek w klastrach lub nierównych wag. Jeśli (DEFF=2), efektywna liczebność jest w przybliżeniu równa (n/2).</p>
+    <p>Reguła wyboru: znana struktura i różne warstwy → warstwowe; uporządkowany operat bez okresowości → systematyczne; brak operatu osób, ale lista grup → grupowe lub wielostopniowe; brak dodatkowej wiedzy → SRS.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#losowanie-proste">Losowanie proste (SRS)</a></li>
+      <li><a href="#losowanie-warstwowe">Losowanie warstwowe</a></li>
+      <li><a href="#losowanie-systematyczne">Losowanie systematyczne</a></li>
+      <li><a href="#losowanie-grupowe">Losowanie grupowe i wielostopniowe</a></li>
+      <li><a href="#porownanie">Porównanie schematów</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

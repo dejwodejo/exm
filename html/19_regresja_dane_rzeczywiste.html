@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model regresji liniowej w zastosowaniach do modelowania danych rzeczywistych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Modelowanie i analiza danych · 6</p>
+    <h1>Model regresji liniowej w zastosowaniach do modelowania danych rzeczywistych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Regresja liniowa</strong> opisuje oczekiwaną wartość liczbowego wyniku \(y\) jako sumę wpływów cech. W danych rzeczywistych najwięcej pracy nie wymaga samo dopasowanie prostej, lecz prawidłowe określenie obserwacji, przygotowanie cech, sprawdzenie założeń i odróżnienie związku statystycznego od przyczyny.</p>
+
+    <h2 id="proces">Proces budowy modelu</h2>
+    <ol>
+      <li><strong>Określ cel:</strong> czy model ma przewidywać, czy wyjaśniać współczynniki. Od tego zależą sposób podziału danych i wymagania wobec założeń.</li>
+      <li><strong>Zdefiniuj obserwację oraz czas:</strong> np. jeden wiersz to mieszkanie w dniu sprzedaży. Cechy muszą być dostępne przed momentem, dla którego tworzymy predykcję.</li>
+      <li><strong>Przygotuj dane:</strong> obsłuż braki, zakoduj kategorie i sprawdź skrajne wartości. Operacje uczące się z danych dopasuj tylko na treningu.</li>
+      <li><strong>Zacznij od prostego modelu:</strong> daje punkt odniesienia i pozwala zauważyć problemy przed dodaniem kolejnych cech.</li>
+      <li><strong>Sprawdź predykcje i reszty:</strong> oceniaj zarówno metryki, jak i wzorce błędów.</li>
+    </ol>
+
+    <h2 id="cechy">Jak odwzorować rzeczywiste zależności?</h2>
+    <p>Zależność może być liniowa w przygotowanych cechach, choć nie jest prostą względem surowej zmiennej. Przykładowo cena mieszkania może rosnąć wraz z powierzchnią, ale nie w tym samym tempie dla każdego metra. Można wtedy użyć logarytmu, potęgi lub odcinkowej funkcji powierzchni.</p>
+    <p>Zmienne kategorialne, np. dzielnicę, kodujemy kolumnami zero-jedynkowymi. <strong>Interakcja</strong> pozwala, aby wpływ jednej cechy zależał od drugiej — np. dodatkowy metr powierzchni może mieć inną wartość w centrum niż na obrzeżach. Każda taka zmiana powinna wynikać z wiedzy o problemie lub poprawy potwierdzonej walidacją.</p>
+
+    <h2 id="gdy-padaja">Problemy widoczne w resztach</h2>
+    <ul>
+      <li><strong>Łuk</strong> na wykresie reszt oznacza, że model pominął nieliniowość. Pomóc może transformacja lub dodatkowa cecha.</li>
+      <li><strong>Lejek</strong> oznacza heteroskedastyczność, czyli zmianę rozrzutu błędów wraz z poziomem przewidywania. Współczynniki mogą pozostać użyteczne, ale klasyczne błędy standardowe są wtedy niewiarygodne; stosuje się błędy odporne albo zmienia postać wyniku.</li>
+      <li><strong>Serie dodatnich i ujemnych reszt w czasie</strong> wskazują autokorelację. Modelowi może brakować trendu, sezonowości lub opóźnień.</li>
+      <li><strong>Obserwacja wpływowa</strong> ma nietypowe cechy i dużą resztę, przez co mocno zmienia dopasowanie. Należy sprawdzić jej poprawność oraz porównać model z nią i bez niej, a nie usuwać jej automatycznie.</li>
+    </ul>
+
+    <h2 id="regularyzacja">Regularyzacja i walidacja</h2>
+    <p>Przy wielu skorelowanych cechach zwykłe współczynniki stają się niestabilne. <strong>Ridge</strong> dodaje karę za duże współczynniki i zmniejsza je, a <strong>Lasso</strong> może dodatkowo wyzerować część z nich. Cechy przed taką regresją skalujemy, aby kara traktowała je porównywalnie.</p>
+    <p>Siłę kary wybieramy walidacją krzyżową na danych treningowych. Zbiór testowy pozostaje nietknięty do jednej końcowej oceny. Dla danych czasowych nie losujemy obserwacji dowolnie: model uczymy na przeszłości, a sprawdzamy na późniejszym okresie.</p>
+
+    <h2 id="interpretacja">Interpretacja i ograniczenia</h2>
+    <p>Współczynnik \(\hat{\beta}_i\) mówi, o ile zmienia się przewidywana średnia \(y\) po wzroście \(x_i\) o jednostkę, gdy pozostałe uwzględnione cechy są stałe. Nie oznacza automatycznie efektu przyczynowego. Pominięta cecha może wpływać jednocześnie na \(x_i\) i \(y\), np. temperatura zwiększa zarówno sprzedaż lodów, jak i liczbę kąpieli.</p>
+    <p>Model nie powinien być bez uzasadnienia używany daleko poza zakresem treningowym, ponieważ liniowy trend może tam przestać obowiązywać. Dla wyniku binarnego stosujemy regresję logistyczną, a gdy złożone nieliniowości są ważniejsze od interpretacji, warto porównać regresję z drzewami. Prostota nadal jest zaletą: regresja stanowi czytelny punkt odniesienia, który bardziej złożony model powinien rzeczywiście poprawić.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#proces">Proces budowy modelu</a></li>
+    <li><a href="#cechy">Przygotowanie cech</a></li>
+    <li><a href="#gdy-padaja">Gdy założenia padają</a></li>
+    <li><a href="#regularyzacja">Regularyzacja i walidacja</a></li>
+    <li><a href="#interpretacja">Interpretacja i ograniczenia</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sieci neuronowe</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 13</p>
+    <h1>Sieci neuronowe</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Sieć neuronowa</strong> składa się z warstw: każda mnoży wejścia przez uczone wagi, dodaje wyrazy wolne i stosuje nieliniową aktywację. Bez aktywacji wiele warstw zachowywałoby się jak jedna transformacja liniowa. Trening zmienia wagi tak, by zmniejszać średni błąd na przykładach treningowych; problem jest niewypukły, więc zwykle znajdujemy dobre, niekoniecznie globalne minimum.</p>
+
+    <h2 id="perceptron-mlp">Perceptron, MLP, aktywacje, strata</h2>
+    <p><strong>Perceptron</strong> to pojedynczy neuron z funkcją progową — uczy się tylko danych liniowo separowalnych i nie rozwiązuje XOR. <strong>MLP</strong> (perceptron wielowarstwowy) dokłada co najmniej jedną warstwę ukrytą i różniczkowalną aktywację, dzięki czemu radzi sobie z problemami nieliniowymi i można go uczyć gradientowo.</p>
+    <p><strong>Funkcja aktywacji</strong> wprowadza nieliniowość — bez niej wiele warstw zachowywałoby się jak jeden model liniowy. W warstwach ukrytych najczęściej używa się <strong>ReLU</strong>: wartości ujemne zeruje, a dodatnie przepuszcza, dzięki czemu gradient zwykle dobrze przechodzi przez sieć. Neuron może jednak „umrzeć”, jeśli stale trafia w obszar ujemny i ma zerowy gradient. Sigmoid i <strong>tanh</strong> ściskają wartości do ograniczonego przedziału; na jego krańcach wykres się spłaszcza, pochodna maleje i gradient może zanikać.</p>
+    <figure class="activation-plots" aria-label="Wykresy funkcji ReLU, sigmoid i tanh">
+      <div id="plot-relu" aria-label="Wykres funkcji ReLU na osiach x i y"></div>
+      <div id="plot-sigmoid" aria-label="Wykres funkcji sigmoid na osiach x i y"></div>
+      <div id="plot-tanh" aria-label="Wykres funkcji tanh na osiach x i y"></div>
+    </figure>
+    <p>Aktywację wyjścia dobieramy do zadania: wyjście liniowe dla regresji, sigmoid dla klasyfikacji binarnej, a <strong>softmax</strong> dla wieloklasowej — zamienia wyniki klas na prawdopodobieństwa sumujące się do 1. Funkcja straty mierzy błąd: typowo MSE w regresji i entropia krzyżowa w klasyfikacji.</p>
+
+    <h2 id="uczenie">Backpropagation i optymalizacja</h2>
+    <p>Uczenie jednej paczki danych ma trzy kroki. Najpierw w <strong>przejściu w przód</strong> sieć oblicza predykcję warstwa po warstwie, a funkcja straty porównuje ją z prawidłową odpowiedzią. Następnie <strong>propagacja wsteczna</strong> (backpropagation), korzystając z reguły łańcuchowej, oblicza gradient — informację, w którą stronę i jak silnie każda waga wpływa na błąd. Na końcu optymalizator aktualizuje wagi w kierunku zmniejszającym stratę. Backpropagation liczy więc poprawki, ale sama ich nie wykonuje.</p>
+    <p><strong>SGD</strong> (Stochastic Gradient Descent) aktualizuje wagi na podstawie małej losowej paczki, zamiast każdorazowo przeliczać cały zbiór. <strong>Współczynnik uczenia</strong> (learning rate) określa wielkość kroku: zbyt mały wydłuża trening, a zbyt duży może omijać minimum i destabilizować uczenie. <strong>Adam</strong> wygładza kolejne gradienty i dobiera skalę kroku osobno dla różnych parametrów, dlatego często szybko daje dobry wynik, choć nie gwarantuje najlepszego modelu.</p>
+
+    <h2 id="gradient-problemy">Znikający i eksplodujący gradient</h2>
+    <p>Podczas propagacji wstecznej gradient przechodzi od wyjścia ku pierwszym warstwom i w każdej z nich jest mnożony przez kolejne pochodne. Gdy wiele z nich ma wartość mniejszą od 1, gradient <strong>zanika</strong>: początkowe warstwy dostają niemal zerową poprawkę i przestają uczyć się użytecznych cech. Gdy mnożniki są duże, gradient <strong>eksploduje</strong>: aktualizacje wag stają się ogromne, strata skacze, a obliczenia mogą dać wartości nieskończone.</p>
+    <ul>
+      <li><strong>Właściwa inicjalizacja</strong> utrzymuje podobną skalę sygnału między warstwami: Xavier pasuje do tanh, a He do ReLU.</li>
+      <li><strong>Połączenia rezydualne</strong> tworzą krótszą drogę dla sygnału i gradientu, omijając część transformacji.</li>
+      <li><strong>Normalizacja</strong> stabilizuje skalę aktywacji, dzięki czemu optymalizacja jest mniej wrażliwa na zmianę ich rozkładu.</li>
+      <li><strong>Gradient clipping</strong> ogranicza zbyt duży gradient do ustalonego progu; zapobiega eksplozji, ale nie usuwa jej źródła.</li>
+    </ul>
+
+    <h2 id="architektury">CNN, RNN, Transformer</h2>
+    <p>Architekturę dobiera się do struktury danych i rodzaju zależności, które model ma wychwycić:</p>
+    <ul>
+      <li><strong>CNN</strong> (Convolutional Neural Network — sieć konwolucyjna) przesuwa po danych mały uczony filtr i wykorzystuje te same jego wagi w każdym miejscu. W obrazie pierwsze warstwy wykrywają lokalne krawędzie i tekstury, a dalsze składają je w większe obiekty. Współdzielenie wag ogranicza liczbę parametrów i pozwala wykryć cechę niezależnie od jej położenia. CNN pasuje przede wszystkim do obrazów i innych danych o lokalnej strukturze.</li>
+      <li><strong>RNN</strong> (Recurrent Neural Network — sieć rekurencyjna) czyta sekwencję element po elemencie, przenosząc między krokami stan ukryty, czyli skompresowaną pamięć wcześniejszego kontekstu. Nadaje się do tekstu, dźwięku i szeregów czasowych, ale długi łańcuch obliczeń utrudnia uczenie odległych zależności i nie pozwala w pełni zrównoleglić treningu. Warianty <strong>LSTM</strong> i <strong>GRU</strong> używają bramek decydujących, co zapamiętać, zaktualizować i usunąć.</li>
+      <li><strong>Transformer</strong> analizuje sekwencję mechanizmem <strong>self-attention</strong>: dla każdego elementu wylicza, które inne elementy są istotne, i tworzy z nich ważoną reprezentację. Dzięki temu bezpośrednio łączy odległe fragmenty i przetwarza pozycje równolegle; informację o kolejności trzeba jednak dodać osobno. Koszt pełnej uwagi rośnie szybko z długością sekwencji, ponieważ porównuje ona każdą pozycję z każdą.</li>
+    </ul>
+
+    <h2 id="regularyzacja">Regularyzacja</h2>
+    <p><strong>Przeuczenie</strong> występuje, gdy strata treningowa nadal maleje, ale wynik walidacyjny przestaje się poprawiać: sieć zapamiętuje szczegóły próby zamiast reguły działającej na nowych danych. Regularyzacja ogranicza to zjawisko:</p>
+    <ul>
+      <li><strong>Weight decay</strong> dodaje karę za duże wagi, skłaniając model do prostszych, mniej skrajnych zależności.</li>
+      <li><strong>Dropout</strong> losowo wyłącza część aktywacji podczas treningu, więc sieć nie może polegać na jednym konkretnym zestawie neuronów; podczas predykcji używa się całej sieci.</li>
+      <li><strong>Augmentacja danych</strong> tworzy realistycznie zmienione przykłady, np. obrócone obrazy, i uczy model niezmienności na takie modyfikacje.</li>
+      <li><strong>Early stopping</strong> zachowuje parametry z momentu najlepszego wyniku walidacyjnego, zanim model zacznie dopasowywać szum.</li>
+    </ul>
+    <p>Standaryzacja wejść oraz batch normalization lub layer normalization przede wszystkim stabilizują i przyspieszają optymalizację. Mogą pośrednio ograniczać przeuczenie, ale nie zastępują kontroli jakości na osobnym zbiorze walidacyjnym.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#perceptron-mlp">Perceptron, MLP, aktywacje, strata</a></li>
+      <li><a href="#uczenie">Backpropagation i optymalizacja</a></li>
+      <li><a href="#gradient-problemy">Znikający i eksplodujący gradient</a></li>
+      <li><a href="#architektury">CNN, RNN, Transformer</a></li>
+      <li><a href="#regularyzacja">Regularyzacja</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script>
+(function () {
+  var x = [], relu = [], sigmoid = [], tanh = [];
+  for (var i = 0; i <= 160; i++) {
+    var value = -4 + i * 0.05;
+    x.push(value);
+    relu.push(Math.max(0, value));
+    sigmoid.push(1 / (1 + Math.exp(-value)));
+    tanh.push(Math.tanh(value));
+  }
+  var style = getComputedStyle(document.documentElement);
+  var ink = style.getPropertyValue("--ink").trim();
+  var grid = style.getPropertyValue("--rule").trim();
+  var line = style.getPropertyValue("--v-blue").trim();
+  var plots = [
+    { id: "plot-relu", name: "ReLU", y: relu, range: [-0.35, 4.25] },
+    { id: "plot-sigmoid", name: "sigmoid", y: sigmoid, range: [-0.1, 1.1] },
+    { id: "plot-tanh", name: "tanh", y: tanh, range: [-1.15, 1.15] }
+  ];
+  plots.forEach(function (plot) {
+    Plotly.newPlot(plot.id, [{
+      x: x, y: plot.y, type: "scatter", mode: "lines",
+      line: { color: line, width: 3 }, hovertemplate: "x=%{x:.2f}<br>y=%{y:.3f}<extra></extra>"
+    }], {
+      title: { text: plot.name, font: { size: 14, color: ink }, y: 0.97 },
+      height: 210, margin: { l: 42, r: 12, t: 35, b: 38 },
+      paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+      font: { color: ink, size: 10 }, showlegend: false,
+      xaxis: { title: "x", range: [-4, 4], dtick: 2, zeroline: true, zerolinecolor: ink, gridcolor: grid },
+      yaxis: { title: "y", range: plot.range, zeroline: true, zerolinecolor: ink, gridcolor: grid }
+    }, { responsive: true, displayModeBar: false });
+  });
+})();
+</script>
+<script src="../assets/notes.js"></script>
+</body></html>

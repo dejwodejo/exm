@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bezpieczeństwo systemów operacyjnych i aplikacji użytkowych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 3</p>
+    <h1>Bezpieczeństwo systemów operacyjnych i aplikacji użytkowych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Bezpieczeństwo systemu</strong> oznacza utrzymywanie danych i usług w oczekiwanym stanie mimo błędów, awarii i celowych ataków. Nie zapewnia go pojedyncze narzędzie: powstaje z połączenia poprawnego kodu, ograniczonych uprawnień, izolacji, monitorowania i możliwości odtworzenia działania.</p>
+    <p>Punktem wyjścia jest <strong>model zagrożeń</strong>. Najpierw wskazuje się aktywa, np. dane klientów i ciągłość usługi, następnie granice zaufania, możliwego przeciwnika oraz drogi ataku. Ryzyko ocenia się przez prawdopodobieństwo i skutek, a dopiero potem dobiera zabezpieczenia. Dzięki temu ochrona odpowiada rzeczywistym scenariuszom zamiast tworzyć przypadkową listę mechanizmów.</p>
+
+    <h2 id="triada-cia">Triada CIA</h2>
+    <p>Triada <strong>CIA</strong> (Confidentiality, Integrity, Availability — poufność, integralność i dostępność) porządkuje cele ochrony:</p>
+    <ul>
+      <li><strong>Poufność</strong> oznacza, że informację poznają tylko uprawnione podmioty. Chronią ją kontrola dostępu i szyfrowanie, które nie pomoże jednak po przejęciu konta mającego prawo odszyfrować dane.</li>
+      <li><strong>Integralność</strong> oznacza, że nieuprawniona zmiana jest niemożliwa albo wykrywalna. Służą jej ograniczenie prawa zapisu, kody uwierzytelniające i podpisy.</li>
+      <li><strong>Dostępność</strong> oznacza, że usługa działa w wymaganym czasie. Zwiększają ją redundancja, ograniczanie przeciążenia i odtwarzanie. Replika nie zastępuje kopii, bo szybko powiela także złośliwą zmianę.</li>
+    </ul>
+    <p>Uzupełnieniem triady są <strong>autentyczność</strong>, czyli pewność co do tożsamości strony, oraz <strong>rozliczalność</strong>, czyli możliwość przypisania działania na podstawie chronionych logów.</p>
+
+    <h2 id="kryptografia">Kryptografia — fundament</h2>
+    <p>Kryptografia zamienia problem ochrony danych w problem ochrony kluczy. Najważniejsze mechanizmy mają różne zadania:</p>
+    <ul>
+      <li><strong>Funkcja skrótu</strong> tworzy krótki, jednokierunkowy odcisk. SHA-256 wykrywa zmianę tylko przy porównaniu z wcześniej zaufanym skrótem; napastnik może podmienić dane i niezabezpieczony hash razem.</li>
+      <li><strong>HMAC</strong> (Hash-based Message Authentication Code) łączy dane ze wspólnym tajnym kluczem, więc pozwala wykryć zmianę i potwierdzić, że kod utworzył ktoś znający sekret.</li>
+      <li><strong>Szyfrowanie symetryczne</strong> używa jednego wspólnego klucza i szybko chroni pliki oraz dane sesji. <strong>Kryptografia asymetryczna</strong> używa pary publiczny–prywatny, ułatwiając wymianę kluczy i podpisy, ale wymaga wiarygodnego przypisania klucza publicznego.</li>
+      <li><strong>Podpis cyfrowy</strong> potwierdza integralność i pochodzenie względem klucza, lecz nie ukrywa treści. Przejęcie klucza prywatnego pozwala tworzyć fałszywe, poprawne matematycznie podpisy.</li>
+    </ul>
+    <p><strong>TLS</strong> (Transport Layer Security) uwierzytelnia serwer certyfikatem, pomaga uzgodnić klucz sesji, a następnie chroni transmisję. Nie chroni danych już odszyfrowanych na przejętym urządzeniu. Hasła przechowuje się przez wolną <strong>KDF</strong> (Key Derivation Function), np. Argon2, z osobną losową solą. Sól rozdziela identyczne hasła, a kosztowna funkcja spowalnia zgadywanie. Base64 jest tylko kodowaniem, nie zabezpieczeniem.</p>
+
+    <h2 id="os">Bezpieczeństwo systemu operacyjnego</h2>
+    <p>System operacyjny tworzy granicę między programami a sprzętem. <strong>Jądro</strong> zarządza pamięcią, procesami, plikami i urządzeniami z wysokimi uprawnieniami, a zwykły proces prosi je o operacje przez kontrolowane wywołania systemowe. Błąd pozwalający wykonać kod w jądrze może unieważnić ochronę wszystkich procesów.</p>
+    <p>Regułą nadrzędną jest <strong>najmniejszy przywilej</strong>: użytkownik lub proces otrzymuje tylko prawa potrzebne do zadania i tylko na potrzebny czas. Nie zapobiega to samemu włamaniu, lecz ogranicza jego zasięg. Izolacja dodatkowo wyznacza obszar dostępny dla przejętego programu:</p>
+    <ul>
+      <li><strong>Sandbox</strong> odbiera pojedynczemu procesowi zbędny dostęp do plików, sieci i wywołań systemowych.</li>
+      <li><strong>Kontener</strong> oddziela procesy i system plików, ale współdzieli jądro gospodarza, więc podatność jądra może naruszyć wiele kontenerów.</li>
+      <li><strong>Maszyna wirtualna</strong> ma własny system i jądro, co tworzy silniejszą granicę kosztem większego zużycia zasobów.</li>
+    </ul>
+    <p>Izolacja ogranicza skutki, lecz nie usuwa podatności. Uzupełniają ją aktualizacje, bezpieczna konfiguracja i wyłączanie niepotrzebnych usług, które zmniejszają <strong>powierzchnię ataku</strong>.</p>
+
+    <h2 id="aplikacje">Bezpieczeństwo aplikacji</h2>
+    <p>Aplikacja jest granicą między niezaufanym wejściem a operacjami wykonywanymi z uprawnieniami serwera. Trzy ataki pokazują różne błędy tej granicy:</p>
+    <ul>
+      <li><strong>SQL injection</strong> powstaje, gdy aplikacja skleja wejście z poleceniem bazy, przez co dane stają się kodem zapytania. Zapytania parametryzowane rozdzielają składnię od wartości.</li>
+      <li><strong>XSS</strong> (Cross-Site Scripting) występuje, gdy niezaufana treść trafia do strony jako kod i wykonuje się w domenie aplikacji. Broni kodowanie wyjścia właściwe dla kontekstu; <strong>CSP</strong> (Content Security Policy) jest dodatkową warstwą.</li>
+      <li><strong>CSRF</strong> (Cross-Site Request Forgery) wykorzystuje automatyczne dołączanie aktywnej sesji do żądania wywołanego przez obcą stronę. Bronią nieprzewidywalne tokeny oraz ciasteczka <code>SameSite</code>.</li>
+      <li><strong>Błędna autoryzacja</strong> występuje, gdy prawa są sprawdzane tylko w interfejsie albo serwer ufa identyfikatorowi klienta. Autoryzację trzeba sprawdzać po stronie serwera dla każdego zasobu i działania.</li>
+    </ul>
+    <p><strong>OWASP</strong> (Open Worldwide Application Security Project) publikuje użyteczną listę częstych klas ryzyka, ale nie zastępuje modelu zagrożeń konkretnej aplikacji.</p>
+
+    <h2 id="malware">Malware, phishing, DDoS</h2>
+    <ul>
+      <li><strong>Trojan</strong> udaje użyteczny program i liczy na uruchomienie przez użytkownika.</li>
+      <li><strong>Robak</strong> sam rozprzestrzenia się między podatnymi systemami; aktualizacje zamykają znane drogi, a segmentacja ogranicza zasięg.</li>
+      <li><strong>Ransomware</strong> odbiera dostęp do danych. Minimalne prawa ograniczają liczbę plików, a odłączone lub niezmienialne kopie umożliwiają odtworzenie.</li>
+      <li><strong>Rootkit</strong> ukrywa napastnika w niskiej warstwie systemu, przez co lokalne narzędzia diagnostyczne mogą być niewiarygodne.</li>
+    </ul>
+    <p><strong>Phishing</strong> manipuluje człowiekiem, aby ujawnił dane lub zatwierdził operację. Szkolenie nie wystarcza; potrzebne są minimalne prawa, niezależne potwierdzanie wrażliwych działań i MFA odporne na phishing. <strong>DDoS</strong> (Distributed Denial of Service) wyczerpuje łącze lub zasoby aplikacji ruchem z wielu źródeł. Bronią filtrowanie, rozproszona infrastruktura, limity żądań i buforowanie, lecz zbyt agresywne reguły odrzucą legalnych użytkowników.</p>
+
+    <h2 id="backup-narzedzia">Backup, DR i narzędzia obronne</h2>
+    <p><strong>Kopia zapasowa</strong> jest oddzielnym stanem danych, a nie aktywną repliką. Reguła <strong>3-2-1</strong> zaleca trzy kopie, na dwóch rodzajach nośników, z jedną poza główną lokalizacją. Przeciw ransomware jedna kopia powinna być niezmienialna albo odłączona od kont produkcyjnych.</p>
+    <p>Plan <strong>DR</strong> (Disaster Recovery — odtwarzanie po katastrofie) obejmuje dane, konfigurację, zależności i kolejność przywracania. <strong>RPO</strong> określa, ile najnowszych danych wolno utracić, a <strong>RTO</strong> — jak długo usługa może być niedostępna. Kopię trzeba testowo odtwarzać; samo jej istnienie nie dowodzi, że zadziała.</p>
+    <p><strong>Obrona warstwowa</strong> zakłada, że pojedyncza kontrola może zawieść. Jedne warstwy zapobiegają, inne ograniczają zasięg, wykrywają nietypowe zdarzenia albo pozwalają odtworzyć usługę. Firewall, system wykrywania włamań i korelacja logów mają różne zadania; żadne z nich nie zastępuje aktualizacji, minimalnych praw ani przygotowanej reakcji.</p>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#triada-cia">Triada CIA</a></li>
+    <li><a href="#kryptografia">Kryptografia — fundament</a></li>
+    <li><a href="#os">Bezpieczeństwo systemu operacyjnego</a></li>
+    <li><a href="#aplikacje">Bezpieczeństwo aplikacji</a></li>
+    <li><a href="#malware">Malware, phishing, DDoS</a></li>
+    <li><a href="#backup-narzedzia">Backup, DR i narzędzia obronne</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

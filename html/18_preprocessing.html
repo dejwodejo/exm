@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proces wstępnego przetwarzania danych – etapy, cele i wpływ na jakość wyników analizy</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Modelowanie i analiza danych · 5</p>
+    <h1>Proces wstępnego przetwarzania danych – etapy, cele i wpływ na jakość wyników analizy</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Wstępne przetwarzanie danych</strong> (preprocessing) zamienia surowe dane w spójny zbiór, na którym można wykonać analizę lub nauczyć model. Celem nie jest mechaniczne „oczyszczenie wszystkiego”, lecz poprawienie błędów, jawne podjęcie decyzji o brakach i przygotowanie cech bez wykorzystania informacji z przyszłości lub zbioru testowego.</p>
+
+    <h2 id="etapy">Etapy preprocessingu</h2>
+    <ol>
+      <li><strong>Zrozumienie danych</strong> — ustalenie znaczenia kolumn, jednostki obserwacji, zakresu czasu i zmiennej docelowej.</li>
+      <li><strong>Kontrola jakości</strong> — sprawdzenie typów, zakresów, braków, duplikatów, jednostek miary i niemożliwych wartości.</li>
+      <li><strong>Integracja</strong> — łączenie źródeł po właściwych kluczach oraz kontrola, czy połączenie nie powieliło albo nie zgubiło rekordów.</li>
+      <li><strong>Podział danych</strong> — oddzielenie zbioru testowego przed operacjami, które uczą się wartości z danych.</li>
+      <li><strong>Transformacja cech</strong> — imputacja, kodowanie kategorii, skalowanie i ewentualna redukcja wymiaru.</li>
+      <li><strong>Zapis w pipeline</strong> — zastosowanie dokładnie tych samych kroków podczas treningu i późniejszej predykcji.</li>
+    </ol>
+
+    <h2 id="braki">Braki danych i imputacja</h2>
+    <p>Sposób postępowania zależy od <em>mechanizmu</em> braku — bo to on decyduje, czy usunięcie wierszy zaszkodzi:</p>
+    <ul>
+      <li><strong>MCAR</strong> (Missing Completely At Random) — prawdopodobieństwo braku nie zależy ani od danych obserwowanych, ani nieobserwowanych. Analiza kompletnych przypadków zwykle nie wprowadza wtedy systematycznej selekcji, ale zmniejsza próbę i precyzję.</li>
+      <li><strong>MAR</strong> (Missing At Random) — po uwzględnieniu danych obserwowanych brak nie zależy już od brakującej wartości, np. niepodanie dochodu można wyjaśnić znanym wiekiem. Metody imputacji lub estymacji muszą wykorzystać te obserwowane predyktory.</li>
+      <li><strong>MNAR</strong> (Missing Not At Random) — prawdopodobieństwo braku nadal zależy od nieobserwowanej wartości, np. najbogatsi częściej ukrywają dochód. Wymaga dodatkowych założeń i analizy wrażliwości; standardowa imputacja nie rozwiązuje problemu automatycznie.</li>
+    </ul>
+    <p>Braki można uzupełnić medianą lub najczęstszą kategorią, a bardziej złożone metody przewidują brakującą wartość z pozostałych cech. Prosta imputacja zmniejsza zmienność i może osłabić zależności, dlatego czasem dodaje się również kolumnę informującą, że wartość była brakująca. Parametry imputacji obliczamy tylko na danych treningowych.</p>
+
+    <h2 id="outliery">Wartości odstające</h2>
+    <p><strong>Wartość odstająca</strong> wyraźnie różni się od większości obserwacji. Może być błędem, np. wzrostem 1800 cm, albo prawdziwym rzadkim przypadkiem, np. bardzo dużą transakcją. Reguła oparta na odstępie międzykwartylowym oznacza jako podejrzane wartości oddalone od kwartylu o więcej niż \(1{,}5\) tego odstępu, ale jest to sygnał do kontroli, a nie automatyczny nakaz usunięcia.</p>
+    <p>Najpierw sprawdzamy źródło i kontekst obserwacji. Błąd poprawiamy lub oznaczamy jako brak; prawidłową skrajną wartość można zachować, przekształcić cechę albo zastosować model i skalowanie odporne na skrajności. Usunięcie prawdziwych rzadkich przypadków zmieni populację, o której wnioskujemy.</p>
+
+    <h2 id="skalowanie">Skalowanie cech</h2>
+    <p><strong>Standaryzacja</strong> odejmuje średnią i dzieli przez odchylenie standardowe, więc cecha ma średnią 0 i odchylenie 1. Skalowanie min–max przenosi wartości do ustalonego zakresu, zwykle 0–1. Wariant odporny wykorzystuje medianę i odstęp międzykwartylowy, dlatego słabiej reaguje na skrajności.</p>
+    <p>Skalowania wymagają przede wszystkim metody wykorzystujące odległość lub wielkość współczynników, np. k-NN (metoda \(k\) najbliższych sąsiadów), SVM (Support Vector Machine — maszyna wektorów nośnych), k-means i regresja z regularyzacją. Drzewa dzielą wartości progami, więc zmiana skali cechy nie zmienia ich decyzji.</p>
+
+    <h2 id="kodowanie">Kodowanie zmiennych kategorycznych</h2>
+    <p>Modele operują na liczbach, więc kategorie trzeba przekształcić.</p>
+    <ul>
+      <li><strong>Ordinal encoding</strong> — kolejne liczby całkowite; właściwe dla zmiennych porządkowych, ale dla nominalnych, np. kolorów i miast, narzuca sztuczną kolejność.</li>
+      <li><strong>One-hot encoding</strong> — osobna kolumna binarna dla każdej kategorii; nie tworzy fałszywego porządku, lecz przy bardzo wielu różnych kategoriach gwałtownie zwiększa liczbę kolumn.</li>
+      <li><strong>Target encoding</strong> — zastąpienie kategorii statystyką zmiennej docelowej; radzi sobie z wieloma kategoriami, ale wartości muszą być obliczane bez podglądania wyniku kodowanej obserwacji, bo inaczej powstaje wyciek i przeuczenie.</li>
+    </ul>
+
+    <h2 id="pca">Redukcja liczby cech</h2>
+    <p><strong>PCA</strong> (Principal Component Analysis — analiza głównych składowych) tworzy nowe cechy będące kombinacjami cech pierwotnych. Pierwsza składowa zachowuje kierunek największego zróżnicowania, kolejna największy pozostały kierunek itd. Zatrzymanie kilku składowych może ograniczyć wymiar i współliniowość, ale utrudnia interpretację, ponieważ składowa nie odpowiada jednej oryginalnej kolumnie. Przy różnych jednostkach cechy zwykle wcześniej standaryzujemy.</p>
+
+    <h2 id="leakage">Data leakage i pipeline</h2>
+    <p><strong>Data leakage</strong> (wyciek danych) występuje, gdy podczas treningu wykorzystujemy informację, której nie będzie w chwili rzeczywistej predykcji. Przykładem jest obliczenie średniej do imputacji na całym zbiorze albo użycie cechy powstałej już po przewidywanym zdarzeniu.</p>
+    <p>Najpierw oddzielamy test. Podczas walidacji <strong>pipeline</strong> dopasowuje imputację, kodowanie, skalowanie i model od nowa wyłącznie na treningowej części każdego podziału. Ten sam zapis kroków chroni również przed innym preprocessingiem w treningu i produkcji.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#etapy">Etapy preprocessingu</a></li>
+    <li><a href="#braki">Braki danych i imputacja</a></li>
+    <li><a href="#outliery">Wartości odstające</a></li>
+    <li><a href="#skalowanie">Skalowanie cech</a></li>
+    <li><a href="#kodowanie">Kodowanie zmiennych kategorycznych</a></li>
+    <li><a href="#pca">Redukcja liczby cech</a></li>
+    <li><a href="#leakage">Data leakage i pipeline</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

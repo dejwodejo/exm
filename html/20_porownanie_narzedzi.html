@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porównanie metod i narzędzi stosowanych w przetwarzaniu oraz analizie danych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Modelowanie i analiza danych · 7</p>
+    <h1>Porównanie metod i narzędzi stosowanych w przetwarzaniu oraz analizie danych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>Narzędzie dobieramy do zadania, a nie do samego rozmiaru danych lub popularności technologii. Najprostsze rozwiązanie spełniające wymagania jest zwykle łatwiejsze do utrzymania. Klaster rozproszony nie pomoże, jeśli dane mieszczą się w pamięci jednej maszyny, a arkusz kalkulacyjny nie wystarczy do cyklicznego przetwarzania milionów rekordów przez wielu użytkowników.</p>
+
+    <h2 id="osie">Osie porównania</h2>
+    <p>Wymiary, wzdłuż których zestawiamy narzędzia:</p>
+    <ul>
+      <li><strong>Wielkość i miejsce danych:</strong> czy mieszczą się na jednej maszynie, czy są już przechowywane w hurtowni albo systemie rozproszonym.</li>
+      <li><strong>Czas odpowiedzi:</strong> czy wystarczy raport nocny, wynik w kilka sekund, czy reakcja na zdarzenie niemal od razu.</li>
+      <li><strong>Tryb pracy:</strong> przetwarzanie wsadowe uruchamia obliczenia na zgromadzonym zbiorze, a strumieniowe aktualizuje wynik wraz z napływem zdarzeń.</li>
+      <li><strong>Rodzaj danych i zapytań:</strong> tabele i agregacje, dokumenty o zmiennej strukturze, relacje grafowe albo szybki dostęp po kluczu.</li>
+      <li><strong>Poprawność i odporność:</strong> czy potrzebne są transakcje, jaka utrata danych jest dopuszczalna i co ma się stać po awarii.</li>
+      <li><strong>Zespół i koszt:</strong> posiadane kompetencje, utrzymanie infrastruktury, cena obliczeń oraz łatwość kontroli rozwiązania.</li>
+    </ul>
+    <p>Wymagania wpływają na siebie. Bardzo szybka odpowiedź, duża skala i mocne gwarancje poprawności jednocześnie zwiększają koszt oraz złożoność.</p>
+
+    <h2 id="klasy">Główne klasy narzędzi</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Klasa</th><th>Kiedy pasuje</th><th>Przykłady i ograniczenia</th></tr></thead>
+      <tbody>
+        <tr><td>Biblioteki jednej maszyny</td><td>Eksploracja, przygotowanie danych i modele, gdy zasoby komputera wystarczają.</td><td>pandas jest popularny, Polars wydajny dla operacji kolumnowych, a DuckDB wykonuje SQL (Structured Query Language — strukturalny język zapytań) bez osobnego serwera.</td></tr>
+        <tr><td>Relacyjna baza danych</td><td>Aplikacje z wieloma krótkimi odczytami i zapisami oraz wymaganiem transakcji.</td><td>PostgreSQL zapewnia SQL i reguły <strong>ACID</strong>: atomowość, spójność, izolację i trwałość.</td></tr>
+        <tr><td>Hurtownia analityczna</td><td>Agregacje wielu tabel, raporty i wielu użytkowników korzystających z SQL.</td><td>BigQuery lub Snowflake skalują obliczenia, ale generują koszt zapytań i wymagają kontroli modelu danych.</td></tr>
+        <tr><td>Silnik rozproszony</td><td>Duże przetwarzanie wsadowe, którego jedna maszyna nie kończy w wymaganym czasie.</td><td>Apache Spark dzieli pracę między maszyny; płacimy narzutem przesyłania danych i utrzymania zadań.</td></tr>
+        <tr><td>Przetwarzanie strumieni</td><td>Wynik musi aktualizować się po napłynięciu zdarzenia, np. przy wykrywaniu oszustw.</td><td>Apache Flink i Kafka Streams obsługują stan oraz czas zdarzeń, ale są trudniejsze od procesu nocnego.</td></tr>
+        <tr><td>Baza nierelacyjna</td><td>Model dokumentowy, klucz–wartość lub inny dostęp, do którego tabele relacyjne słabo pasują.</td><td>MongoDB i Cassandra rozwiązują różne problemy; <strong>NoSQL</strong> (Not Only SQL) nie jest jedną wspólną technologią.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 id="wybor">Proces wyboru</h2>
+    <ol>
+      <li>Opisz wejście, oczekiwany wynik i maksymalny dopuszczalny czas odpowiedzi.</li>
+      <li>Sprawdź, gdzie dane już się znajdują i czy przenoszenie ich nie będzie droższe od obliczeń.</li>
+      <li>Wybierz najprostsze narzędzie, które mieści dane i kończy zadanie w wymaganym czasie.</li>
+      <li>Zbuduj mały test na prawdziwym fragmencie danych i zmierz czas, pamięć oraz koszt.</li>
+      <li>Dopiero po wykazaniu ograniczenia skaluj pionowo lub przechodź do systemu rozproszonego.</li>
+    </ol>
+    <p>Przykładowo jednorazową analizę plików może obsłużyć DuckDB lub Polars. Cykliczny raport używany przez wiele osób lepiej oprzeć na hurtowni SQL. Spark ma sens, gdy lokalne przetwarzanie rzeczywiście nie spełnia wymagań, a system strumieniowy — gdy wynik nocny jest zbyt późny.</p>
+
+    <h2 id="warstwy">Narzędzia pełnią różne role</h2>
+    <p>Silnik obliczeniowy nie zastępuje całej architektury. Airflow może ustalać kolejność i harmonogram zadań, ale sam nie jest bazą ani silnikiem analitycznym. dbt zarządza transformacjami SQL wykonywanymi w hurtowni. Jupyter służy analizie, lecz nie zapewnia automatycznie bezpiecznej produkcyjnej usługi. Porównujemy więc narzędzia wykonujące tę samą rolę, a nie np. orkiestrator z bazą danych.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#osie">Osie porównania</a></li>
+    <li><a href="#klasy">Klasy narzędzi</a></li>
+    <li><a href="#wybor">Proces wyboru</a></li>
+    <li><a href="#warstwy">Różne role narzędzi</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

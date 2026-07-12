@@ -1,0 +1,220 @@
+<figure class="viz" id="v15">
+  <div class="viz-head">
+    <p class="viz-title">Sieć AON, ścieżka krytyczna i przybliżenie PERT</p>
+    <p class="viz-sub">Przesuwaj <b>Krok</b>, aby wypełnić CPM. Włącz PERT, aby zobaczyć, jak z estymat (a, m, b) powstaje rozkład terminu dla ścieżki krytycznej i prawdopodobieństwo dotrzymania deadline'u.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v15-svg" viewBox="0 0 680 430" role="img" aria-label="Sieć czynności AON z CPM oraz panelem PERT pokazującym przybliżony rozkład czasu projektu i prawdopodobieństwo dotrzymania terminu"></svg>
+  </div>
+  <div class="viz-controls">
+    <label>Krok
+      <input id="v15-step" type="range" min="0" max="3" step="1" value="0">
+      <span class="val" id="v15-stepv">0 · nazwy i czasy</span>
+    </label>
+    <span class="toggle" id="v15-crit" role="button" tabindex="0" aria-pressed="false">Ścieżka krytyczna</span>
+    <span class="toggle" id="v15-pert" role="button" tabindex="0" aria-pressed="false">PERT: ryzyko terminu</span>
+    <label>Termin
+      <input id="v15-deadline" type="range" min="10" max="15" step="0.5" value="13">
+      <span class="val" id="v15-deadlinev">13.0</span>
+    </label>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      czynność <b id="v15-who">–</b> · ES=<b id="v15-es">–</b> EF=<b id="v15-ef">–</b> · LS=<b id="v15-ls">–</b> LF=<b id="v15-lf">–</b> · <b>TF=<span id="v15-tf">–</span></b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> ścieżka krytyczna <b style="font-family:var(--mono)">A→C→E→F = 3+4+3+2 = 12 dni</b> ma zapas TF = 0 — poślizg którejkolwiek z tych czynności przesuwa koniec projektu. PERT dodaje niepewność czasu i liczy ryzyko terminu, ale klasyczne przybliżenie po jednej ścieżce ignoruje możliwość zmiany ścieżki krytycznej.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v15-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  // --- dane sieci: czasy trwania + relacje precedencji (FS) ---
+  var dur={A:3,B:2,C:4,D:2,E:3,F:2};
+  var edges=[["A","C"],["B","C"],["C","D"],["C","E"],["D","F"],["E","F"]];
+  var order=["A","B","C","D","E","F"];            // porzadek topologiczny
+  var pert={A:{a:2,m:3,b:4},B:{a:1,m:2,b:3},C:{a:2,m:4,b:6},D:{a:1,m:2,b:3},E:{a:2,m:3,b:4},F:{a:1,m:2,b:3}};
+  var preds={},succs={};
+  order.forEach(function(k){preds[k]=[];succs[k]=[];});
+  edges.forEach(function(e){succs[e[0]].push(e[1]);preds[e[1]].push(e[0]);});
+
+  // --- CPM: forward pass ---
+  var ES={},EF={};
+  order.forEach(function(k){
+    ES[k]=preds[k].length?Math.max.apply(null,preds[k].map(function(p){return EF[p];})):0;
+    EF[k]=ES[k]+dur[k];
+  });
+  var T=Math.max.apply(null,order.map(function(k){return EF[k];}));   // = 12
+  // --- CPM: backward pass ---
+  var LS={},LF={};
+  order.slice().reverse().forEach(function(k){
+    LF[k]=succs[k].length?Math.min.apply(null,succs[k].map(function(s){return LS[s];})):T;
+    LS[k]=LF[k]-dur[k];
+  });
+  var TF={};
+  order.forEach(function(k){TF[k]=LS[k]-ES[k];});
+  var crit=function(k){return TF[k]===0;};
+  var critEdge=function(a,b){return crit(a)&&crit(b);};   // A-C, C-E, E-F
+  var critPath=["A","C","E","F"];
+  function pertTe(k){var p=pert[k];return (p.a+4*p.m+p.b)/6;}
+  function pertVar(k){var p=pert[k];return Math.pow((p.b-p.a)/6,2);}
+  function sum(arr,fn){return arr.reduce(function(s,k){return s+fn(k);},0);}
+  var pertMean=sum(critPath,pertTe), pertVariance=sum(critPath,pertVar), pertSd=Math.sqrt(pertVariance);
+  function erf(x){
+    var sign=x<0?-1:1;x=Math.abs(x);
+    var t=1/(1+0.3275911*x);
+    var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+    return sign*y;
+  }
+  function normCdf(x,mu,sd){return 0.5*(1+erf((x-mu)/(sd*Math.SQRT2)));}
+
+  // --- geometria wezlow ---
+  var bw=112,bh=66;
+  var pos={
+    A:{x:18, y:46},  E:{x:362,y:46},
+    C:{x:190,y:132}, F:{x:534,y:132},
+    B:{x:18, y:218}, D:{x:362,y:218}
+  };
+  var STEPLAB=["0 · nazwy i czasy","1 · przód ES/EF","2 · wstecz LS/LF","3 · zapasy + ścieżka krytyczna"];
+
+  var hovered=null;
+
+  function edgePath(a,b){
+    var na=pos[a],nb=pos[b];
+    var sx=na.x+bw, sy=na.y+bh/2, ex=nb.x, ey=nb.y+bh/2;
+    var mx=(sx+ex)/2;
+    return "M"+sx+" "+sy+" C "+mx+" "+sy+", "+mx+" "+ey+", "+(ex-3)+" "+ey;
+  }
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var step=parseInt(document.getElementById("v15-step").value,10);
+    var critOn=document.getElementById("v15-crit").getAttribute("aria-pressed")==="true";
+    var pertOn=document.getElementById("v15-pert").getAttribute("aria-pressed")==="true";
+    var deadline=parseFloat(document.getElementById("v15-deadline").value);
+    var showCrit=step>=3||critOn||pertOn||hovered!=null;
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),RULE=cvar("--rule"),
+        BG=cvar("--bg"),BG2=cvar("--bg2"),GRID=cvar("--v-grid"),
+        CR=cvar("--v-orange"),SL=cvar("--v-blue"),TE=cvar("--v-teal"),MONO=cvar("--mono");
+
+    // markery strzalek (odtwarzane co render — zaleza od tokenow motywu)
+    var defs=E("defs",{});
+    [["v15-aC",CR],["v15-aN",SL]].forEach(function(p){
+      var m=E("marker",{id:p[0],markerWidth:9,markerHeight:9,refX:7.5,refY:3,orient:"auto",markerUnits:"strokeWidth"});
+      m.appendChild(E("path",{d:"M0 0 L7 3 L0 6 Z",fill:p[1]}));defs.appendChild(m);
+    });
+    svg.appendChild(defs);
+
+    // luki
+    edges.forEach(function(e){
+      var ce=critEdge(e[0],e[1]);
+      var hot=ce&&showCrit;
+      svg.appendChild(E("path",{d:edgePath(e[0],e[1]),fill:"none",
+        stroke:hot?CR:(ce?SL:GRID),"stroke-width":hot?3:(ce?1.8:1.5),
+        "marker-end":"url(#"+(hot?"v15-aC":"v15-aN")+")",opacity:hot?1:.85}));
+    });
+
+    // wezly
+    order.forEach(function(k){
+      var n=pos[k],c=crit(k),hot=c&&showCrit,isHov=hovered===k;
+      var col=hot?CR:SL;
+      var g=E("g",{});g.style.cursor="pointer";
+      g.appendChild(E("rect",{x:n.x,y:n.y,width:bw,height:bh,rx:8,
+        fill:isHov?BG2:BG,stroke:col,"stroke-width":hot?2.6:(isHov?2.2:1.6)}));
+      g.appendChild(E("line",{x1:n.x,y1:n.y+22,x2:n.x+bw,y2:n.y+22,stroke:RULE,"stroke-width":1}));
+      g.appendChild(E("line",{x1:n.x,y1:n.y+bh-22,x2:n.x+bw,y2:n.y+bh-22,stroke:RULE,"stroke-width":1}));
+      // gorny pasek ES | EF (krok >=1)
+      g.appendChild(E("text",{x:n.x+bw/2,y:n.y+15,"text-anchor":"middle","font-size":11,
+        fill:step>=1?INK2:MUT,"font-family":MONO},
+        step>=1?("ES "+ES[k]+"   EF "+EF[k]):"ES · | · EF"));
+      // srodek: nazwa (czas)
+      g.appendChild(E("text",{x:n.x+bw/2,y:n.y+bh/2+6,"text-anchor":"middle","font-size":15,
+        "font-weight":700,fill:INK},k+"  ("+dur[k]+" dni)"));
+      // dolny pasek LS | LF (krok >=2)
+      g.appendChild(E("text",{x:n.x+bw/2,y:n.y+bh-8,"text-anchor":"middle","font-size":11,
+        fill:step>=2?INK2:MUT,"font-family":MONO},
+        step>=2?("LS "+LS[k]+"   LF "+LF[k]):"LS · | · LF"));
+      // plakietka TF (krok >=3)
+      if(step>=3){
+        var bx=n.x+bw-4,by=n.y-3;
+        g.appendChild(E("rect",{x:bx-44,y:by-2,width:48,height:18,rx:6,fill:c?CR:SL}));
+        g.appendChild(E("text",{x:bx-20,y:by+11,"text-anchor":"middle","font-size":10.5,
+          "font-weight":700,fill:BG},"TF "+TF[k]));
+      }
+      g.addEventListener("mouseenter",function(){hovered=k;render();});
+      g.addEventListener("mouseleave",function(){hovered=null;render();});
+      svg.appendChild(g);
+    });
+
+    // etykiety kolumn faz
+    svg.appendChild(E("text",{x:74,y:24,"text-anchor":"middle","font-size":10.5,
+      fill:MUT,"font-weight":700},"start →"));
+    svg.appendChild(E("text",{x:590,y:24,"text-anchor":"middle","font-size":10.5,
+      fill:MUT,"font-weight":700},"→ koniec"));
+    // czas projektu
+    svg.appendChild(E("text",{x:340,y:315,"text-anchor":"middle","font-size":13,"font-weight":700,
+      fill:showCrit?CR:INK},"Czas projektu T* = "+T+" dni"));
+    svg.appendChild(E("text",{x:340,y:332,"text-anchor":"middle","font-size":10.5,fill:MUT,
+      "font-family":MONO},"TF = LS − ES · pomarańcz = ścieżka krytyczna (TF=0) · niebieski = zapas > 0"));
+
+    if(pertOn){
+      var px=26,py=352,pw=628,ph=62,bx=54,by=404,bw2=350,bh2=36;
+      var lo=9,hi=15,td=Math.max(lo,Math.min(hi,deadline));
+      function fmt(x){return (Math.round(x*100)/100).toFixed(2);}
+      function xmap(v){return bx+(v-lo)/(hi-lo)*bw2;}
+      function density(x){var z=(x-pertMean)/pertSd;return Math.exp(-0.5*z*z)/(pertSd*Math.sqrt(2*Math.PI));}
+      var maxD=density(pertMean);
+      function ymap(d){return by-(d/maxD)*bh2;}
+      var curve="",area="M"+xmap(lo)+" "+by;
+      for(var i=0;i<=96;i++){
+        var xv=lo+(hi-lo)*i/96, yv=ymap(density(xv));
+        curve+=(i?" L":"M")+xmap(xv).toFixed(1)+" "+yv.toFixed(1);
+        if(xv<=td)area+=" L"+xmap(xv).toFixed(1)+" "+yv.toFixed(1);
+      }
+      area+=" L"+xmap(td).toFixed(1)+" "+by+" Z";
+      var prob=normCdf(deadline,pertMean,pertSd), z=(deadline-pertMean)/pertSd;
+      svg.appendChild(E("rect",{x:px,y:py,width:pw,height:ph,rx:8,fill:BG2,stroke:RULE,"stroke-width":1}));
+      svg.appendChild(E("text",{x:px+12,y:py+17,"font-size":11,"font-weight":700,fill:INK},"PERT: stała ścieżka krytyczna "+critPath.join("→")));
+      svg.appendChild(E("line",{x1:bx,y1:by,x2:bx+bw2,y2:by,stroke:RULE,"stroke-width":1}));
+      svg.appendChild(E("path",{d:area,fill:TE,opacity:.16}));
+      svg.appendChild(E("path",{d:curve,fill:"none",stroke:CR,"stroke-width":2}));
+      [[10,"10"],[12,"12"],[14,"14"]].forEach(function(t){
+        svg.appendChild(E("line",{x1:xmap(t[0]),y1:by,x2:xmap(t[0]),y2:by+4,stroke:RULE,"stroke-width":1}));
+        svg.appendChild(E("text",{x:xmap(t[0]),y:by+16,"text-anchor":"middle","font-size":9,fill:MUT},t[1]));
+      });
+      svg.appendChild(E("line",{x1:xmap(pertMean),y1:ymap(maxD)-4,x2:xmap(pertMean),y2:by,stroke:CR,"stroke-width":1.4,"stroke-dasharray":"4 3"}));
+      svg.appendChild(E("line",{x1:xmap(td),y1:py+21,x2:xmap(td),y2:by,stroke:TE,"stroke-width":1.8}));
+      svg.appendChild(E("text",{x:xmap(pertMean),y:py+34,"text-anchor":"middle","font-size":9.5,"font-weight":700,fill:CR},"μ="+fmt(pertMean)));
+      svg.appendChild(E("text",{x:xmap(td)+5,y:py+34,"font-size":9.5,"font-weight":700,fill:TE},"deadline"));
+      svg.appendChild(E("text",{x:px+405,y:py+20,"font-size":12,"font-weight":700,fill:INK},"Pr(T ≤ "+deadline.toFixed(1)+") ≈ "+Math.round(prob*100)+"%"));
+      svg.appendChild(E("text",{x:px+405,y:py+38,"font-size":10.5,fill:INK2,"font-family":MONO},"σ="+fmt(pertSd)+" · z="+fmt(z)));
+      svg.appendChild(E("text",{x:px+405,y:py+55,"font-size":9.6,fill:MUT},"uwaga: merge bias i zmiana ścieżki"));
+    }
+
+    // odczyt na zywo
+    var k=hovered;
+    document.getElementById("v15-who").textContent=k?k:"–";
+    document.getElementById("v15-es").textContent=k&&step>=1?ES[k]:"–";
+    document.getElementById("v15-ef").textContent=k&&step>=1?EF[k]:"–";
+    document.getElementById("v15-ls").textContent=k&&step>=2?LS[k]:"–";
+    document.getElementById("v15-lf").textContent=k&&step>=2?LF[k]:"–";
+    document.getElementById("v15-tf").textContent=k?TF[k]:"–";
+    document.getElementById("v15-stepv").textContent=STEPLAB[step];
+    document.getElementById("v15-deadlinev").textContent=deadline.toFixed(1);
+  }
+
+  document.getElementById("v15-step").addEventListener("input",render);
+  var ct=document.getElementById("v15-crit");
+  function toggleCrit(){ct.setAttribute("aria-pressed",ct.getAttribute("aria-pressed")==="true"?"false":"true");render();}
+  ct.addEventListener("click",toggleCrit);
+  ct.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleCrit();}});
+  var pt=document.getElementById("v15-pert");
+  function togglePert(){pt.setAttribute("aria-pressed",pt.getAttribute("aria-pressed")==="true"?"false":"true");render();}
+  pt.addEventListener("click",togglePert);
+  pt.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();togglePert();}});
+  document.getElementById("v15-deadline").addEventListener("input",render);
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

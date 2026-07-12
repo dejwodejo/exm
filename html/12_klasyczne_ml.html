@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klasyczne modele uczenia maszynowego</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 12</p>
+    <h1>Klasyczne modele uczenia maszynowego</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Uczenie maszynowe (ML — Machine Learning)</strong> polega na wyznaczeniu reguły na podstawie przykładów. Model dopasowuje się do danych treningowych, ale powinien działać również na nowych obserwacjach. Tę zdolność nazywamy <strong>generalizacją</strong>. Sam mały błąd treningowy nie wystarcza — wynik trzeba sprawdzić na danych, których model nie widział podczas uczenia.</p>
+
+    <h2 id="typy-uczenia">Typy uczenia</h2>
+    <ul>
+      <li><strong>Nadzorowane</strong> — pary \((x, y)\); klasyfikacja, gdy etykiety dyskretne, regresja, gdy liczbowe.</li>
+      <li><strong>Nienadzorowane</strong> — same \(\{x_i\}\), cel to struktura danych: klasteryzacja, redukcja wymiarów.</li>
+      <li><strong>Uczenie ze wzmocnieniem (RL — Reinforcement Learning)</strong> — agent wybiera działania i maksymalizuje sumę nagród, równoważąc poznawanie nowych możliwości z używaniem już poznanych.</li>
+    </ul>
+
+    <h2 id="proces">Proces uczenia modelu</h2>
+    <ol>
+      <li>Dzielimy dane na cechy \(X\) i oczekiwany wynik \(y\).</li>
+      <li>Wydzielamy dane treningowe, walidacyjne lub testowe.</li>
+      <li>Przetwarzanie, np. uzupełnianie braków i skalowanie, dopasowujemy wyłącznie na części treningowej.</li>
+      <li>Model uczy się parametrów przez minimalizację wybranej funkcji straty.</li>
+      <li>Na walidacji dobieramy ustawienia modelu, a końcowy wynik podajemy na nietkniętym zbiorze testowym.</li>
+    </ol>
+
+    <h2 id="bias-variance-tradeoff">Niedouczenie i przeuczenie</h2>
+    <p><strong>Niedouczenie</strong> występuje, gdy model jest zbyt prosty i popełnia duży błąd nawet na danych treningowych. <strong>Przeuczenie</strong> oznacza, że model zapamiętał przypadkowe szczegóły treningu: radzi sobie tam dobrze, ale słabo na nowych danych. Ograniczamy je przez prostszy model, regularyzację, więcej danych lub właściwe strojenie w walidacji.</p>
+    <p>Ten kompromis opisuje się też przez obciążenie i wariancję. Model bardzo prosty ma zwykle większe obciążenie, a bardzo elastyczny — większą wrażliwość na konkretną próbę treningową.</p>
+
+    <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
+    <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
+    <p>Dla klasyfikacji liczymy trafność (accuracy) oraz <strong>precyzję</strong>: odsetek prawdziwych trafień wśród wskazań pozytywnych, i <strong>czułość</strong>: odsetek wykrytych przypadków wśród wszystkich rzeczywiście pozytywnych. F1 jest średnią harmoniczną precyzji i czułości. <strong>ROC-AUC</strong> łączy krzywą ROC (Receiver Operating Characteristic) z polem pod krzywą AUC (Area Under the Curve) i mierzy jakość rankingu w wielu progach. Przy rzadkiej klasie pozytywnej bardziej informacyjna bywa krzywa precyzja–czułość i jej pole. Dla regresji używamy <strong>RMSE</strong> (pierwiastka błędu średniokwadratowego), <strong>MAE</strong> (średniego błędu bezwzględnego) i \(R^2\).</p>
+
+    <h2 id="modele-nadzorowane">Najważniejsze modele nadzorowane</h2>
+    <ul>
+      <li><strong>Regresja logistyczna</strong> oblicza liniową kombinację cech, a następnie zamienia ją na prawdopodobieństwo klasy. Jest szybka i łatwa do interpretacji, ale bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.</li>
+      <li><strong>k-NN</strong> (k-Nearest Neighbours — metoda \(k\) najbliższych sąsiadów) przewiduje na podstawie najbardziej podobnych obserwacji treningowych. Może odwzorować nieliniową granicę, lecz wymaga skalowania i zwalnia przy dużym zbiorze.</li>
+      <li><strong>Drzewo decyzyjne</strong> kolejno dzieli dane pytaniami typu „czy cecha jest mniejsza od progu?”. Jest czytelne i nie wymaga skalowania, ale głębokie drzewo łatwo się przeucza.</li>
+      <li><strong>Random Forest</strong> uczy wiele drzew na różnych próbach i podzbiorach cech, po czym uśrednia ich wyniki. Zmniejsza niestabilność pojedynczego drzewa kosztem prostoty interpretacji.</li>
+      <li><strong>Gradient Boosting</strong> buduje drzewa kolejno, tak aby następne poprawiało błędy aktualnego zespołu. Jest skuteczny na danych tabelarycznych, ale wymaga kontroli liczby i głębokości drzew oraz tempa uczenia.</li>
+      <li><strong>SVM</strong> (Support Vector Machine — maszyna wektorów nośnych) szuka granicy z możliwie szerokim marginesem między klasami. Funkcja jądra pozwala tworzyć granice nieliniowe, lecz trening może być kosztowny dla dużych zbiorów.</li>
+      <li><strong>Naiwny Bayes</strong> łączy informacje z cech przy założeniu ich warunkowej niezależności w każdej klasie. Założenie jest mocne, ale metoda jest bardzo szybka i często skuteczna dla zliczeń słów.</li>
+    </ul>
+
+    <h2 id="modele-nienadzorowane">Najważniejsze modele nienadzorowane</h2>
+    <ul>
+      <li><strong>k-means</strong> przypisuje punkty do najbliższych centrów, przelicza centra i powtarza te dwa kroki. Wymaga podania liczby klastrów i najlepiej działa dla skupień o podobnym rozmiarze oraz kształcie.</li>
+      <li><strong>DBSCAN</strong> (Density-Based Spatial Clustering of Applications with Noise — klasteryzacja gęstościowa z wykrywaniem szumu) łączy punkty mające dostatecznie wielu sąsiadów w zadanym promieniu. Nie wymaga liczby klastrów i wykrywa nieregularne kształty, ale trudno dobrać jeden promień przy mocno różniących się gęstościach.</li>
+    </ul>
+
+    <h2 id="regularyzacja">Regularyzacja</h2>
+    <p>Regularyzacja dodaje do błędu karę za duże wagi. <strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
+
+    <h2 id="kluczowe-rozroznienia">Co wpływa na wybór modelu?</h2>
+    <ul>
+      <li><strong>Rodzaj zadania:</strong> regresja, klasyfikacja czy szukanie klastrów.</li>
+      <li><strong>Skala danych:</strong> k-NN i klasyczny SVM stają się kosztowne przy bardzo wielu obserwacjach.</li>
+      <li><strong>Skalowanie cech:</strong> jest ważne dla metod opartych na odległości, takich jak k-NN, SVM, k-means i DBSCAN; drzewa go nie potrzebują.</li>
+      <li><strong>Interpretacja:</strong> regresja logistyczna i małe drzewo są łatwiejsze do objaśnienia niż duży zespół drzew.</li>
+      <li><strong>Jakość walidacyjna:</strong> ostatecznego wyboru dokonujemy przez porównanie modeli w tym samym, poprawnie wykonanym schemacie walidacji.</li>
+    </ul>
+
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#typy-uczenia">Typy uczenia</a></li>
+    <li><a href="#proces">Proces uczenia</a></li>
+    <li><a href="#bias-variance-tradeoff">Niedouczenie i przeuczenie</a></li>
+    <li><a href="#walidacja-i-metryki">Walidacja i metryki</a></li>
+    <li><a href="#modele-nadzorowane">Modele nadzorowane</a></li>
+    <li><a href="#modele-nienadzorowane">Modele nienadzorowane</a></li>
+    <li><a href="#regularyzacja">Regularyzacja</a></li>
+    <li><a href="#kluczowe-rozroznienia">Wybór modelu</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

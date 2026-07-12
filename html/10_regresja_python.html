@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Budowa, analiza, wizualizacja modelu regresji liniowej w Python</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 10</p>
+    <h1>Budowa, analiza, wizualizacja modelu regresji liniowej w Python</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>Regresja liniowa służy do przewidywania wartości liczbowej i opisywania, jak zmienia się ona wraz z cechami wejściowymi. Praca z modelem obejmuje nie tylko wywołanie <code>fit()</code>, lecz cały proces: przygotowanie danych, dopasowanie, ocenę na nowych obserwacjach oraz sprawdzenie reszt.</p>
+
+    <h2 id="czym-jest">Czym jest regresja liniowa</h2>
+    <p>Regresja liniowa modeluje zależność zmiennej objaśnianej \(y\) od jednej cechy (regresja prosta) lub wielu cech (regresja wieloraka):</p>
+    <div class="mathblock">\[y = \beta_0 + \beta_1 x_1 + \ldots + \beta_p x_p + \varepsilon\]</div>
+    <p>Tu \(y\) jest modelowaną wartością, \(x_1,\ldots,x_p\) to \(p\) cech, \(\beta_0\) to wyraz wolny, \(\beta_i\) — ich współczynniki, a \(\varepsilon\) — część niewyjaśniona przez model. Model jest liniowy <strong>w parametrach</strong> \(\beta\), więc \(x^2\) użyte jako przygotowana cecha nadal daje regresję liniową.</p>
+
+    <h2 id="ols">Metoda najmniejszych kwadratów (OLS)</h2>
+    <p><strong>OLS</strong> (Ordinary Least Squares — zwykła metoda najmniejszych kwadratów) dobiera współczynniki tak, by suma kwadratów reszt była najmniejsza. Dla obserwacji \(i\) reszta \(e_i=y_i-\hat y_i\) jest różnicą między wynikiem rzeczywistym a przewidzianym:</p>
+    <div class="mathblock">\[\text{minimalizuj } \sum_{i=1}^{n} e_i^2\]</div>
+    <p>Podnoszenie reszt do kwadratu ma swoją cenę: OLS jest wrażliwy na wartości odstające, bo jeden skrajny punkt dominuje sumę i przeciąga prostą w swoim kierunku.</p>
+
+    <h2 id="zalozenia">Założenia modelu</h2>
+    <p>Aby współczynniki i podawana przez model niepewność miały właściwą interpretację, sprawdzamy następujące założenia:</p>
+    <ul>
+      <li><strong>Liniowość</strong> — oczekiwana wartość \(y\) jest liniową kombinacją przygotowanych cech.</li>
+      <li><strong>Niezależność błędów</strong> — błąd jednej obserwacji nie powinien przewidywać błędu innej; problem pojawia się np. w szeregu czasowym.</li>
+      <li><strong>Egzogeniczność</strong> — po uwzględnieniu cech w błędzie nie zostaje czynnik systematycznie z nimi związany.</li>
+      <li><strong>Homoskedastyczność</strong> — rozrzut błędów jest podobny dla małych i dużych przewidywań.</li>
+      <li><strong>Brak idealnej współliniowości</strong> — żadna cecha nie jest dokładną kombinacją pozostałych.</li>
+    </ul>
+    <p>Przy tych warunkach metoda najmniejszych kwadratów jest <strong>BLUE</strong> (Best Linear Unbiased Estimator — najlepszym liniowym estymatorem nieobciążonym), czyli ma najmniejszą wariancję w tej klasie estymatorów. Normalność błędów jest potrzebna głównie do dokładnych testów i przedziałów ufności w małej próbie. Silna współliniowość może nie zepsuć predykcji, ale destabilizuje pojedyncze współczynniki i utrudnia ich interpretację.</p>
+
+    <h2 id="analiza">Analiza modelu: R², metryki, reszty</h2>
+    <p>\(SS_{res}=\sum_i(y_i-\hat y_i)^2\) to błąd modelu, a \(SS_{tot}=\sum_i(y_i-\bar y)^2\) — całkowita zmienność wyników wokół średniej. Indeks \(i\) wskazuje obserwację, \(y_i\) jest jej wynikiem, \(\hat y_i\) przewidywaniem, a \(\bar y\) średnią wyników. W OLS z wyrazem wolnym dopiero po zsumowaniu całej próby zachodzi \(SS_{tot}=SS_{reg}+SS_{res}\). Stąd \(R^2=1-SS_{res}/SS_{tot}\) to część zmienności wyjaśniona przez model. Ponieważ rośnie nawet po dodaniu bezużytecznej cechy, skorygowane \(R^2\) karze za ich liczbę.</p>
+    <p>Błąd predykcji mierzymy m.in. przez <strong>RMSE</strong> (Root Mean Squared Error — pierwiastek błędu średniokwadratowego), który mocniej karze duże pomyłki, oraz <strong>MAE</strong> (Mean Absolute Error — średni błąd bezwzględny), który jest mniej wrażliwy na wartości odstające. Obie miary są w jednostkach zmiennej \(y\).</p>
+    <p>Reszty pozwalają sprawdzić założenia. Na wykresie reszt względem wartości dopasowanych losowa chmura wspiera założenie liniowości i stałej wariancji, lejek sugeruje heteroskedastyczność, a łuk — brakującą nieliniowość. <strong>Q–Q plot</strong> (quantile–quantile) porównuje kwantyle reszt z rozkładem normalnym; normalność jest potrzebna przede wszystkim do dokładnych testów i przedziałów w małych próbach, nie do samego dopasowania OLS.</p>
+    <p>Przedział ufności dotyczy średniego \(y\) dla danego \(x\), a przedział predykcji — pojedynczej nowej obserwacji, więc jest szerszy; oba rozszerzają się daleko od średniej wartości cechy.</p>
+
+    <h2 id="python">Budowa modelu w Pythonie</h2>
+    <ol>
+      <li><strong>Wybierz zmienną wynikową i cechy.</strong> Usuń oczywiste błędy danych, obsłuż braki i zakoduj zmienne kategorialne.</li>
+      <li><strong>Podziel dane</strong> na część treningową i testową. Wszystkie operacje uczące się z danych, np. imputację, dopasuj wyłącznie na części treningowej.</li>
+      <li><strong>Dopasuj model</strong> przez <code>model.fit(X_train, y_train)</code>.</li>
+      <li><strong>Oceń predykcję</strong> na zbiorze testowym za pomocą MAE lub RMSE i porównaj ją z prostą wartością odniesienia, np. przewidywaniem średniej.</li>
+      <li><strong>Zbadaj reszty</strong> i dopiero wtedy interpretuj współczynniki oraz niepewność.</li>
+    </ol>
+    <pre><code>from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error
+
+model = LinearRegression().fit(X_train, y_train)
+y_pred = model.predict(X_test)
+mae = mean_absolute_error(y_test, y_pred)</code></pre>
+    <p><code>sklearn.LinearRegression</code> wygodnie łączy się z podziałem danych, walidacją i <code>Pipeline</code>, dlatego służy głównie do predykcji. <code>statsmodels.OLS</code> zwraca rozbudowane podsumowanie ze współczynnikami, testami i przedziałami ufności, więc lepiej pasuje do wnioskowania statystycznego. W <code>statsmodels</code> wyraz wolny trzeba zwykle dodać jawnie przez <code>sm.add_constant(X)</code>.</p>
+
+    <h2 id="wizualizacja">Co należy zwizualizować?</h2>
+    <ul>
+      <li><strong>Przed dopasowaniem:</strong> wykres rozrzutu pokazuje kierunek zależności, nieliniowość i obserwacje odstające.</li>
+      <li><strong>Po dopasowaniu:</strong> wartości rzeczywiste względem przewidzianych pokazują ogólną trafność modelu.</li>
+      <li><strong>Reszty względem przewidywań:</strong> ujawniają łuk, lejek i pojedyncze duże błędy.</li>
+      <li><strong>Q–Q plot:</strong> pomaga ocenić, czy rozkład reszt mocno odbiega od normalnego.</li>
+    </ul>
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#czym-jest">Czym jest regresja liniowa</a></li>
+    <li><a href="#ols">Metoda najmniejszych kwadratów (OLS)</a></li>
+    <li><a href="#zalozenia">Założenia modelu</a></li>
+    <li><a href="#analiza">Analiza modelu: R², metryki, reszty</a></li>
+    <li><a href="#python">Budowa modelu w Pythonie</a></li>
+    <li><a href="#wizualizacja">Wizualizacja</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

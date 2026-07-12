@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parametry i rodzaje badań populacji generalnej w metodach reprezentacyjnych</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 7</p>
+    <h1>Parametry i rodzaje badań populacji generalnej w metodach reprezentacyjnych</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Metoda reprezentacyjna</strong> pozwala opisać całą zbiorowość na podstawie części jej jednostek. Najpierw określamy populację i cechę, którą mierzymy, następnie losujemy próbę według znanego schematu, a na końcu przeliczamy wyniki z próby na oszacowanie dla populacji. Losowanie jest tu kluczowe: umożliwia ocenę, jak bardzo wynik mógłby zmienić się po wylosowaniu innej próby.</p>
+
+    <h2 id="pojecia">Populacja, próba, operat</h2>
+    <p><strong>Populacja generalna</strong> to wszystkie jednostki, o których chcemy wyciągnąć wniosek. Musi być określona rzeczowo, przestrzennie i czasowo, np. „studenci polskich uczelni 1 października danego roku”. <strong>Jednostka badania</strong> jest pojedynczym elementem tej populacji, a <strong>cecha</strong> to mierzona właściwość jednostki, np. liczba godzin nauki tygodniowo.</p>
+    <p><strong>Operat losowania</strong> jest wykazem jednostek, z którego technicznie wybieramy <strong>próbę</strong>, czyli badaną część populacji. Operat powinien możliwie wiernie odpowiadać populacji. Jeżeli brakuje w nim części osób, występują duplikaty albo pozostają jednostki spoza populacji, mechanizm losowania nie naprawi tego błędu. Powstaje wtedy <strong>błąd pokrycia</strong>, a wynik może być systematycznie przesunięty.</p>
+    <p>W schemacie probabilistycznym każda jednostka ma znane, dodatnie <strong>prawdopodobieństwo inkluzji</strong> \(\pi_i\), czyli szansę znalezienia się w próbie. Gdy szanse są nierówne, jednostce o mniejszym \(\pi_i\) nadaje się zwykle większą wagę, często proporcjonalną do \(1/\pi_i\). Dzięki temu pojedyncza obserwacja reprezentuje odpowiednią liczbę podobnie losowanych jednostek populacji.</p>
+
+    <h2 id="rodzaje-badan">Badanie pełne a reprezentacyjne</h2>
+    <p><strong>Badanie pełne (wyczerpujące)</strong>, nazywane spisem, ma objąć każdą jednostkę populacji. Usuwa błąd wynikający z losowania próby i może dostarczyć danych dla bardzo małych obszarów, ale jest kosztowne i długotrwałe. Nadal może zawierać błędy pomiaru, braki odpowiedzi lub pominięcia jednostek, więc „pełne” nie oznacza automatycznie „bezbłędne”. Przykładem jest spis powszechny.</p>
+    <p><strong>Badanie reprezentacyjne (częściowe)</strong> obejmuje tylko próbę. Jest szybsze, tańsze i pozwala dokładniej kontrolować pracę ankieterów, ale wynik obarczony jest <strong>błędem losowania</strong>, ponieważ inna próba dałaby nieco inną wartość. Jeżeli znamy schemat doboru, możemy ten błąd oszacować i podać przedział ufności. Badanie próby wybiera się więc wtedy, gdy wystarcza wynik dla całej populacji lub dużych grup, a wymagany poziom dokładności można osiągnąć bez spisu.</p>
+
+    <h2 id="parametry">Parametry populacji</h2>
+    <p><strong>Parametr</strong> jest ustaloną, zwykle nieznaną charakterystyką całej populacji. Nie zmienia się wskutek wylosowania innej próby; zmienia się jedynie jego oszacowanie. Dla populacji liczącej \(N\) jednostek, w której wartość cechy dla jednostki \(i\) oznaczamy przez \(y_i\), najczęściej interesują nas:</p>
+    <ul>
+      <li><strong>Średnia</strong> \(\mu=\frac{1}{N}\sum_{i=1}^{N}y_i\) opisuje przeciętny poziom cechy, np. przeciętny miesięczny dochód.</li>
+      <li><strong>Wariancja</strong> \(\sigma^2=\frac{1}{N}\sum_{i=1}^{N}(y_i-\mu)^2\), a także jej pierwiastek, czyli odchylenie standardowe, opisują zróżnicowanie wartości wokół średniej.</li>
+      <li><strong>Proporcja</strong> \(P\) jest udziałem jednostek spełniających warunek. Można ją traktować jako średnią zmiennej przyjmującej 1, gdy warunek jest spełniony, i 0 w przeciwnym przypadku.</li>
+      <li><strong>Suma</strong> \(T=\sum_{i=1}^{N}y_i\), nazywana też wartością globalną, opisuje łączny poziom cechy, np. całkowite wydatki gospodarstw domowych.</li>
+    </ul>
+    <p>Dobór parametru zależy od pytania. Średnia odpowiada na pytanie „ile przeciętnie?”, proporcja — „jaki odsetek?”, wariancja — „jak bardzo wartości się różnią?”, a suma — „ile łącznie?”.</p>
+
+    <h2 id="estymator">Estymator i nieobciążoność</h2>
+    <p><strong>Estymator</strong> to reguła obliczania przybliżenia parametru z danych próby, np. średnia z próby \(\bar{y}\) może estymować średnią populacji \(\mu\). Przed losowaniem estymator jest zmienną losową, bo nie wiemy, które jednostki trafią do próby. Po zebraniu danych otrzymujemy jego konkretną wartość, nazywaną <strong>oszacowaniem</strong>.</p>
+    <p>Estymator jest <strong>nieobciążony</strong>, jeżeli jego wartość oczekiwana po wszystkich próbach możliwych w danym schemacie jest równa prawdziwemu parametrowi. Nie oznacza to, że wynik jednej próby będzie dokładnie trafny, lecz że procedura nie zawyża ani nie zaniża parametru systematycznie. <strong>Wariancja estymatora</strong> opisuje rozrzut wyników między możliwymi próbami, a jej pierwiastek to <strong>błąd standardowy</strong>.</p>
+    <p>Większa próba zwykle zmniejsza błąd standardowy, lecz dokładność zależy również od schematu losowania, zróżnicowania populacji i zastosowanych wag. Ponadto zwiększanie próby ogranicza błąd losowania, ale nie usuwa błędów pokrycia, pomiaru ani braku odpowiedzi. Z tego powodu duża próba dobrana wadliwie może dać bardziej precyzyjny, lecz nadal systematycznie błędny wynik.</p>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#pojecia">Populacja, próba, operat</a></li>
+      <li><a href="#rodzaje-badan">Badanie pełne a reprezentacyjne</a></li>
+      <li><a href="#parametry">Parametry populacji</a></li>
+      <li><a href="#estymator">Estymator i nieobciążoność</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

@@ -10,79 +10,91 @@
 <main class="wrap wrap-index">
   <p class="eyebrow">Egzamin magisterski · Inżynieria danych</p>
   <h1>Notatki egzaminacyjne</h1>
-  <div class="note-audio"><span class="na-label">▶ Cały materiał audio</span><audio controls preload="metadata" src="audio/wszystkie_notatki.mp3"></audio></div>
+  <p class="subtitle">20 notatek — po jednej na każde zagadnienie, w kolejności listy egzaminacyjnej.</p>
   <div id="dash" hidden></div>
-  <section class="group"><h2>Próbkowanie i estymacja</h2><div class="ncards"><a class="ncard" href="html/00_schematy_losowania.html">
+
+  <section class="group"><h2>Zagadnienia wspólne dla kierunku</h2><div class="ncards">
+<a class="ncard" href="html/01_optymalizacja_wielokryterialna.html">
         <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Populacja generalna i schematy losowania</span><span class="ncard-desc">Jak struktura doboru próby — nie jej wielkość — decyduje o precyzji estymatora.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Optymalizacja wielokryterialna w badaniach operacyjnych</span><span class="ncard-desc">Front Pareto, dominacja i metody wielokryterialne.</span></span>
       </a>
-<a class="ncard" href="html/01_estymatory_wartosci_sredniej.html">
+<a class="ncard" href="html/02_metody_sieciowe.html">
         <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">Estymatory wartości średniej</span><span class="ncard-desc">Nieobciążoność, wariancja i reważenie 1/πᵢ — dlaczego prosta średnia potrafi kłamać.</span></span>
-      </a></div></section>
-<section class="group"><h2>Przygotowanie danych i modele klasyczne</h2><div class="ncards"><a class="ncard" href="html/02_preprocessing.html">
-        <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Wstępne przetwarzanie danych</span><span class="ncard-desc">Skalowanie, kodowanie, braki danych i PCA — zanim model zobaczy dane.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Metody sieciowe w zarządzaniu projektami</span><span class="ncard-desc">Ścieżka krytyczna, zapasy czasowe i szacowanie czasu projektu (CPM/PERT).</span></span>
       </a>
-<a class="ncard" href="html/03_regresja_liniowa.html">
-        <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">Regresja liniowa</span><span class="ncard-desc">OLS, założenia, diagnostyka reszt oraz regularyzacja Ridge i Lasso.</span></span>
-      </a>
-<a class="ncard" href="html/04_wizualizacja.html">
+<a class="ncard" href="html/03_bezpieczenstwo_systemow.html">
         <span class="ncard-idx">03</span>
-        <span class="ncard-body"><span class="ncard-title">Wizualizacja danych</span><span class="ncard-desc">Gramatyka wykresu, percepcja i pułapki — na czele kwartet Anscombe'a.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Bezpieczeństwo systemów operacyjnych i aplikacji użytkowych</span><span class="ncard-desc">Obrona w głąb — warstwy ochrony wokół danych i aplikacji.</span></span>
       </a>
-<a class="ncard" href="html/10_klasyczne_ml.html">
+<a class="ncard" href="html/04_autoryzacja_podpis.html">
         <span class="ncard-idx">04</span>
+        <span class="ncard-body"><span class="ncard-title">Autoryzacja i kontrola dostępu do zasobów oraz podpis elektroniczny</span><span class="ncard-desc">Kontrola dostępu, funkcje skrótu i podpis cyfrowy.</span></span>
+      </a>
+<a class="ncard" href="html/05_klasyczna_vs_bigdata.html">
+        <span class="ncard-idx">05</span>
+        <span class="ncard-body"><span class="ncard-title">Porównanie klasycznej analizy danych z analizą Big Data</span><span class="ncard-desc">Kiedy klasyczna analiza ustępuje przetwarzaniu rozproszonemu.</span></span>
+      </a>
+<a class="ncard" href="html/06_mapreduce.html">
+        <span class="ncard-idx">06</span>
+        <span class="ncard-body"><span class="ncard-title">Paradygmat programowania MapReduce: cel, zasada działania, zastosowania</span><span class="ncard-desc">Model map → shuffle → reduce i rola monoidów oraz combinerów.</span></span>
+      </a>
+<a class="ncard" href="html/07_populacja_generalna.html">
+        <span class="ncard-idx">07</span>
+        <span class="ncard-body"><span class="ncard-title">Parametry i rodzaje badań populacji generalnej w metodach reprezentacyjnych</span><span class="ncard-desc">Populacja, próba i operat; parametry oraz badanie pełne vs reprezentacyjne.</span></span>
+      </a>
+<a class="ncard" href="html/08_schematy_losowania.html">
+        <span class="ncard-idx">08</span>
+        <span class="ncard-body"><span class="ncard-title">Schematy losowania próby w metodach reprezentacyjnych</span><span class="ncard-desc">SRS, warstwowe, systematyczne i grupowe — dobór próby a precyzja (DEFF).</span></span>
+      </a>
+<a class="ncard" href="html/09_estymatory_sredniej.html">
+        <span class="ncard-idx">09</span>
+        <span class="ncard-body"><span class="ncard-title">Rodzaje estymatorów wartości średniej w zależności od metod reprezentacyjnych</span><span class="ncard-desc">Nieobciążoność, wariancja i reważenie 1/πᵢ — dlaczego prosta średnia potrafi kłamać.</span></span>
+      </a>
+<a class="ncard" href="html/10_regresja_python.html">
+        <span class="ncard-idx">10</span>
+        <span class="ncard-body"><span class="ncard-title">Budowa, analiza, wizualizacja modelu regresji liniowej w Python</span><span class="ncard-desc">OLS, założenia Gaussa–Markowa, diagnostyka reszt; statsmodels vs sklearn.</span></span>
+      </a>
+<a class="ncard" href="html/11_wizualizacja.html">
+        <span class="ncard-idx">11</span>
+        <span class="ncard-body"><span class="ncard-title">Wykresy i wizualizacja danych w Python</span><span class="ncard-desc">Gramatyka wykresu, percepcja i pułapki — na czele kwartet Anscombe'a.</span></span>
+      </a>
+<a class="ncard" href="html/12_klasyczne_ml.html">
+        <span class="ncard-idx">12</span>
         <span class="ncard-body"><span class="ncard-title">Klasyczne modele uczenia maszynowego</span><span class="ncard-desc">Kompromis obciążenie–wariancja, SVM, drzewa, klastrowanie.</span></span>
-      </a></div></section>
-<section class="group"><h2>Uczenie głębokie</h2><div class="ncards"><a class="ncard" href="html/11_sieci_neuronowe.html">
-        <span class="ncard-idx">01</span>
+      </a>
+<a class="ncard" href="html/13_sieci_neuronowe.html">
+        <span class="ncard-idx">13</span>
         <span class="ncard-body"><span class="ncard-title">Sieci neuronowe</span><span class="ncard-desc">Propagacja w przód i wstecz, funkcje aktywacji, optymalizatory.</span></span>
       </a></div></section>
-<section class="group"><h2>Modele wielowymiarowe</h2><div class="ncards"><a class="ncard" href="html/12_modele_wielowymiarowe.html">
+
+  <section class="group"><h2>Specjalność: Modelowanie i analiza danych</h2><div class="ncards">
+<a class="ncard" href="html/14_modele_wielowymiarowe.html">
         <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Modele wielowymiarowe w prognozowaniu</span><span class="ncard-desc">PCA, LDA, GMM/EM i odległość Mahalanobisa w prognozowaniu.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Rola statystycznych modeli wielowymiarowych w prognozowaniu i podejmowaniu decyzji</span><span class="ncard-desc">PCA, LDA, GMM/EM i odległość Mahalanobisa w prognozowaniu.</span></span>
       </a>
-<a class="ncard" href="html/09_porownanie_modelowania.html">
+<a class="ncard" href="html/15_koncepcje_modelowania.html">
         <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">Porównanie koncepcji modelowania</span><span class="ncard-desc">Paradygmaty modelowania danych wielowymiarowych zestawione osiami.</span></span>
-      </a></div></section>
-<section class="group"><h2>Big Data i systemy rozproszone</h2><div class="ncards"><a class="ncard" href="html/06_big_data_vs_klasyczna.html">
-        <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Klasyczna analiza vs Big Data</span><span class="ncard-desc">Kiedy klasyczna analiza ustępuje przetwarzaniu rozproszonemu.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Podobieństwa i różnice w koncepcjach modelowania wielowymiarowych danych statystycznych</span><span class="ncard-desc">Paradygmaty modelowania danych wielowymiarowych zestawione osiami.</span></span>
       </a>
-<a class="ncard" href="html/07_mapreduce.html">
-        <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">MapReduce</span><span class="ncard-desc">Model map → shuffle → reduce i rola monoidów oraz combinerów.</span></span>
-      </a>
-<a class="ncard" href="html/05_raportowanie.html">
+<a class="ncard" href="html/16_raportowanie.html">
         <span class="ncard-idx">03</span>
-        <span class="ncard-body"><span class="ncard-title">Techniki raportowania</span><span class="ncard-desc">Hurtownie danych, agregaty i składalność miar (BI).</span></span>
+        <span class="ncard-body"><span class="ncard-title">Techniki raportowania z użyciem narzędzi programowania wyższego rzędu</span><span class="ncard-desc">Hurtownie danych, agregaty i składalność miar (BI).</span></span>
       </a>
-<a class="ncard" href="html/08_porownanie_narzedzi.html">
+<a class="ncard" href="html/17_text_mining.html">
         <span class="ncard-idx">04</span>
-        <span class="ncard-body"><span class="ncard-title">Porównanie metod i narzędzi</span><span class="ncard-desc">Batch vs streaming; krajobraz narzędzi na osiach skali i latencji.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Techniki i metody wydobywania informacji z plików tekstowych</span><span class="ncard-desc">TF-IDF, przestrzeń wektorowa i miary podobieństwa tekstu.</span></span>
       </a>
-<a class="ncard" href="html/13_text_mining.html">
+<a class="ncard" href="html/18_preprocessing.html">
         <span class="ncard-idx">05</span>
-        <span class="ncard-body"><span class="ncard-title">Wydobywanie informacji z tekstu</span><span class="ncard-desc">TF-IDF, przestrzeń wektorowa i miary podobieństwa tekstu.</span></span>
-      </a></div></section>
-<section class="group"><h2>Optymalizacja i zarządzanie projektami</h2><div class="ncards"><a class="ncard" href="html/14_optymalizacja_wielokryterialna.html">
-        <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Optymalizacja wielokryterialna</span><span class="ncard-desc">Front Pareto, dominacja i metody wielokryterialne.</span></span>
+        <span class="ncard-body"><span class="ncard-title">Proces wstępnego przetwarzania danych – etapy, cele i wpływ na jakość wyników analizy</span><span class="ncard-desc">Skalowanie, kodowanie, braki danych i PCA — zanim model zobaczy dane.</span></span>
       </a>
-<a class="ncard" href="html/15_cpm_pert.html">
-        <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">Metody sieciowe: CPM i PERT</span><span class="ncard-desc">Ścieżka krytyczna, zapasy czasowe i szacowanie czasu projektu.</span></span>
-      </a></div></section>
-<section class="group"><h2>Bezpieczeństwo IT</h2><div class="ncards"><a class="ncard" href="html/16_bezpieczenstwo_it.html">
-        <span class="ncard-idx">01</span>
-        <span class="ncard-body"><span class="ncard-title">Bezpieczeństwo systemów i aplikacji</span><span class="ncard-desc">Obrona w głąb — warstwy ochrony wokół danych i aplikacji.</span></span>
+<a class="ncard" href="html/19_regresja_dane_rzeczywiste.html">
+        <span class="ncard-idx">06</span>
+        <span class="ncard-body"><span class="ncard-title">Model regresji liniowej w zastosowaniach do modelowania danych rzeczywistych</span><span class="ncard-desc">Gdy założenia padają: transformacje, regularyzacja Ridge/Lasso, interpretacja.</span></span>
       </a>
-<a class="ncard" href="html/17_autoryzacja_podpis.html">
-        <span class="ncard-idx">02</span>
-        <span class="ncard-body"><span class="ncard-title">Autoryzacja, dostęp i podpis cyfrowy</span><span class="ncard-desc">Kontrola dostępu, funkcje skrótu i podpis cyfrowy.</span></span>
+<a class="ncard" href="html/20_porownanie_narzedzi.html">
+        <span class="ncard-idx">07</span>
+        <span class="ncard-body"><span class="ncard-title">Porównanie metod i narzędzi stosowanych w przetwarzaniu oraz analizie danych</span><span class="ncard-desc">Batch vs streaming; krajobraz narzędzi na osiach skali i latencji.</span></span>
       </a></div></section>
 
 </main>

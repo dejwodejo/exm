@@ -1,0 +1,162 @@
+<figure class="viz" id="v03">
+  <div class="viz-head">
+    <p class="viz-title">OLS: dosłowne kwadraty reszt i kara kwadratowa</p>
+    <p class="viz-sub">Przy każdym punkcie rysujemy kwadrat o boku równym reszcie eᵢ (pionowy odcinek do prostej). Suma ich pól to kryterium OLS Σeᵢ². Przeciągnij pomarańczowy outlier (albo użyj suwaka) i zobacz, jak jego pole rośnie kwadratowo.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="v03-svg" viewBox="0 0 680 340" role="img" aria-label="Chmura punktów, prosta OLS i kwadraty reszt; jeden outlier z nieproporcjonalnie dużym kwadratem"></svg>
+  </div>
+  <div class="viz-controls">
+    <label>Położenie outliera (y)
+      <input id="v03-oy" type="range" min="0.5" max="10.5" step="0.1" value="9.5">
+      <span class="val" id="v03-oyv">9.5</span>
+    </label>
+    <span class="toggle" id="v03-fit" role="button" tabindex="0" aria-pressed="false">Dopasuj OLS do wszystkich (z outlierem)</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      <b>SUMA pól = Σeᵢ² = <span id="v03-sum">–</span></b> · udział outliera <b id="v03-share">–</b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> OLS minimalizuje <i>sumę kwadratów</i> reszt, więc podniesienie błędu 2× zwiększa jego pole 4× — jeden outlier potrafi zdominować kryterium i przeciągnąć prostą w swoją stronę.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("v03-svg");
+  var cvar=function(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();};
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  var W=680,H=340,L=44,R=20,T=18,B=42, x0=L,x1=W-R,y0=H-B,y1=T, xmax=10, ymax=11;
+  var cx=function(x){return x0+x/xmax*(x1-x0);};
+  var cy=function(v){return y0-v/ymax*(y0-y1);};
+  var invy=function(py){return (y0-py)/(y0-y1)*ymax;};
+  // dane ilustracyjne: 6 punktów przy prostej + 1 ruchomy outlier
+  var INL=[[1.0,1.9],[2.2,3.0],[3.4,4.1],[5.0,5.6],[6.4,7.0],[8.6,8.9]];
+  var OX=4.5; // stałe x outliera
+  function ols(P){
+    var n=P.length,sx=0,sy=0,sxy=0,sxx=0,i;
+    for(i=0;i<n;i++){sx+=P[i][0];sy+=P[i][1];sxy+=P[i][0]*P[i][1];sxx+=P[i][0]*P[i][0];}
+    var b=(sxy-sx*sy/n)/(sxx-sx*sx/n), a=sy/n-b*sx/n;
+    return {a:a,b:b};
+  }
+  var slider=document.getElementById("v03-oy"),
+      fit=document.getElementById("v03-fit");
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var refit=fit.getAttribute("aria-pressed")==="true";
+    var oy=parseFloat(slider.value);
+    var INK=cvar("--ink"),INK2=cvar("--ink2"),MUT=cvar("--muted"),GRID=cvar("--v-grid"),
+        AX=cvar("--v-axis"),BL=cvar("--v-blue"),OR=cvar("--v-orange"),TE=cvar("--v-teal"),
+        AM=cvar("--v-amber"),BG=cvar("--bg2");
+    var clean=ols(INL);
+    var all=INL.concat([[OX,oy]]);
+    var line=refit?ols(all):clean;
+
+    // siatka + osie
+    var g;
+    for(g=0;g<=ymax;g+=2){svg.appendChild(E("line",{x1:x0,y1:cy(g),x2:x1,y2:cy(g),stroke:GRID,"stroke-width":1}));
+      svg.appendChild(E("text",{x:x0-8,y:cy(g)+4,"text-anchor":"end","font-size":10,fill:MUT},String(g)));}
+    for(g=0;g<=xmax;g+=2){svg.appendChild(E("text",{x:cx(g),y:y0+16,"text-anchor":"middle","font-size":10,fill:MUT},String(g)));}
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x1,y2:y0,stroke:AX,"stroke-width":1.4}));
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:AX,"stroke-width":1.4}));
+
+    // referencyjna prosta bez outliera (gdy dopasowujemy do wszystkich)
+    if(refit){
+      svg.appendChild(E("line",{x1:cx(0),y1:cy(clean.a),x2:cx(xmax),y2:cy(clean.a+clean.b*xmax),
+        stroke:MUT,"stroke-width":1.4,"stroke-dasharray":"5 4",opacity:.8}));
+      svg.appendChild(E("text",{x:cx(xmax),y:cy(clean.a+clean.b*xmax)+14,"text-anchor":"end","font-size":10,fill:MUT},"bez outliera"));
+    }
+
+    // kwadraty reszt (rysujemy przed prostą, żeby prosta była na wierzchu)
+    var sum=0,oShare=0,i,P,x,y,yh,e,sidePx,top,left,isOut,col;
+    for(i=0;i<all.length;i++){
+      P=all[i]; x=P[0]; y=P[1]; isOut=(i===all.length-1);
+      yh=line.a+line.b*x; e=y-yh; sum+=e*e;
+      sidePx=Math.abs(cy(y)-cy(yh));
+      top=Math.min(cy(y),cy(yh));
+      left=cx(x);
+      col=isOut?AM:TE;
+      // dosłowny kwadrat: bok = reszta, rozciągnięty w prawo
+      svg.appendChild(E("rect",{x:left,y:top,width:sidePx,height:sidePx,fill:col,"fill-opacity":isOut?0.20:0.28,
+        stroke:col,"stroke-width":isOut?1.6:1.1}));
+      // pionowy odcinek reszty (lewy bok kwadratu, pogrubiony)
+      svg.appendChild(E("line",{x1:left,y1:cy(y),x2:left,y2:cy(yh),stroke:col,"stroke-width":2.2}));
+    }
+
+    // prosta OLS
+    svg.appendChild(E("line",{x1:cx(0),y1:cy(line.a),x2:cx(xmax),y2:cy(line.a+line.b*xmax),
+      stroke:INK,"stroke-width":2.6,"stroke-linecap":"round"}));
+
+    // punkty (na wierzchu)
+    for(i=0;i<all.length;i++){
+      P=all[i]; isOut=(i===all.length-1);
+      if(isOut){var eo=P[1]-(line.a+line.b*P[0]); oShare=eo*eo;}
+      svg.appendChild(E("circle",{cx:cx(P[0]),cy:cy(P[1]),r:isOut?7:5,
+        fill:isOut?OR:BL,stroke:BG,"stroke-width":2,
+        style:isOut?"cursor:ns-resize":""}));
+    }
+    // uchwyt outliera – etykieta
+    svg.appendChild(E("text",{x:cx(OX),y:cy(oy)-12,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:OR},"outlier ↕"));
+
+    // podpisy osi + prostej
+    svg.appendChild(E("text",{x:(x0+x1)/2,y:H-6,"text-anchor":"middle","font-size":11,fill:MUT},"x"));
+    svg.appendChild(E("text",{x:cx(xmax)-4,y:cy(line.a+line.b*xmax)-8,"text-anchor":"end","font-size":10.5,"font-weight":700,fill:INK2},"prosta OLS ŷ = β₀ + β₁x"));
+
+    // inset: MSE karze duże reszty szybciej niż MAE
+    var ix=500, iy=36, iw=150, ih=96, ax=ix+25, ay=iy+ih-24, pxw=iw-38, pxh=ih-38;
+    svg.appendChild(E("rect",{x:ix,y:iy,width:iw,height:ih,rx:6,fill:BG,stroke:GRID,"stroke-width":1,opacity:.96}));
+    svg.appendChild(E("text",{x:ix+9,y:iy+15,"font-size":10.5,"font-weight":700,fill:INK2},"kara błędu"));
+    svg.appendChild(E("line",{x1:ax,y1:ay,x2:ax+pxw,y2:ay,stroke:AX,"stroke-width":1}));
+    svg.appendChild(E("line",{x1:ax,y1:ay,x2:ax,y2:ay-pxh,stroke:AX,"stroke-width":1}));
+    var pMae="", pMse="";
+    for(var t=0;t<=40;t++){
+      var er=t/10, xx=ax+er/4*pxw;
+      pMae+=(t?"L":"M")+xx.toFixed(1)+" "+(ay-(er/16)*pxh).toFixed(1);
+      pMse+=(t?"L":"M")+xx.toFixed(1)+" "+(ay-(er*er/16)*pxh).toFixed(1);
+    }
+    svg.appendChild(E("path",{d:pMae,fill:"none",stroke:TE,"stroke-width":1.8}));
+    svg.appendChild(E("path",{d:pMse,fill:"none",stroke:OR,"stroke-width":2.2}));
+    svg.appendChild(E("text",{x:ax+pxw-2,y:ay-10,"text-anchor":"end","font-size":9.5,fill:TE},"|e|"));
+    svg.appendChild(E("text",{x:ax+pxw-2,y:ay-pxh+10,"text-anchor":"end","font-size":9.5,fill:OR,"font-weight":700},"e²"));
+    svg.appendChild(E("text",{x:ax+pxw/2,y:ay+14,"text-anchor":"middle","font-size":9,fill:MUT},"|reszta|"));
+
+    // odczyty
+    document.getElementById("v03-oyv").textContent=oy.toFixed(1);
+    document.getElementById("v03-sum").textContent=sum.toFixed(2);
+    document.getElementById("v03-share").textContent=(sum>0?Math.round(oShare/sum*100):0)+"%";
+  }
+
+  // suwak
+  slider.addEventListener("input",render);
+  // przełącznik dopasowania
+  function toggleFit(){fit.setAttribute("aria-pressed",fit.getAttribute("aria-pressed")==="true"?"false":"true");render();}
+  fit.addEventListener("click",toggleFit);
+  fit.addEventListener("keydown",function(ev){if(ev.key===" "||ev.key==="Enter"){ev.preventDefault();toggleFit();}});
+
+  // przeciąganie outliera w pionie
+  var dragging=false;
+  function toData(ev){
+    var r=svg.getBoundingClientRect();
+    var py=(ev.clientY-r.top)/r.height*H;
+    return Math.max(0.5,Math.min(10.5,invy(py)));
+  }
+  function nearOutlier(ev){
+    var r=svg.getBoundingClientRect();
+    var px=(ev.clientX-r.left)/r.width*W, py=(ev.clientY-r.top)/r.height*H;
+    var dx=px-cx(OX), dy=py-cy(parseFloat(slider.value));
+    return Math.sqrt(dx*dx+dy*dy)<22;
+  }
+  svg.addEventListener("pointerdown",function(ev){
+    if(nearOutlier(ev)){dragging=true;svg.setPointerCapture(ev.pointerId);
+      slider.value=toData(ev).toFixed(1);render();ev.preventDefault();}
+  });
+  svg.addEventListener("pointermove",function(ev){
+    if(dragging){slider.value=toData(ev).toFixed(1);render();}
+  });
+  function endDrag(){dragging=false;}
+  svg.addEventListener("pointerup",endDrag);
+  svg.addEventListener("pointercancel",endDrag);
+
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>

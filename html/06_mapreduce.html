@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paradygmat programowania MapReduce: cel, zasada działania, zastosowania</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 6</p>
+    <h1>Paradygmat programowania MapReduce: cel, zasada działania, zastosowania</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>MapReduce</strong> to model programistyczny do przetwarzania bardzo dużych danych na wielu komputerach. Programista definiuje głównie dwie operacje: <em>map</em> przekształca rekordy, a <em>reduce</em> scala wyniki należące do tego samego klucza. System dzieli pracę, uruchamia ją równolegle, przesyła dane i ponawia zadania po awarii. Celem jest ukrycie złożoności klastra za prostym interfejsem par klucz–wartość.</p>
+    <p>Model najlepiej pasuje do zadań wsadowych, w których wiele rekordów można przetworzyć niezależnie, a następnie pogrupować i zagregować.</p>
+
+    <h2 id="zasada">Zasada działania</h2>
+    <p>Użytkownik dostarcza dwie funkcje: <strong>map</strong> zamienia rekord wejściowy w pary klucz–wartość, a <strong>reduce</strong> dostaje klucz ze wszystkimi jego wartościami i tworzy wynik.</p>
+    <ol>
+      <li><strong>Split</strong> — wejście, np. plik w <strong>HDFS</strong> (Hadoop Distributed File System), jest dzielone na fragmenty przetwarzane równolegle; ich rozmiar zależy od konfiguracji.</li>
+      <li><strong>Map</strong> — każdy mapper niezależnie odczytuje rekordy fragmentu i emituje zero, jedną lub wiele par klucz–wartość. Klucz określa późniejszą grupę.</li>
+      <li><strong>Shuffle &amp; sort</strong> — system dzieli pary według klucza, przesyła je do reducerów i grupuje. Wszystkie wartości jednego klucza muszą trafić do tego samego reducera.</li>
+      <li><strong>Reduce</strong> — otrzymuje klucz i jego wartości, scala je i emituje wynik. Różne klucze mogą być obsługiwane równolegle.</li>
+      <li><strong>Output</strong> — zapis do HDFS (jeden plik na reducer).</li>
+    </ol>
+    <p>Shuffle jest zwykle najdroższą fazą, ponieważ dane pośrednie trzeba podzielić, często zapisać, przesłać przez sieć i posortować. Szybkie mapowanie nie pomoże, jeśli prawie cały wynik pośredni musi przejść między maszynami.</p>
+
+    <h2 id="mechanizmy">Trzy kluczowe mechanizmy</h2>
+    <ul>
+      <li><strong>Combiner</strong> wykonuje lokalną agregację przed shuffle. Zamiast tysiąca par <em>(kot, 1)</em> może wysłać <em>(kot, 1000)</em>. Może uruchomić się zero lub wiele razy, więc poprawność nie może od niego zależeć; średnia wymaga przesłania sumy i liczności.</li>
+      <li><strong>Data locality</strong> („move computation to data”) — to kod jest wysyłany tam, gdzie fizycznie leżą dane, a nie odwrotnie. Dzięki temu wąskim gardłem przestaje być sieć, a staje się lokalny dysk węzła.</li>
+      <li><strong>Odporność na awarie przez ponowne wykonanie</strong> — gdy węzeł przestaje odpowiadać, framework uruchamia jego zadanie na innej maszynie. Dlatego funkcje powinny być deterministyczne: dla tego samego wejścia dawać ten sam wynik i nie polegać na ukrytych efektach ubocznych.</li>
+    </ul>
+
+    <h2 id="przyklad">Przykład: WordCount</h2>
+    <ol>
+      <li>Mapper emituje parę <em>(słowo, 1)</em> dla każdego wystąpienia.</li>
+      <li>Combiner może lokalnie zsumować jedynki, np. do <em>(dane, 40)</em>.</li>
+      <li>Shuffle kieruje częściowe wyniki tego samego słowa do jednego reducera.</li>
+      <li>Reducer dodaje wartości i zapisuje końcową liczność.</li>
+    </ol>
+
+    <h2 id="zastosowania">Zastosowania</h2>
+    <ul>
+      <li><strong>Indeks odwrócony</strong> — map emituje \((\text{term},\text{docID})\), reduce zbiera listę dokumentów. Fundament wyszukiwarek.</li>
+      <li><strong>Join</strong> — łączenie tabel po wspólnym kluczu w fazie reduce.</li>
+      <li><strong>Agregacje i statystyki</strong> — sumy, liczności, min/max po grupach: map liczy lokalnie, reduce scala. To najprostsza klasa zadań, do których MapReduce pasuje wprost.</li>
+    </ul>
+
+    <h2 id="ograniczenia">Ograniczenia i miejsce dziś</h2>
+    <ul>
+      <li><strong>Koszt shuffle</strong> wynika z operacji dyskowych, sortowania i transferu sieciowego. Combiner, kompresja i dobry klucz ograniczają ruch, ale nie usuwają koniecznego grupowania.</li>
+      <li><strong>Data skew</strong> pojawia się, gdy jeden klucz dominuje: pojedynczy reducer dostaje większość pracy, a cały job czeka mimo bezczynności pozostałych węzłów.</li>
+      <li><strong>Algorytmy iteracyjne</strong> są nieefektywne, bo każda runda zapisuje wynik, a następna ponownie go odczytuje. Spark ogranicza ten koszt, utrzymując dane pośrednie w pamięci.</li>
+      <li><strong>Duże opóźnienie</strong> sprawia, że MapReduce pasuje do batchu, nie do interaktywnych zapytań i reakcji w czasie rzeczywistym.</li>
+    </ul>
+  </main>
+  <nav class="toc" aria-label="Spis treści">
+    <h5>Na tej stronie</h5>
+    <ol>
+      <li><a href="#zasada">Zasada działania</a></li>
+      <li><a href="#mechanizmy">Trzy kluczowe mechanizmy</a></li>
+      <li><a href="#przyklad">Przykład: WordCount</a></li>
+      <li><a href="#zastosowania">Zastosowania</a></li>
+      <li><a href="#ograniczenia">Ograniczenia i miejsce dziś</a></li>
+    </ol>
+  </nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metody sieciowe w zarządzaniu projektami</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 2</p>
+    <h1>Metody sieciowe w zarządzaniu projektami</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p><strong>Metody sieciowe</strong> przedstawiają projekt jako układ czynności i zależności. Pozwalają ustalić nie tylko czas każdego zadania, ale przede wszystkim to, które opóźnienia przesuną termin całego projektu, a które zmieszczą się w dostępnym marginesie.</p>
+
+    <h2 id="dag">Sieć projektu jako DAG</h2>
+    <p>Projekt dzieli się na czynności, a dla każdej wskazuje <strong>poprzedników</strong>, którzy muszą zakończyć się przed jej startem. Zależności tworzą <strong>DAG</strong> (Directed Acyclic Graph — skierowany graf acykliczny): brak cykli oznacza, że zadanie nie może pośrednio zależeć od samego siebie. Cykl A → B → C → A uniemożliwiałby rozpoczęcie prac i świadczył o błędzie w planie.</p>
+    <p>W konwencji <strong>AON</strong> (Activity on Node — czynność w węźle) węzeł oznacza zadanie wraz z czasem trwania, a strzałka — zależność. Sieć buduje się kolejno:</p>
+    <ol>
+      <li>wypisuje się czynności i czasy trwania,</li>
+      <li>dla każdej wskazuje się bezpośrednich poprzedników,</li>
+      <li>sprawdza się brak cykli,</li>
+      <li>ustawia zadania tak, aby każdy poprzednik występował przed następcą.</li>
+    </ol>
+    <p>Taki porządek umożliwia obliczenie harmonogramu od początku do końca, a następnie w przeciwnym kierunku. Sama sieć opisuje zależności logiczne, nie dostępność ludzi, maszyn ani materiałów.</p>
+
+    <h2 id="cpm">Algorytm CPM</h2>
+    <p><strong>CPM</strong> (Critical Path Method — metoda ścieżki krytycznej) zakłada znane, stałe czasy czynności. Dla każdego zadania wyznacza się:</p>
+    <ul>
+      <li><strong>ES</strong> i <strong>EF</strong> (Early Start, Early Finish) — najwcześniejszy start i koniec,</li>
+      <li><strong>LS</strong> i <strong>LF</strong> (Late Start, Late Finish) — najpóźniejszy start i koniec, które nie opóźnią projektu.</li>
+    </ul>
+    <p>W <strong>przejściu w przód</strong> pierwsze zadania zaczynają się w chwili 0, a (EF=ES+t), gdzie (t) jest czasem trwania. Zadanie z kilkoma poprzednikami czeka na najpóźniej kończącego się z nich, dlatego jego (ES) jest maksimum ich wartości (EF). Największe zakończenie zadań końcowych wyznacza minimalny czas projektu.</p>
+    <p>W <strong>przejściu wstecz</strong> zaczynamy od terminu końca. Liczymy (LS=LF-t), a zadanie z kilkoma następcami musi skończyć się przed najwcześniejszym z ich dopuszczalnych startów. Dlatego jego (LF) jest minimum wartości (LS) następców.</p>
+
+    <h2 id="sciezka">Zapasy czasowe i ścieżka krytyczna</h2>
+    <p><strong>Zapas całkowity</strong> wynosi (TF=LS-ES=LF-EF) i mówi, o ile można opóźnić czynność bez przesunięcia końca projektu. Jest marginesem harmonogramu, nie dodatkowym czasem pracy. <strong>Ścieżka krytyczna</strong> jest najdłuższą czasowo drogą od startu do końca; tworzą ją zadania o zerowym zapasie. Ich opóźnienie bez odzyskania czasu gdzie indziej opóźnia cały projekt. Ścieżek krytycznych może być kilka.</p>
+    <p><strong>Przykład</strong>: A trwa 3 dni. Po niej równolegle wykonywane są B (4 dni) i C (2 dni), a D (2 dni) czeka na oba. Najwcześniejsze terminy to A 0–3, B 3–7, C 3–5, D 7–9. Projekt trwa 9 dni, a ścieżką krytyczną jest A–B–D. C może rozpocząć się dwa dni później, bo ma dwa dni zapasu.</p>
+
+    <h2 id="pert">PERT — czasy niepewne</h2>
+    <p><strong>PERT</strong> (Program Evaluation and Review Technique — technika oceny i kontroli programu) stosuje się, gdy jeden pewny czas byłby nierealistyczny. Dla zadania podajemy czas optymistyczny (a), najbardziej prawdopodobny (m) i pesymistyczny (b), a czas oczekiwany przybliżamy wzorem:</p>
+    <div class="mathblock">\[t_e=\frac{a+4m+b}{6}\]</div>
+    <p>Największą wagę otrzymuje scenariusz typowy, a skrajne oceny uwzględniają niepewność. Otrzymane czasy można wstawić do sieci i przeprowadzić rachunek CPM. Wynik pozostaje prognozą: oceny są subiektywne, opóźnienia mogą mieć wspólną przyczynę, a w realizacji krytyczna może stać się inna ścieżka.</p>
+
+    <h2 id="crashing">Time-cost trade-off (crashing)</h2>
+    <p><strong>Crashing</strong>, czyli kosztowe skracanie harmonogramu, polega na przeznaczeniu dodatkowych zasobów na szybsze wykonanie wybranych czynności. Postępujemy iteracyjnie:</p>
+    <ol>
+      <li>wyznaczamy aktualną ścieżkę lub ścieżki krytyczne,</li>
+      <li>wybieramy możliwą do skrócenia czynność krytyczną o najniższym koszcie jednego dnia,</li>
+      <li>skracamy ją do dopuszczalnego minimum albo do pojawienia się nowej ścieżki krytycznej,</li>
+      <li>ponownie przeliczamy sieć.</li>
+    </ol>
+    <p>Skracanie zadania niekrytycznego nie przyspiesza projektu, dopóki mieści się ono w swoim zapasie. Przy kilku ścieżkach krytycznych trzeba skrócić zadanie wspólne albo odpowiednie zadania na każdej drodze.</p>
+
+    <h2 id="ograniczenia">Ograniczenia i zastosowania</h2>
+    <p>Metody sieciowe stosuje się m.in. w budownictwie, remontach, wdrożeniach informatycznych i projektach badawczych. Ich podstawowe ograniczenia wynikają z modelu:</p>
+    <ul>
+      <li><strong>Ograniczone zasoby</strong> — CPM i PERT zakładają, że wszystkie logicznie dostępne zadania mogą ruszyć jednocześnie. Jeśli dwa wymagają tej samej maszyny, realny harmonogram będzie dłuższy.</li>
+      <li><strong>Niepewne dane</strong> — nawet dobry szacunek nie przewidzi każdej awarii i poprawki, więc harmonogram trzeba aktualizować.</li>
+      <li><strong>Błędna sieć</strong> — pominięta czynność lub zły poprzednik daje precyzyjny rachunek dla nieprawidłowego projektu.</li>
+      <li><strong>Ścieżki bliskie krytycznej</strong> — zadanie z małym zapasem może szybko stać się krytyczne, dlatego nie kontroluje się wyłącznie zadań o zapasie zero.</li>
+    </ul>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+<li><a href="#dag">Sieć projektu jako DAG</a></li>
+<li><a href="#cpm">Algorytm CPM</a></li>
+<li><a href="#sciezka">Zapasy czasowe i ścieżka krytyczna</a></li>
+<li><a href="#pert">PERT — czasy niepewne</a></li>
+<li><a href="#crashing">Time-cost trade-off (crashing)</a></li>
+<li><a href="#ograniczenia">Ograniczenia i zastosowania</a></li></ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

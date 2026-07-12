@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wykresy i wizualizacja danych w Python</title>
+<link rel="stylesheet" href="../assets/katex/katex.min.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/notes.css">
+<script defer src="../assets/katex/katex.min.js"></script>
+<script defer src="../assets/katex/auto-render.min.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
+</head><body>
+<div class="topbar">
+  <a href="../index.html">← Wszystkie notatki</a>
+  <span class="sp"></span>
+  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
+  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
+</div>
+<div class="layout">
+  <main class="wrap">
+    <p class="eyebrow">Zagadnienie wspólne · 11</p>
+    <h1>Wykresy i wizualizacja danych w Python</h1>
+    <p class="subtitle">Notatka egzaminacyjna</p>
+
+    <p>Wizualizacja służy dwóm celom. Podczas <strong>EDA</strong> (Exploratory Data Analysis — eksploracyjnej analizy danych) pomaga odkrywać rozkłady, zależności i błędy. W raporcie ma natomiast jasno przekazać już znaleziony wniosek. Dobry wykres pozwala szybko odczytać właściwe porównanie i nie sugeruje różnic, których w danych nie ma.</p>
+
+    <h2 id="typ-danych">Typ danych i cel wyznaczają wykres</h2>
+    <p>Najpierw określamy typ danych. Zmienna <strong>nominalna</strong> zawiera kategorie bez kolejności, np. województwo. Zmienna <strong>porządkowa</strong> ma ustaloną kolejność, ale odstępy między poziomami nie muszą być równe, np. ocena „niska–średnia–wysoka”. Zmienna <strong>ilościowa</strong> jest liczbą, dla której różnica wartości ma znaczenie, np. dochód lub temperatura. Następnie wybieramy cel: rozkład, porównanie grup, zależność albo zmianę w czasie.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Cel</th><th>Dane</th><th>Wykres</th></tr></thead>
+      <tbody>
+        <tr><td>Rozkład jednej zmiennej liczbowej</td><td>wartości liczbowe</td><td>histogram; pomocniczo boxplot lub estymata gęstości</td></tr>
+        <tr><td>Porównanie kategorii</td><td>kategoria i wartość</td><td>wykres słupkowy</td></tr>
+        <tr><td>Część całości</td><td>udziały sumujące się do 100%</td><td>wykres słupkowy; kołowy tylko przy kilku częściach</td></tr>
+        <tr><td>Zależność dwóch zmiennych</td><td>dwie wartości liczbowe</td><td>wykres rozrzutu</td></tr>
+        <tr><td>Zmiana w czasie</td><td>czas i wartość</td><td>wykres liniowy</td></tr>
+        <tr><td>Wiele zmiennych liczbowych</td><td>macierz cech</td><td>macierz korelacji lub zestaw wykresów rozrzutu</td></tr>
+      </tbody>
+    </table></div>
+    <p>Ludzie najłatwiej porównują położenie na wspólnej osi i długość, a gorzej kąty, powierzchnie oraz objętości. Dlatego słupki są zwykle czytelniejsze od wykresu kołowego, a położenie punktów łatwiej porównać niż wielkość bąbelków.</p>
+
+    <h2 id="budowa">Jak zbudować czytelny wykres?</h2>
+    <ol>
+      <li>Określ jedno pytanie, na które wykres ma odpowiedzieć.</li>
+      <li>Dobierz typ wykresu do danych i porównania.</li>
+      <li>Podpisz osie, podaj jednostki i zrozumiały tytuł opisujący treść.</li>
+      <li>Usuń ozdoby, które nie niosą informacji, np. efekt 3D lub zbędną legendę.</li>
+      <li>Sprawdź skalę osi, kolory oraz czy wykres pozostaje czytelny dla osoby nierozróżniającej części barw.</li>
+    </ol>
+
+    <h2 id="pulapki">Pułapki wizualizacji</h2>
+    <ul>
+      <li><strong>Obcięta oś Y</strong> — najczęstsze zniekształcenie: słupek wyolbrzymia różnice, bo jego długość przestaje odpowiadać wartości.</li>
+      <li><strong>Sam boxplot ukrywa kształt rozkładu</strong> — dwa różne rozkłady mogą mieć tę samą medianę i kwartyle. Histogram lub <strong>KDE</strong> (Kernel Density Estimation — estymacja gęstości) pokażą np. kilka skupisk wartości.</li>
+      <li><strong>Overplotting</strong> — miliony punktów w scatter zlewają się w czarną plamę; ratują przezroczystość (<code>alpha</code>), <code>hexbin</code>, 2D KDE lub próbkowanie.</li>
+      <li><strong>Korelacja nie pokazuje całej zależności</strong> — korelacja Pearsona opisuje związek liniowy. Wartość bliska zeru nie wyklucza zależności krzywoliniowej, a wysoka korelacja nie dowodzi przyczynowości.</li>
+      <li><strong>Źle dobrane kolory</strong> — tęczowa paleta może tworzyć pozorne granice. Do wartości rosnących sprawdza się np. <code>viridis</code>, a do odchyleń w dwóch kierunkach paleta z neutralnym środkiem. Ważne grupy warto odróżniać nie tylko kolorem, lecz także markerem lub stylem linii.</li>
+    </ul>
+
+    <h2 id="biblioteki">Biblioteki Python</h2>
+    <ul>
+      <li><strong>Matplotlib</strong> daje pełną kontrolę nad elementami wykresu. Typowy początek to <code>fig, ax = plt.subplots()</code>, a następnie wywołania metod obiektu <code>ax</code>.</li>
+      <li><strong>Seaborn</strong> upraszcza wykresy statystyczne i bezpośrednio obsługuje kolumny obiektu <code>DataFrame</code>. Parametry takie jak <code>hue</code> dzielą dane na grupy.</li>
+      <li><strong>Plotly</strong> tworzy wykresy interaktywne z podpowiedziami i powiększaniem. Dobrze działa w raportach HTML, ale ogromna liczba punktów może obciążyć przeglądarkę.</li>
+      <li><strong>pandas <code>.plot()</code></strong> — szybki skrót do matplotlib na <code>DataFrame</code>.</li>
+    </ul>
+
+  </main>
+  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#typ-danych">Typ danych i cel</a></li>
+    <li><a href="#budowa">Budowa czytelnego wykresu</a></li>
+    <li><a href="#pulapki">Pułapki wizualizacji</a></li>
+    <li><a href="#biblioteki">Biblioteki Python</a></li>
+  </ol></nav>
+</div>
+<script src="../assets/notes.js"></script>
+</body></html>

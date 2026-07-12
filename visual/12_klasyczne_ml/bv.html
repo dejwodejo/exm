@@ -1,0 +1,76 @@
+<figure class="viz" id="bv">
+  <div class="viz-head">
+    <p class="viz-title">Rozkład błędu: obciążenie² + wariancja + szum</p>
+    <p class="viz-sub">Przesuń złożoność modelu i zobacz, jak przesuwa się optimum. Włącz regularyzację, aby stłumić wariancję.</p>
+  </div>
+  <div class="viz-body">
+    <svg id="bv-svg" viewBox="0 0 680 340" role="img" aria-label="Interaktywny wykres kompromisu obciążenie-wariancja"></svg>
+  </div>
+  <div class="viz-controls">
+    <label>Złożoność modelu
+      <input id="bv-c" type="range" min="0" max="10" step="0.1" value="3.0">
+      <span class="val" id="bv-cv">3.0</span>
+    </label>
+    <span class="toggle" id="bv-reg" role="button" tabindex="0" aria-pressed="false">Regularyzacja λ</span>
+    <span style="font-family:var(--mono);font-size:12px;color:var(--ink2)">
+      obciążenie²=<b id="bv-b">–</b> · wariancja=<b id="bv-v">–</b> · <b>błąd=<span id="bv-t">–</span></b>
+    </span>
+  </div>
+  <figcaption><b>Sedno:</b> na lewo od optimum model jest za prosty (niedouczenie — dominuje obciążenie), na prawo za złożony (przeuczenie — dominuje wariancja). Regularyzacja spłaszcza człon wariancji i przesuwa optimum w stronę większej złożoności.</figcaption>
+</figure>
+<script>
+(function(){
+  "use strict";
+  var NS="http://www.w3.org/2000/svg", svg=document.getElementById("bv-svg");
+  var cvar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function E(n,a,t){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+  var W=680,H=340,L=48,R=18,T=20,B=46, x0=L,x1=W-R,y0=H-B,y1=T, ymax=12;
+  var cx=c=>x0+c/10*(x1-x0), cy=v=>y0-Math.min(v,ymax)/ymax*(y0-y1);
+  var noise=1.1;
+  function bias2(c){return 9.2*Math.exp(-0.52*c);}
+  function varf(c,reg){return (reg?0.45:1)*0.22*Math.exp(0.40*c) + (reg?0.5:0);}
+  function total(c,reg){return bias2(c)+varf(c,reg)+noise;}
+  function optimum(reg){var best=0,bv=1e9;for(var i=0;i<=200;i++){var c=i/20,t=total(c,reg);if(t<bv){bv=t;best=c;}}return best;}
+  function pathd(fn,reg){var d="";for(var i=0;i<=120;i++){var c=i/12;d+=(i?"L":"M")+cx(c).toFixed(1)+" "+cy(fn(c,reg)).toFixed(1);}return d;}
+
+  function render(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var reg=document.getElementById("bv-reg").getAttribute("aria-pressed")==="true";
+    var c=parseFloat(document.getElementById("bv-c").value);
+    var INK=cvar("--ink"),MUT=cvar("--muted"),GRID=cvar("--v-grid"),AX=cvar("--v-axis"),
+        BL=cvar("--v-blue"),OR=cvar("--v-orange"),AM=cvar("--v-amber"),BG=cvar("--bg2");
+    for(var g=0;g<=12;g+=3){svg.appendChild(E("line",{x1:x0,y1:cy(g),x2:x1,y2:cy(g),stroke:GRID,"stroke-width":1}));
+      svg.appendChild(E("text",{x:x0-8,y:cy(g)+4,"text-anchor":"end","font-size":10.5,fill:MUT},String(g)));}
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x1,y2:y0,stroke:AX,"stroke-width":1.4}));
+    svg.appendChild(E("line",{x1:x0,y1:y0,x2:x0,y2:y1,stroke:AX,"stroke-width":1.4}));
+    svg.appendChild(E("line",{x1:x0,y1:cy(noise),x2:x1,y2:cy(noise),stroke:AX,"stroke-width":1.3,"stroke-dasharray":"4 4",opacity:.7}));
+    svg.appendChild(E("path",{d:pathd(bias2,reg),fill:"none",stroke:BL,"stroke-width":2.4,"stroke-linecap":"round"}));
+    svg.appendChild(E("path",{d:pathd((cc)=>varf(cc,reg),reg),fill:"none",stroke:OR,"stroke-width":2.4,"stroke-linecap":"round"}));
+    svg.appendChild(E("path",{d:pathd(total,reg),fill:"none",stroke:INK,"stroke-width":3}));
+    // optimum
+    var oc=optimum(reg);
+    svg.appendChild(E("line",{x1:cx(oc),y1:y1,x2:cx(oc),y2:y0,stroke:AM,"stroke-width":1.2,"stroke-dasharray":"3 3",opacity:.8}));
+    svg.appendChild(E("circle",{cx:cx(oc),cy:cy(total(oc,reg)),r:5,fill:AM,stroke:BG,"stroke-width":2}));
+    svg.appendChild(E("text",{x:cx(oc),y:cy(total(oc,reg))-10,"text-anchor":"middle","font-size":10.5,"font-weight":700,fill:INK},"optimum"));
+    // live marker
+    svg.appendChild(E("line",{x1:cx(c),y1:y1,x2:cx(c),y2:y0,stroke:INK,"stroke-width":1.4,opacity:.55}));
+    svg.appendChild(E("circle",{cx:cx(c),cy:cy(total(c,reg)),r:5.5,fill:INK,stroke:BG,"stroke-width":2}));
+    // labels
+    svg.appendChild(E("text",{x:x1,y:cy(bias2(10))-4,"text-anchor":"end","font-size":10.5,"font-weight":700,fill:BL},"obciążenie²"));
+    svg.appendChild(E("text",{x:x1,y:cy(varf(10,reg))-6,"text-anchor":"end","font-size":10.5,"font-weight":700,fill:OR},"wariancja"));
+    svg.appendChild(E("text",{x:(x0+x1)/2,y:H-12,"text-anchor":"middle","font-size":11,fill:MUT},"złożoność modelu →"));
+    // live values
+    document.getElementById("bv-cv").textContent=c.toFixed(1);
+    document.getElementById("bv-b").textContent=bias2(c).toFixed(1);
+    document.getElementById("bv-v").textContent=varf(c,reg).toFixed(1);
+    document.getElementById("bv-t").textContent=total(c,reg).toFixed(1);
+  }
+  document.getElementById("bv-c").addEventListener("input",render);
+  var reg=document.getElementById("bv-reg");
+  function toggleReg(){reg.setAttribute("aria-pressed",reg.getAttribute("aria-pressed")==="true"?"false":"true");render();}
+  reg.addEventListener("click",toggleReg);
+  reg.addEventListener("keydown",function(e){if(e.key===" "||e.key==="Enter"){e.preventDefault();toggleReg();}});
+  document.addEventListener("themechange",render);
+  render();
+})();
+</script>
