@@ -57,12 +57,6 @@
       <li><strong>Agregacje i statystyki</strong> — sumy, liczności, min/max po grupach: map liczy lokalnie, reduce scala. To najprostsza klasa zadań, do których MapReduce pasuje wprost.</li>
     </ul>
 
-    <h2 id="ograniczenia">Ograniczenia i miejsce dziś</h2>
-    <ul>
-      <li><strong>Koszt shuffle</strong> wynika z operacji dyskowych, sortowania i transferu sieciowego. Combiner, kompresja i dobry klucz ograniczają ruch, ale nie usuwają koniecznego grupowania.</li>
-      <li><strong>Data skew</strong> pojawia się, gdy jeden klucz dominuje: pojedynczy reducer dostaje większość pracy, a cały job czeka mimo bezczynności pozostałych węzłów.</li>
-      <li><strong>Algorytmy iteracyjne</strong> są nieefektywne, bo każda runda zapisuje wynik, a następna ponownie go odczytuje. Spark ogranicza ten koszt, utrzymując dane pośrednie w pamięci.</li>
-      <li><strong>Duże opóźnienie</strong> sprawia, że MapReduce pasuje do batchu, nie do interaktywnych zapytań i reakcji w czasie rzeczywistym.</li>
     </ul>
   </main>
   <nav class="toc" aria-label="Spis treści">

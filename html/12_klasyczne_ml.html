@@ -45,18 +45,28 @@
 
     <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
     <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
-    <p>Dla klasyfikacji liczymy trafność (accuracy) oraz <strong>precyzję</strong>: odsetek prawdziwych trafień wśród wskazań pozytywnych, i <strong>czułość</strong>: odsetek wykrytych przypadków wśród wszystkich rzeczywiście pozytywnych. F1 jest średnią harmoniczną precyzji i czułości. <strong>ROC-AUC</strong> łączy krzywą ROC (Receiver Operating Characteristic) z polem pod krzywą AUC (Area Under the Curve) i mierzy jakość rankingu w wielu progach. Przy rzadkiej klasie pozytywnej bardziej informacyjna bywa krzywa precyzja–czułość i jej pole. Dla regresji używamy <strong>RMSE</strong> (pierwiastka błędu średniokwadratowego), <strong>MAE</strong> (średniego błędu bezwzględnego) i \(R^2\).</p>
+    <p>Dla klasyfikacji liczymy:</p>
+    <ul>
+      <li><strong>Trafność (accuracy)</strong> — odsetek poprawnych predykcji wśród wszystkich przypadków.</li>
+      <li><strong>Precyzja</strong> — odsetek prawdziwych trafień wśród wskazań pozytywnych.</li>
+      <li><strong>Czułość</strong> — odsetek wykrytych przypadków wśród wszystkich rzeczywiście pozytywnych.</li>
+      <li><strong>F1</strong> — średnia harmoniczna precyzji i czułości.</li>
+      <li><strong>ROC-AUC</strong> — łączy krzywą ROC (Receiver Operating Characteristic) z polem pod krzywą AUC (Area Under the Curve) i mierzy jakość rankingu w wielu progach.</li>
+      <li><strong>Krzywa precyzja–czułość i jej pole</strong> — bardziej informacyjna przy rzadkiej klasie pozytywnej.</li>
+    </ul>
+    <p>Dla regresji używamy:</p>
+    <ul>
+      <li><strong>RMSE</strong> — pierwiastek błędu średniokwadratowego.</li>
+      <li><strong>MAE</strong> — średni błąd bezwzględny.</li>
+      <li><strong>\(R^2\)</strong> — współczynnik determinacji.</li>
+    </ul>
 
     <h2 id="modele-nadzorowane">Najważniejsze modele nadzorowane</h2>
     <ul>
       <li><strong>Regresja logistyczna</strong> oblicza liniową kombinację cech, a następnie zamienia ją na prawdopodobieństwo klasy. Jest szybka i łatwa do interpretacji, ale bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.</li>
       <li><strong>k-NN</strong> (k-Nearest Neighbours — metoda \(k\) najbliższych sąsiadów) przewiduje na podstawie najbardziej podobnych obserwacji treningowych. Może odwzorować nieliniową granicę, lecz wymaga skalowania i zwalnia przy dużym zbiorze.</li>
       <li><strong>Drzewo decyzyjne</strong> kolejno dzieli dane pytaniami typu „czy cecha jest mniejsza od progu?”. Jest czytelne i nie wymaga skalowania, ale głębokie drzewo łatwo się przeucza.</li>
-      <li><strong>Random Forest</strong> uczy wiele drzew na różnych próbach i podzbiorach cech, po czym uśrednia ich wyniki. Zmniejsza niestabilność pojedynczego drzewa kosztem prostoty interpretacji.</li>
-      <li><strong>Gradient Boosting</strong> buduje drzewa kolejno, tak aby następne poprawiało błędy aktualnego zespołu. Jest skuteczny na danych tabelarycznych, ale wymaga kontroli liczby i głębokości drzew oraz tempa uczenia.</li>
-      <li><strong>SVM</strong> (Support Vector Machine — maszyna wektorów nośnych) szuka granicy z możliwie szerokim marginesem między klasami. Funkcja jądra pozwala tworzyć granice nieliniowe, lecz trening może być kosztowny dla dużych zbiorów.</li>
-      <li><strong>Naiwny Bayes</strong> łączy informacje z cech przy założeniu ich warunkowej niezależności w każdej klasie. Założenie jest mocne, ale metoda jest bardzo szybka i często skuteczna dla zliczeń słów.</li>
-    </ul>
+
 
     <h2 id="modele-nienadzorowane">Najważniejsze modele nienadzorowane</h2>
     <ul>
@@ -66,15 +76,6 @@
 
     <h2 id="regularyzacja">Regularyzacja</h2>
     <p>Regularyzacja dodaje do błędu karę za duże wagi. <strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
-
-    <h2 id="kluczowe-rozroznienia">Co wpływa na wybór modelu?</h2>
-    <ul>
-      <li><strong>Rodzaj zadania:</strong> regresja, klasyfikacja czy szukanie klastrów.</li>
-      <li><strong>Skala danych:</strong> k-NN i klasyczny SVM stają się kosztowne przy bardzo wielu obserwacjach.</li>
-      <li><strong>Skalowanie cech:</strong> jest ważne dla metod opartych na odległości, takich jak k-NN, SVM, k-means i DBSCAN; drzewa go nie potrzebują.</li>
-      <li><strong>Interpretacja:</strong> regresja logistyczna i małe drzewo są łatwiejsze do objaśnienia niż duży zespół drzew.</li>
-      <li><strong>Jakość walidacyjna:</strong> ostatecznego wyboru dokonujemy przez porównanie modeli w tym samym, poprawnie wykonanym schemacie walidacji.</li>
-    </ul>
 
 
   </main>

@@ -1,76 +1,207 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rola statystycznych modeli wielowymiarowych w prognozowaniu i podejmowaniu decyzji</title>
-<link rel="stylesheet" href="../assets/katex/katex.min.css">
-<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/notes.css">
-<script defer src="../assets/katex/katex.min.js"></script>
-<script defer src="../assets/katex/auto-render.min.js"></script>
-<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
-</head><body>
-<div class="topbar">
-  <a href="../index.html">← Wszystkie notatki</a>
-  <span class="sp"></span>
-  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
-  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
-</div>
-<div class="layout">
-  <main class="wrap">
-    <p class="eyebrow">Modelowanie i analiza danych · 1</p>
-    <h1>Rola statystycznych modeli wielowymiarowych w prognozowaniu i podejmowaniu decyzji</h1>
-    <p class="subtitle">Notatka egzaminacyjna</p>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Rola statystycznych modeli wielowymiarowych w prognozowaniu i podejmowaniu
+      decyzji
+    </title>
+    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/notes.css" />
+    <script defer src="../assets/katex/katex.min.js"></script>
+    <script defer src="../assets/katex/auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="../index.html">← Wszystkie notatki</a>
+      <span class="sp"></span>
+      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
+        Drukuj
+      </button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
+        ◐ Motyw
+      </button>
+    </div>
+    <div class="layout">
+      <main class="wrap">
+        <p class="eyebrow">Modelowanie i analiza danych · 1</p>
+        <h1>
+          Rola statystycznych modeli wielowymiarowych w prognozowaniu i
+          podejmowaniu decyzji
+        </h1>
+        <p class="subtitle">Notatka egzaminacyjna</p>
 
-    <p><strong>Model wielowymiarowy</strong> opisuje obserwację za pomocą wielu cech \(X_1,\ldots,X_p\) jednocześnie. Jest potrzebny, gdy znaczenie jednej cechy zależy od pozostałych: wysoki dochód może zmniejszać ryzyko kredytowe, ale jego interpretacja zmienia się wraz z zadłużeniem. Taki model może uprościć dane, przewidzieć wynik albo odkryć grupy obserwacji. Dopiero później wynik modelu łączy się z kosztami i regułą działania, aby podjąć decyzję.</p>
+        <p>
+          <strong>Model wielowymiarowy</strong> opisuje obserwację za pomocą
+          wielu cech \(X_1,\ldots,X_p\) jednocześnie. Jest potrzebny, gdy
+          znaczenie jednej cechy zależy od pozostałych: wysoki dochód może
+          zmniejszać ryzyko kredytowe, ale jego interpretacja zmienia się wraz z
+          zadłużeniem. Taki model może uprościć dane, przewidzieć wynik albo
+          odkryć grupy obserwacji. Dopiero później wynik modelu łączy się z
+          kosztami i regułą działania, aby podjąć decyzję.
+        </p>
 
-    <h2 id="aparat">Kowariancja i korelacja</h2>
-    <p><strong>Kowariancja</strong> dwóch cech jest dodatnia, gdy wartości większe od swoich średnich zwykle występują razem, ujemna, gdy wzrostowi jednej towarzyszy spadek drugiej, a bliska zeru, gdy nie ma wyraźnej zależności liniowej. <strong>Macierz kowariancji</strong> zbiera wariancje na przekątnej i kowariancje każdej pary poza nią. Dzięki temu model uwzględnia nie tylko rozrzut pojedynczych cech, lecz także kierunki, w których dane zmieniają się wspólnie.</p>
-    <p>Wartość kowariancji zależy od jednostek, dlatego cechy mierzone w różnych skalach porównuje się przez <strong>korelację</strong>, czyli kowariancję podzieloną przez odchylenia standardowe obu cech. Korelacja mieści się od \(-1\) do \(1\), ale opisuje tylko zależność liniową i sama nie dowodzi związku przyczynowego.</p>
+        <h2 id="aparat">Kowariancja i korelacja</h2>
+        <p>
+          <strong>Kowariancja</strong> dwóch cech jest dodatnia, gdy wartości
+          większe od swoich średnich zwykle występują razem, ujemna, gdy
+          wzrostowi jednej towarzyszy spadek drugiej, a bliska zeru, gdy nie ma
+          wyraźnej zależności liniowej.
+          <strong>Macierz kowariancji</strong> zbiera wariancje na przekątnej i
+          kowariancje każdej pary poza nią. Dzięki temu model uwzględnia nie
+          tylko rozrzut pojedynczych cech, lecz także kierunki, w których dane
+          zmieniają się wspólnie.
+        </p>
+        <p>
+          Wartość kowariancji zależy od jednostek, dlatego cechy mierzone w
+          różnych skalach porównuje się przez <strong>korelację</strong>, czyli
+          kowariancję podzieloną przez odchylenia standardowe obu cech.
+          Korelacja mieści się od \(-1\) do \(1\), ale opisuje tylko zależność
+          liniową i sama nie dowodzi związku przyczynowego.
+        </p>
 
-    <h2 id="pca">PCA — redukcja wymiaru</h2>
-    <p><strong>PCA</strong> (Principal Component Analysis — analiza głównych składowych) obraca układ współrzędnych tak, aby pierwsza nowa oś wskazywała kierunek największej wariancji danych. Druga oś jest do niej prostopadła i zachowuje największą część pozostałej wariancji; kolejne powstają analogicznie. Każda składowa jest kombinacją liniową cech, a składowe są ze sobą nieskorelowane.</p>
-    <p>Jeżeli kilka pierwszych składowych zachowuje większość zmienności, pozostałe można odrzucić. Zmniejsza to liczbę wymiarów, usuwa współliniowość i może przyspieszyć dalszy model, lecz utrudnia interpretację, bo jedna składowa miesza kilka cech. Przed PCA zwykle standaryzuje się cechy o różnych jednostkach; inaczej cecha o dużej skali zdominuje wariancję. Standaryzację i PCA dopasowuje się wyłącznie na zbiorze treningowym.</p>
-    <p>PCA nie zna zmiennej celu, więc kierunek o małej wariancji może zostać odrzucony mimo dużej wartości predykcyjnej. <strong>Analiza czynnikowa</strong> odpowiada na inne pytanie: zakłada, że korelacje obserwowanych cech są skutkiem kilku nieobserwowalnych czynników, np. pytania ankietowe mogą mierzyć wspólną „satysfakcję”. PCA kompresuje wariancję, a analiza czynnikowa modeluje ukrytą przyczynę współzmienności.</p>
+        <h2 id="pca">PCA — redukcja wymiaru</h2>
+        <p>
+          <strong>PCA</strong> (Principal Component Analysis — analiza głównych
+          składowych) obraca układ współrzędnych tak, aby pierwsza nowa oś
+          wskazywała kierunek największej wariancji danych. Druga oś jest do
+          niej prostopadła i zachowuje największą część pozostałej wariancji;
+          kolejne powstają analogicznie. Każda składowa jest kombinacją liniową
+          cech, a składowe są ze sobą nieskorelowane.
+        </p>
+        <p>
+          Jeżeli kilka pierwszych składowych zachowuje większość zmienności,
+          pozostałe można odrzucić. Zmniejsza to liczbę wymiarów, usuwa
+          współliniowość i może przyspieszyć dalszy model, lecz utrudnia
+          interpretację, bo jedna składowa miesza kilka cech. Przed PCA zwykle
+          standaryzuje się cechy o różnych jednostkach; inaczej cecha o dużej
+          skali zdominuje wariancję. Standaryzację i PCA dopasowuje się
+          wyłącznie na zbiorze treningowym.
+        </p>
+        <p>
+          PCA nie zna zmiennej celu, więc kierunek o małej wariancji może zostać
+          odrzucony mimo dużej wartości predykcyjnej.
+          <strong>Analiza czynnikowa</strong> odpowiada na inne pytanie:
+          zakłada, że korelacje obserwowanych cech są skutkiem kilku
+          nieobserwowalnych czynników, np. pytania ankietowe mogą mierzyć
+          wspólną „satysfakcję”. PCA kompresuje wariancję, a analiza czynnikowa
+          modeluje ukrytą przyczynę współzmienności.
+        </p>
 
-    <h2 id="lda-qda">LDA i QDA — klasyfikacja</h2>
-    <p>Obie metody modelują rozkład cech osobno w każdej znanej klasie, a nową obserwację przypisują tam, gdzie ma największe prawdopodobieństwo po uwzględnieniu częstości klas:</p>
-    <ul>
-      <li><strong>LDA</strong> (Linear Discriminant Analysis — liniowa analiza dyskryminacyjna) zakłada wielowymiarowy rozkład normalny cech i tę samą macierz kowariancji we wszystkich klasach. Różnią się więc położenia klas, ale nie kształty ich chmur. Wspólna kowariancja sprawia, że granica decyzji jest liniowa i ogranicza liczbę szacowanych parametrów. Metoda działa dobrze przy małej próbie, lecz zawodzi, gdy klasy mają wyraźnie różne kształty.</li>
-      <li><strong>QDA</strong> (Quadratic Discriminant Analysis — kwadratowa analiza dyskryminacyjna) szacuje osobną macierz kowariancji dla każdej klasy. Może dzięki temu utworzyć zakrzywioną granicę, ale potrzebuje więcej danych i łatwiej się przeucza, zwłaszcza przy wielu cechach.</li>
-    </ul>
-    <p>LDA może też redukować wymiar: wybiera kierunki, dla których odległości między średnimi klas są duże względem rozrzutu wewnątrz klas. Jest to redukcja nadzorowana, bo korzysta z etykiet. PCA szuka natomiast dużej wariancji bez etykiet, więc może pominąć kierunek słabo zmienny, który dobrze rozdziela klasy.</p>
+        <h2 id="klasteryzacja">Klasteryzacja — segmentacja</h2>
+        <p>
+          <strong>Klasteryzacja</strong> szuka grup bez gotowych etykiet,
+          dlatego wynik oznacza podobieństwo według wybranych cech i miary
+          odległości, a nie „prawdziwe” klasy. Cechy o dużej skali zdominowałyby
+          odległość, więc przed grupowaniem zwykle się je standaryzuje.
+        </p>
+        <ul>
+          <li>
+            <strong>k-means</strong> zaczyna od \(K\) centrów, przypisuje każdy
+            punkt do najbliższego, przelicza centra jako średnie grup i powtarza
+            te kroki aż do ustabilizowania. Minimalizuje sumę kwadratów
+            odległości od centrów, dlatego najlepiej opisuje zwarte, zbliżone
+            rozmiarem klastry. Trzeba z góry wybrać \(K\), wynik zależy od
+            inicjalizacji, a wartości odstające mogą silnie przesuwać średnie.
+          </li>
+          <li>
+            <strong>DBSCAN</strong> (Density-Based Spatial Clustering of
+            Applications with Noise — klasteryzacja gęstościowa z wykrywaniem
+            szumu) tworzy grupę tam, gdzie punkt ma dostatecznie wielu sąsiadów
+            w promieniu \(\varepsilon\). Od takich punktów rdzeniowych dołącza
+            kolejne osiągalne punkty, a obserwacje leżące poza gęstymi obszarami
+            oznacza jako szum. Metoda nie wymaga podania liczby klastrów i
+            potrafi znaleźć grupy o nieregularnych kształtach. Trzeba jednak
+            dobrać promień \(\varepsilon\) i minimalną liczbę sąsiadów; jeden
+            zestaw parametrów działa słabo, gdy klastry mają bardzo różne
+            gęstości, a w wysokim wymiarze odległości tracą użyteczność.
+          </li>
+        </ul>
 
-    <h2 id="klasteryzacja">Klasteryzacja — segmentacja</h2>
-    <p><strong>Klasteryzacja</strong> szuka grup bez gotowych etykiet, dlatego wynik oznacza podobieństwo według wybranych cech i miary odległości, a nie „prawdziwe” klasy. Cechy o dużej skali zdominowałyby odległość, więc przed grupowaniem zwykle się je standaryzuje.</p>
-    <ul>
-      <li><strong>k-means</strong> zaczyna od \(K\) centrów, przypisuje każdy punkt do najbliższego, przelicza centra jako średnie grup i powtarza te kroki aż do ustabilizowania. Minimalizuje sumę kwadratów odległości od centrów, dlatego najlepiej opisuje zwarte, zbliżone rozmiarem klastry. Trzeba z góry wybrać \(K\), wynik zależy od inicjalizacji, a wartości odstające mogą silnie przesuwać średnie.</li>
-      <li><strong>DBSCAN</strong> (Density-Based Spatial Clustering of Applications with Noise — klasteryzacja gęstościowa z wykrywaniem szumu) tworzy grupę tam, gdzie punkt ma dostatecznie wielu sąsiadów w promieniu \(\varepsilon\). Od takich punktów rdzeniowych dołącza kolejne osiągalne punkty, a obserwacje leżące poza gęstymi obszarami oznacza jako szum. Metoda nie wymaga podania liczby klastrów i potrafi znaleźć grupy o nieregularnych kształtach. Trzeba jednak dobrać promień \(\varepsilon\) i minimalną liczbę sąsiadów; jeden zestaw parametrów działa słabo, gdy klastry mają bardzo różne gęstości, a w wysokim wymiarze odległości tracą użyteczność.</li>
-    </ul>
+        <h2 id="zastosowania">Zastosowania: prognozowanie i decyzje</h2>
+        <p>
+          Prognoza nie jest jeszcze decyzją. Model zwraca wartość, klasę albo
+          prawdopodobieństwo, a reguła decyzyjna łączy ten wynik z
+          ograniczeniami i kosztami błędów.
+        </p>
+        <ul>
+          <li>
+            W segmentacji klientów cechy <strong>RFM</strong> (Recency,
+            Frequency, Monetary value — czas od ostatniego zakupu, częstość i
+            wartość zakupów) są standaryzowane i grupowane, np. metodą k-means.
+            Analityk opisuje otrzymane segmenty, a firma przypisuje im
+            działania, takie jak odzyskanie nieaktywnych klientów. Segment ma
+            wartość tylko wtedy, gdy jest stabilny, interpretowalny i pozwala
+            działać inaczej.
+          </li>
+          <li>
+            W scoringu kredytowym klasyfikator szacuje prawdopodobieństwo
+            niewypłacalności. Bank wybiera próg akceptacji, porównując stratę z
+            udzielenia złego kredytu z utraconą korzyścią po odrzuceniu dobrego
+            klienta. <strong>AUC</strong> (Area Under the Curve — pole pod
+            krzywą) dla krzywej <strong>ROC</strong> (Receiver Operating
+            Characteristic — charakterystyka operacyjna odbiornika) mierzy
+            zdolność porządkowania klientów według ryzyka dla wszystkich progów,
+            ale nie wybiera progu i nie uwzględnia kosztów biznesowych.
+          </li>
+        </ul>
 
-    <h2 id="zastosowania">Zastosowania: prognozowanie i decyzje</h2>
-    <p>Prognoza nie jest jeszcze decyzją. Model zwraca wartość, klasę albo prawdopodobieństwo, a reguła decyzyjna łączy ten wynik z ograniczeniami i kosztami błędów.</p>
-    <ul>
-      <li>W segmentacji klientów cechy <strong>RFM</strong> (Recency, Frequency, Monetary value — czas od ostatniego zakupu, częstość i wartość zakupów) są standaryzowane i grupowane, np. metodą k-means. Analityk opisuje otrzymane segmenty, a firma przypisuje im działania, takie jak odzyskanie nieaktywnych klientów. Segment ma wartość tylko wtedy, gdy jest stabilny, interpretowalny i pozwala działać inaczej.</li>
-      <li>W scoringu kredytowym klasyfikator szacuje prawdopodobieństwo niewypłacalności. Bank wybiera próg akceptacji, porównując stratę z udzielenia złego kredytu z utraconą korzyścią po odrzuceniu dobrego klienta. <strong>AUC</strong> (Area Under the Curve — pole pod krzywą) dla krzywej <strong>ROC</strong> (Receiver Operating Characteristic — charakterystyka operacyjna odbiornika) mierzy zdolność porządkowania klientów według ryzyka dla wszystkich progów, ale nie wybiera progu i nie uwzględnia kosztów biznesowych.</li>
-    </ul>
-
-    <h2 id="pulapki">Pułapki</h2>
-    <ul>
-      <li><strong>Wyciek danych</strong> (data leakage) powstaje, gdy standaryzacja, PCA lub wybór cech korzystają z całego zbioru przed podziałem. Informacja ze zbioru testowego wpływa wtedy na trening i sztucznie poprawia ocenę. Każdy etap uczony z danych należy dopasować na zbiorze treningowym, a na walidacyjnym i testowym jedynie zastosować.</li>
-      <li><strong>Przeuczenie</strong> rośnie wraz z liczbą cech i parametrów. Wynik trzeba oceniać na niewidzianych danych, a metodę i jej hiperparametry, np. liczbę składowych lub klastrów, wybierać bez podglądania zbioru testowego.</li>
-      <li><strong>Niestabilność</strong> oznacza, że niewielka zmiana próby daje inne składowe, granice lub klastry. Pomaga sprawdzenie wyniku na kolejnych próbach i ocena, czy prowadzi on do podobnych decyzji.</li>
-      <li><strong>Korelacja nie oznacza przyczynowości</strong>: model może trafnie prognozować na podstawie współwystępowania, ale sam nie dowodzi, że zmiana cechy spowoduje zmianę wyniku. Do decyzji interwencyjnych potrzebne są założenia przyczynowe lub eksperyment.</li>
-    </ul>
-
-  </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
-    <li><a href="#aparat">Kowariancja i korelacja</a></li>
-    <li><a href="#pca">PCA — redukcja wymiaru</a></li>
-    <li><a href="#lda-qda">LDA i QDA — klasyfikacja</a></li>
-    <li><a href="#klasteryzacja">Klasteryzacja — segmentacja</a></li>
-    <li><a href="#zastosowania">Zastosowania: prognozowanie i decyzje</a></li>
-    <li><a href="#pulapki">Pułapki</a></li>
-  </ol></nav>
-</div>
-<script src="../assets/notes.js"></script>
-</body></html>
+        <h2 id="pulapki">Pułapki</h2>
+        <ul>
+          <li>
+            <strong>Wyciek danych</strong> (data leakage) powstaje, gdy
+            standaryzacja, PCA lub wybór cech korzystają z całego zbioru przed
+            podziałem. Informacja ze zbioru testowego wpływa wtedy na trening i
+            sztucznie poprawia ocenę. Każdy etap uczony z danych należy
+            dopasować na zbiorze treningowym, a na walidacyjnym i testowym
+            jedynie zastosować.
+          </li>
+          <li>
+            <strong>Przeuczenie</strong> rośnie wraz z liczbą cech i parametrów.
+            Wynik trzeba oceniać na niewidzianych danych, a metodę i jej
+            hiperparametry, np. liczbę składowych lub klastrów, wybierać bez
+            podglądania zbioru testowego.
+          </li>
+          <li>
+            <strong>Niestabilność</strong> oznacza, że niewielka zmiana próby
+            daje inne składowe, granice lub klastry. Pomaga sprawdzenie wyniku
+            na kolejnych próbach i ocena, czy prowadzi on do podobnych decyzji.
+          </li>
+          <li>
+            <strong>Korelacja nie oznacza przyczynowości</strong>: model może
+            trafnie prognozować na podstawie współwystępowania, ale sam nie
+            dowodzi, że zmiana cechy spowoduje zmianę wyniku. Do decyzji
+            interwencyjnych potrzebne są założenia przyczynowe lub eksperyment.
+          </li>
+        </ul>
+      </main>
+      <nav class="toc" aria-label="Spis treści">
+        <h5>Na tej stronie</h5>
+        <ol>
+          <li><a href="#aparat">Kowariancja i korelacja</a></li>
+          <li><a href="#pca">PCA — redukcja wymiaru</a></li>
+          <li><a href="#lda-qda">LDA i QDA — klasyfikacja</a></li>
+          <li><a href="#klasteryzacja">Klasteryzacja — segmentacja</a></li>
+          <li>
+            <a href="#zastosowania">Zastosowania: prognozowanie i decyzje</a>
+          </li>
+          <li><a href="#pulapki">Pułapki</a></li>
+        </ol>
+      </nav>
+    </div>
+    <script src="../assets/notes.js"></script>
+  </body>
+</html>

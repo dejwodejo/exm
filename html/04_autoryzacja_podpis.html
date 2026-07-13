@@ -1,78 +1,193 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Autoryzacja i kontrola dostępu do zasobów oraz podpis elektroniczny</title>
-<link rel="stylesheet" href="../assets/katex/katex.min.css">
-<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/notes.css">
-<script defer src="../assets/katex/katex.min.js"></script>
-<script defer src="../assets/katex/auto-render.min.js"></script>
-<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
-</head><body>
-<div class="topbar">
-  <a href="../index.html">← Wszystkie notatki</a>
-  <span class="sp"></span>
-  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
-  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
-</div>
-<div class="layout">
-  <main class="wrap">
-    <p class="eyebrow">Zagadnienie wspólne · 4</p>
-    <h1>Autoryzacja i kontrola dostępu do zasobów oraz podpis elektroniczny</h1>
-    <p class="subtitle">Notatka egzaminacyjna</p>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Autoryzacja i kontrola dostępu do zasobów oraz podpis elektroniczny
+    </title>
+    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/notes.css" />
+    <script defer src="../assets/katex/katex.min.js"></script>
+    <script defer src="../assets/katex/auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="../index.html">← Wszystkie notatki</a>
+      <span class="sp"></span>
+      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
+        Drukuj
+      </button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
+        ◐ Motyw
+      </button>
+    </div>
+    <div class="layout">
+      <main class="wrap">
+        <p class="eyebrow">Zagadnienie wspólne · 4</p>
+        <h1>
+          Autoryzacja i kontrola dostępu do zasobów oraz podpis elektroniczny
+        </h1>
+        <p class="subtitle">Notatka egzaminacyjna</p>
 
-    <p>Ochrona zasobu wymaga ustalenia, kto zgłasza żądanie, czy potwierdził tożsamość, co wolno mu zrobić i jak zarejestrować działanie. Dokument elektroniczny stawia drugi problem: jak wykryć zmianę treści i wiarygodnie powiązać podpis z osobą. Pierwszy rozwiązują mechanizmy kontroli dostępu, a drugi — podpis cyfrowy i infrastruktura klucza publicznego.</p>
+        <p>
+          Ochrona zasobu wymaga ustalenia, kto zgłasza żądanie, czy potwierdził
+          tożsamość, co wolno mu zrobić i jak zarejestrować działanie. Dokument
+          elektroniczny stawia drugi problem: jak wykryć zmianę treści i
+          wiarygodnie powiązać podpis z osobą. Pierwszy rozwiązują mechanizmy
+          kontroli dostępu, a drugi — podpis cyfrowy i infrastruktura klucza
+          publicznego.
+        </p>
 
-    <h2 id="aaa">AAA i uwierzytelnianie</h2>
-    <p><strong>Identyfikacja</strong> jest deklaracją „kim jestem”, np. loginem, i sama niczego nie dowodzi. <strong>Uwierzytelnianie (AuthN)</strong> sprawdza deklarację poświadczeniem. <strong>Autoryzacja (AuthZ)</strong> dopiero potem rozstrzyga, czy uwierzytelniony podmiot może wykonać daną operację na konkretnym zasobie. Można więc poprawnie się zalogować i nadal nie mieć prawa do pliku.</p>
-    <p><strong>AAA</strong> (Authentication, Authorization, Accounting) porządkuje uwierzytelnianie, autoryzację i rozliczalność. Accounting zapisuje, kto, kiedy i z jakim wynikiem próbował wykonać operację. Log umożliwia audyt tylko wtedy, gdy jest kompletny, ma wiarygodny czas i jest chroniony przed zmianą.</p>
-    <p>Uwierzytelnianie opiera się na trzech kategoriach czynników: <em>coś wiesz</em> (hasło), <em>coś masz</em> (token, klucz prywatny), <em>coś, czym jesteś</em> (biometria). <strong>MFA</strong> wymaga czynników z <strong>różnych</strong> kategorii — dwa hasła to nie MFA. SMS jest słaby, bo jest podatny na atak SIM-swap; odporne na phishing są klucze sprzętowe <strong>FIDO2/WebAuthn</strong>, wiążące poświadczenie z domeną.</p>
+        <h2 id="aaa">AAA i uwierzytelnianie</h2>
+        <p>
+          <strong>Identyfikacja</strong> jest deklaracją „kim jestem”, np.
+          loginem, i sama niczego nie dowodzi.
+          <strong>Uwierzytelnianie (AuthN)</strong> sprawdza deklarację
+          poświadczeniem. <strong>Autoryzacja (AuthZ)</strong> dopiero potem
+          rozstrzyga, czy uwierzytelniony podmiot może wykonać daną operację na
+          konkretnym zasobie. Można więc poprawnie się zalogować i nadal nie
+          mieć prawa do pliku.
+        </p>
+        <p>
+          <strong>AAA</strong> (Authentication, Authorization, Accounting)
+          porządkuje uwierzytelnianie, autoryzację i rozliczalność. Accounting
+          zapisuje, kto, kiedy i z jakim wynikiem próbował wykonać operację. Log
+          umożliwia audyt tylko wtedy, gdy jest kompletny, ma wiarygodny czas i
+          jest chroniony przed zmianą.
+        </p>
+        <p>
+          Uwierzytelnianie opiera się na trzech kategoriach czynników:
+          <em>coś wiesz</em> (hasło), <em>coś masz</em> (token, klucz prywatny),
+          <em>coś, czym jesteś</em> (biometria). <strong>MFA</strong> wymaga
+          czynników z <strong>różnych</strong> kategorii — dwa hasła to nie MFA.
+          SMS jest słaby, bo jest podatny na atak SIM-swap; odporne na phishing
+          są klucze sprzętowe <strong>FIDO2/WebAuthn</strong>, wiążące
+          poświadczenie z domeną.
+        </p>
 
-    <h2 id="modele">Modele kontroli dostępu</h2>
-    <p>Cztery modele różnią się tym, <strong>kto i na jakiej podstawie</strong> ustala prawa:</p>
-    <ul>
-      <li><strong>DAC</strong> (Discretionary Access Control) pozwala właścicielowi nadawać prawa, np. przez <code>rwx</code> lub listę <strong>ACL</strong>. Jest elastyczny, ale właściciel może omyłkowo udostępnić zasób zbyt szeroko.</li>
-      <li><strong>MAC</strong> (Mandatory Access Control) opiera się na centralnej polityce i etykietach; użytkownik nie może sam zmienić reguły. Daje ścisłą kontrolę kosztem elastyczności.</li>
-      <li><strong>RBAC</strong> (Role-Based Access Control) wiąże prawa z rolami służbowymi, a użytkowników z rolami. Upraszcza zmianę stanowiska i audyt, lecz zbyt wiele wyjątków prowadzi do mnożenia ról.</li>
-      <li><strong>ABAC</strong> (Attribute-Based Access Control) wylicza decyzję z cech podmiotu, zasobu, operacji i kontekstu. Jest dynamiczny, ale liczne reguły trudniej testować i wyjaśniać.</li>
-    </ul>
+        <h2 id="modele">Modele kontroli dostępu</h2>
+        <p>
+          Cztery modele różnią się tym,
+          <strong>kto i na jakiej podstawie</strong> ustala prawa:
+        </p>
+        <ul>
+          <li>
+            <strong>DAC</strong> (Discretionary Access Control) pozwala
+            właścicielowi nadawać prawa, np. przez <code>rwx</code> lub listę
+            <strong>ACL</strong>. Jest elastyczny, ale właściciel może omyłkowo
+            udostępnić zasób zbyt szeroko.
+          </li>
+          <li>
+            <strong>MAC</strong> (Mandatory Access Control) opiera się na
+            centralnej polityce i etykietach; użytkownik nie może sam zmienić
+            reguły. Daje ścisłą kontrolę kosztem elastyczności.
+          </li>
+          <li>
+            <strong>RBAC</strong> (Role-Based Access Control) wiąże prawa z
+            rolami służbowymi, a użytkowników z rolami. Upraszcza zmianę
+            stanowiska i audyt, lecz zbyt wiele wyjątków prowadzi do mnożenia
+            ról.
+          </li>
+          <li>
+            <strong>ABAC</strong> (Attribute-Based Access Control) wylicza
+            decyzję z cech podmiotu, zasobu, operacji i kontekstu. Jest
+            dynamiczny, ale liczne reguły trudniej testować i wyjaśniać.
+          </li>
+        </ul>
 
-    <h2 id="podpis">Podpis cyfrowy</h2>
-    <p>Podpis cyfrowy wykorzystuje funkcję skrótu oraz parę kluczy: prywatny do podpisania, publiczny do weryfikacji. Proces przebiega kolejno:</p>
-    <ol>
-      <li>podpisujący oblicza skrót dokumentu,</li>
-      <li>algorytm tworzy podpis skrótu kluczem prywatnym,</li>
-      <li>odbiorca oblicza skrót otrzymanego dokumentu,</li>
-      <li>kluczem publicznym sprawdza podpis względem własnego skrótu.</li>
-    </ol>
-    <p>Poprawny wynik potwierdza brak zmiany treści i użycie odpowiadającego klucza prywatnego, ale jeszcze nie tożsamość jego właściciela. Podpis nie szyfruje dokumentu.</p>
-    <p>Sam <strong>hash</strong> wykrywa zmianę tylko wtedy, gdy mamy zaufany skrót odniesienia. <strong>HMAC</strong> chroni integralność i pochodzenie wspólnym tajnym kluczem, ale nie daje niezaprzeczalności, bo obie strony mogą go utworzyć. <strong>Podpis cyfrowy</strong> wiąże dokument z posiadaczem klucza prywatnego; niezaprzeczalność wymaga jeszcze ochrony tego klucza i wiarygodnego certyfikatu.</p>
+        <h2 id="podpis">Podpis cyfrowy</h2>
+        <p>
+          Podpis cyfrowy wykorzystuje funkcję skrótu oraz parę kluczy: prywatny
+          do podpisania, publiczny do weryfikacji. Proces przebiega kolejno:
+        </p>
+        <ol>
+          <li>podpisujący oblicza skrót dokumentu,</li>
+          <li>algorytm tworzy podpis skrótu kluczem prywatnym,</li>
+          <li>odbiorca oblicza skrót otrzymanego dokumentu,</li>
+          <li>kluczem publicznym sprawdza podpis względem własnego skrótu.</li>
+        </ol>
+        <p>
+          Poprawny wynik potwierdza brak zmiany treści i użycie odpowiadającego
+          klucza prywatnego, ale jeszcze nie tożsamość jego właściciela. Podpis
+          nie szyfruje dokumentu.
+        </p>
+        <p>
+          Sam <strong>hash</strong> wykrywa zmianę tylko wtedy, gdy mamy zaufany
+          skrót odniesienia. <strong>HMAC</strong> chroni integralność i
+          pochodzenie wspólnym tajnym kluczem, ale nie daje niezaprzeczalności,
+          bo obie strony mogą go utworzyć. <strong>Podpis cyfrowy</strong> wiąże
+          dokument z posiadaczem klucza prywatnego; niezaprzeczalność wymaga
+          jeszcze ochrony tego klucza i wiarygodnego certyfikatu.
+        </p>
 
-    <h2 id="pki">PKI i certyfikaty</h2>
-    <p>Poprawna weryfikacja wskazuje klucz, nie człowieka. <strong>PKI</strong> (Public Key Infrastructure — infrastruktura klucza publicznego) zarządza wiarygodnym przypisaniem kluczy. Certyfikat X.509 zawiera dane podmiotu, klucz publiczny, okres ważności i zastosowania, a <strong>CA</strong> (Certification Authority) potwierdza go własnym podpisem. Weryfikator sprawdza łańcuch przez pośrednie CA do zaufanego głównego CA.</p>
-    <p>Po kradzieży klucza certyfikat trzeba odwołać. Status publikuje lista <strong>CRL</strong> albo usługa <strong>OCSP</strong>. Informacja może dotrzeć z opóźnieniem, a kompromitacja CA podważa zaufanie do wydanych certyfikatów.</p>
+        <h2 id="pki">PKI i certyfikaty</h2>
+        <p>
+          Poprawna weryfikacja wskazuje klucz, nie człowieka.
+          <strong>PKI</strong> (Public Key Infrastructure — infrastruktura
+          klucza publicznego) zarządza wiarygodnym przypisaniem kluczy.
+          Certyfikat X.509 zawiera dane podmiotu, klucz publiczny, okres
+          ważności i zastosowania, a <strong>CA</strong> (Certification
+          Authority) potwierdza go własnym podpisem. Weryfikator sprawdza
+          łańcuch przez pośrednie CA do zaufanego głównego CA.
+        </p>
+        <p>
+          Po kradzieży klucza certyfikat trzeba odwołać. Status publikuje lista
+          <strong>CRL</strong> albo usługa <strong>OCSP</strong>. Informacja
+          może dotrzeć z opóźnieniem, a kompromitacja CA podważa zaufanie do
+          wydanych certyfikatów.
+        </p>
 
-    <h2 id="eidas">Podpis elektroniczny — eIDAS</h2>
-    <p>Drugi kontrast: <strong>podpis elektroniczny to nie podpis cyfrowy</strong>. Elektroniczny to pojęcie <strong>prawne</strong> (rozporządzenie eIDAS) — dowolne dane elektroniczne dołączone jako podpis, formalnie nawet skan podpisu odręcznego. Cyfrowy to konkretny <strong>mechanizm kryptograficzny</strong>. Każdy cyfrowy jest elektroniczny, nie odwrotnie. eIDAS wyróżnia trzy poziomy:</p>
-    <ul>
-      <li><strong>SES</strong> — minimalna definicja, dowolna forma elektroniczna.</li>
-      <li><strong>AdES</strong> — jednoznacznie przypisany podpisującemu, pod jego wyłączną kontrolą, wykrywa zmiany w dokumencie.</li>
-      <li><strong>QES</strong> — AdES złożony przy użyciu kwalifikowanego urządzenia i certyfikatu. Tylko QES jest w UE prawnie <strong>równoważny podpisowi odręcznemu</strong>.</li>
-    </ul>
-
-    <h2 id="aplikacje">Autoryzacja w aplikacjach</h2>
-    <p><strong>OAuth 2.0</strong> służy do delegowania ograniczonego dostępu bez przekazywania aplikacji hasła użytkownika. Serwer wydaje <strong>access token</strong> reprezentujący określony zakres i czas uprawnień; aplikacja przedstawia go serwerowi zasobu. Wąski zakres i krótka ważność ograniczają skutki wycieku.</p>
-    <p>OAuth nie jest protokołem logowania. <strong>OIDC</strong> (OpenID Connect) dodaje warstwę uwierzytelniania i <strong>ID token</strong> z podpisaną informacją o użytkowniku. Access token służy do wywoływania API z delegowanymi prawami, a ID token informuje aplikację, kto został uwierzytelniony. Nie należy używać ich zamiennie.</p>
-
-  </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
-    <li><a href="#aaa">AAA i uwierzytelnianie</a></li>
-    <li><a href="#modele">Modele kontroli dostępu</a></li>
-    <li><a href="#podpis">Podpis cyfrowy</a></li>
-    <li><a href="#pki">PKI i certyfikaty</a></li>
-    <li><a href="#eidas">Podpis elektroniczny — eIDAS</a></li>
-    <li><a href="#aplikacje">Autoryzacja w aplikacjach</a></li>
-  </ol></nav>
-</div>
-<script src="../assets/notes.js"></script>
-</body></html>
+        <h2 id="eidas">Podpis elektroniczny — eIDAS</h2>
+        <p>
+          Drugi kontrast:
+          <strong>podpis elektroniczny to nie podpis cyfrowy</strong>.
+          Elektroniczny to pojęcie <strong>prawne</strong> (rozporządzenie
+          eIDAS) — dowolne dane elektroniczne dołączone jako podpis, formalnie
+          nawet skan podpisu odręcznego. Cyfrowy to konkretny
+          <strong>mechanizm kryptograficzny</strong>. Każdy cyfrowy jest
+          elektroniczny, nie odwrotnie. eIDAS wyróżnia trzy poziomy:
+        </p>
+        <ul>
+          <li>
+            <strong>SES</strong> — minimalna definicja, dowolna forma
+            elektroniczna.
+          </li>
+          <li>
+            <strong>AdES</strong> — jednoznacznie przypisany podpisującemu, pod
+            jego wyłączną kontrolą, wykrywa zmiany w dokumencie.
+          </li>
+          <li>
+            <strong>QES</strong> — AdES złożony przy użyciu kwalifikowanego
+            urządzenia i certyfikatu. Tylko QES jest w UE prawnie
+            <strong>równoważny podpisowi odręcznemu</strong>.
+          </li>
+        </ul>
+      </main>
+      <nav class="toc" aria-label="Spis treści">
+        <h5>Na tej stronie</h5>
+        <ol>
+          <li><a href="#aaa">AAA i uwierzytelnianie</a></li>
+          <li><a href="#modele">Modele kontroli dostępu</a></li>
+          <li><a href="#podpis">Podpis cyfrowy</a></li>
+          <li><a href="#pki">PKI i certyfikaty</a></li>
+          <li><a href="#eidas">Podpis elektroniczny — eIDAS</a></li>
+          <li><a href="#aplikacje">Autoryzacja w aplikacjach</a></li>
+        </ol>
+      </nav>
+    </div>
+    <script src="../assets/notes.js"></script>
+  </body>
+</html>

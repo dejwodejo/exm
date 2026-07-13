@@ -1,93 +1,199 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Porównanie klasycznej analizy danych z analizą Big Data</title>
-<link rel="stylesheet" href="../assets/katex/katex.min.css">
-<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/notes.css">
-<script defer src="../assets/katex/katex.min.js"></script>
-<script defer src="../assets/katex/auto-render.min.js"></script>
-<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
-</head><body>
-<div class="topbar">
-  <a href="../index.html">← Wszystkie notatki</a>
-  <span class="sp"></span>
-  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
-  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
-</div>
-<div class="layout">
-  <main class="wrap">
-    <p class="eyebrow">Zagadnienie wspólne · 5</p>
-    <h1>Porównanie klasycznej analizy danych z analizą Big Data</h1>
-    <p class="subtitle">Notatka egzaminacyjna</p>
-
-    <p><strong>Big Data</strong> to dane, których rozmiar, tempo napływu lub różnorodność uniemożliwiają przetwarzanie klasycznymi narzędziami na jednej maszynie (pandas, R, jednowęzłowy RDBMS) i wymuszają zmianę paradygmatu na rozproszony. Sam wzrost liczby wierszy to jeszcze klasyka — Big Data zaczyna się tam, gdzie trzeba <em>zmienić sposób</em> pracy.</p>
-
-    <h2 id="5v">Model 5V</h2>
-    <p>Pięć cech nie jest listą warunków, które zawsze muszą wystąpić razem. Pomagają rozpoznać, czy trudnością jest przechowywanie, tempo reakcji, format, jakość czy brak uzasadnienia biznesowego:</p>
-    <ul>
-      <li><strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej maszynie.</li>
-      <li><strong>Velocity</strong> — tempo napływu (strumienie, near-real-time).</li>
-      <li><strong>Variety</strong> — różnorodność: dane ustrukturyzowane, semi-strukturyzowane (JSON, logi), nieustrukturyzowane (tekst, obraz, audio).</li>
-      <li><strong>Veracity</strong> — niepewność i jakość (szum, braki, sprzeczne źródła).</li>
-      <li><strong>Value</strong> — wartość biznesowa wydobyta z danych („po co to robimy").</li>
-    </ul>
-
-    <h2 id="klasyka">Paradygmat klasyczny</h2>
-    <p>Klasyczne podejście zwykle zakłada, że dane można przechować i przetworzyć na jednej maszynie albo w centralnej bazie. W badaniu statystycznym często pobiera się reprezentatywną <strong>próbę</strong> i z niej wnioskuje o populacji, podając niepewność wyniku. Nie jest to jednak definicja klasycznej analizy: pełny rejestr również można analizować klasycznymi narzędziami, jeśli jego rozmiar na to pozwala.</p>
-    <ul>
-      <li><strong>Dane</strong>: reprezentatywna <strong>próba</strong> z populacji.</li>
-      <li><strong>Cel</strong>: <strong>wnioskowanie</strong> o parametrach populacji (testy hipotez, przedziały ufności).</li>
-      <li><strong>Skalowanie pionowe</strong> (scale-up): mocniejsza jedna maszyna.</li>
-      <li><strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) — gwarancje poprawności transakcji w relacyjnych systemach baz danych (<strong>RDBMS</strong>).</li>
-      <li><strong>ETL</strong> (Extract, Transform, Load) + <strong>schema-on-write</strong>: dane czyścimy i dopasowujemy do schematu przed załadowaniem do hurtowni.</li>
-      <li><strong>Narzędzia</strong>: pandas, NumPy, scikit-learn, R, klasyczne hurtownie (PostgreSQL, Oracle).</li>
-    </ul>
-
-    <h2 id="bigdata">Paradygmat Big Data</h2>
-    <p>Big Data często obejmuje prawie wszystkie <em>dostępne</em> rekordy i sprzyja zadaniom predykcyjnym, ale nie usuwa statystyki ani wnioskowania. Dostępne rekordy mogą systematycznie pomijać część populacji, przyszłość może różnić się od historii, a pomiar może być błędny — duży wolumen zmniejsza błąd losowy, lecz nie naprawia błędu doboru.</p>
-    <ul>
-      <li><strong>Dane</strong>: <strong>N≈all</strong> — całe dostępne dane zamiast próby.</li>
-      <li><strong>Cel</strong>: przesunięcie z wnioskowania na <strong>predykcję</strong> (uczenie maszynowe, wykrywanie wzorców).</li>
-      <li><strong>Skalowanie poziome</strong> (scale-out): klaster tanich maszyn.</li>
-      <li><strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) — wzorzec części systemów rozproszonych, które dopuszczają chwilową niespójność dla dostępności.</li>
-      <li><strong>ELT</strong> (Extract, Load, Transform) + <strong>schema-on-read</strong>: dane najpierw trafiają do jeziora danych, a strukturę nadaje się podczas późniejszego użycia.</li>
-      <li><strong>Narzędzia</strong>: Hadoop, Apache Spark, Kafka, data lake / lakehouse (HDFS, S3, Delta Lake).</li>
-    </ul>
-    <p>Rozproszenie zwiększa pojemność i przepustowość, lecz wprowadza koszt komunikacji, koordynacji i obsługi awarii. Nie każdy algorytm daje się dobrze podzielić, a gdy dane mieszczą się na jednej maszynie, narzut klastra może być większy niż korzyść z równoległości.</p>
-    <p>ETL i ELT nie tworzą sztywnej granicy. <strong>ETL</strong> kontroluje schemat i jakość przed załadowaniem, natomiast <strong>ELT</strong> zachowuje surowe dane i przekształca je podczas użycia. ELT daje elastyczność, ale bez katalogu, wersjonowania i reguł jakości jezioro danych łatwo staje się zbiorem niezrozumiałych plików.</p>
-
-    <h2 id="cap-mapreduce">Dwa pojęcia do wymienienia</h2>
-    <p>Twierdzenie <strong>CAP</strong> (Consistency, Availability, Partition tolerance) mówi, że podczas podziału sieci system nie może jednocześnie gwarantować liniowej spójności i odpowiedzi z każdego osiągalnego węzła. Tolerowanie podziału jest w systemie rozproszonym koniecznością; kompromis C–A ujawnia się właśnie podczas awarii komunikacji, nie przez cały czas.</p>
-    <p><strong>MapReduce</strong> — model obliczeń rozproszonych: dane dzielone na fragmenty, faza <em>map</em> przetwarza je równolegle na klastrze do par klucz–wartość, faza <em>reduce</em> agreguje wartości o tym samym kluczu.</p>
-
-    <h2 id="synteza">Synteza</h2>
-    <div class="tablewrap">
-      <table>
-        <thead><tr><th>Wymiar</th><th>Klasyczna analiza</th><th>Big Data</th></tr></thead>
-        <tbody>
-          <tr><td>Dane</td><td>próba z populacji</td><td>N≈all, dane wyczerpujące</td></tr>
-          <tr><td>Cel</td><td>wnioskowanie o parametrach</td><td>predykcja, wzorce</td></tr>
-          <tr><td>Skalowanie</td><td>pionowe (scale-up)</td><td>poziome (scale-out)</td></tr>
-          <tr><td>Spójność</td><td>często transakcje ACID</td><td>ACID albo eventual consistency — zależnie od systemu</td></tr>
-          <tr><td>Schemat</td><td>schema-on-write (ETL)</td><td>schema-on-read (ELT, lake)</td></tr>
-          <tr><td>Metoda</td><td>testy istotności, p-value</td><td>metryki predykcyjne, walidacja</td></tr>
-          <tr><td>Narzędzia</td><td>pandas, R, RDBMS</td><td>Spark, Kafka, lakehouse</td></tr>
-        </tbody>
-      </table>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Porównanie klasycznej analizy danych z analizą Big Data</title>
+    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/notes.css" />
+    <script defer src="../assets/katex/katex.min.js"></script>
+    <script defer src="../assets/katex/auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="../index.html">← Wszystkie notatki</a>
+      <span class="sp"></span>
+      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
+        Drukuj
+      </button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
+        ◐ Motyw
+      </button>
     </div>
-    <p><strong>Pułapka</strong>: „premature Big Data" — stawianie klastra Spark dla 10 GB, które obsłuży laptop; narzut rozproszenia bywa większy niż zysk. Duża próba nie zwalnia z myślenia o tym, <em>jak</em> zebrano dane — błąd doboru nie znika z wolumenem.</p>
-  </main>
-  <nav class="toc" aria-label="Spis treści">
-    <h5>Na tej stronie</h5>
-    <ol>
-      <li><a href="#5v">Model 5V</a></li>
-      <li><a href="#klasyka">Paradygmat klasyczny</a></li>
-      <li><a href="#bigdata">Paradygmat Big Data</a></li>
-      <li><a href="#cap-mapreduce">CAP i MapReduce</a></li>
-      <li><a href="#synteza">Synteza</a></li>
-    </ol>
-  </nav>
-</div>
-<script src="../assets/notes.js"></script>
-</body></html>
+    <div class="layout">
+      <main class="wrap">
+        <p class="eyebrow">Zagadnienie wspólne · 5</p>
+        <h1>Porównanie klasycznej analizy danych z analizą Big Data</h1>
+        <p class="subtitle">Notatka egzaminacyjna</p>
+
+        <p>
+          <strong>Big Data</strong> to dane, których rozmiar, tempo napływu lub
+          różnorodność uniemożliwiają przetwarzanie klasycznymi narzędziami na
+          jednej maszynie (pandas, R, jednowęzłowy RDBMS) i wymuszają zmianę
+          paradygmatu na rozproszony. Sam wzrost liczby wierszy to jeszcze
+          klasyka — Big Data zaczyna się tam, gdzie trzeba
+          <em>zmienić sposób</em> pracy.
+        </p>
+
+        <h2 id="5v">Model 5V</h2>
+        <p>
+          Pięć cech nie jest listą warunków, które zawsze muszą wystąpić razem.
+          Pomagają rozpoznać, czy trudnością jest przechowywanie, tempo reakcji,
+          format, jakość czy brak uzasadnienia biznesowego:
+        </p>
+        <ul>
+          <li>
+            <strong>Volume</strong> — rozmiar (TB–PB), nie mieści się na jednej
+            maszynie.
+          </li>
+          <li>
+            <strong>Velocity</strong> — tempo napływu (strumienie,
+            near-real-time).
+          </li>
+          <li>
+            <strong>Variety</strong> — różnorodność: dane ustrukturyzowane,
+            semi-strukturyzowane (JSON, logi), nieustrukturyzowane (tekst,
+            obraz, audio).
+          </li>
+          <li>
+            <strong>Veracity</strong> — niepewność i jakość (szum, braki,
+            sprzeczne źródła).
+          </li>
+          <li>
+            <strong>Value</strong> — wartość biznesowa wydobyta z danych („po co
+            to robimy").
+          </li>
+        </ul>
+
+        <h2 id="klasyka">Paradygmat klasyczny</h2>
+        <p>
+          Klasyczne podejście zwykle zakłada, że dane można przechować i
+          przetworzyć na jednej maszynie albo w centralnej bazie. W badaniu
+          statystycznym często pobiera się reprezentatywną
+          <strong>próbę</strong> i z niej wnioskuje o populacji, podając
+          niepewność wyniku. Nie jest to jednak definicja klasycznej analizy:
+          pełny rejestr również można analizować klasycznymi narzędziami, jeśli
+          jego rozmiar na to pozwala.
+        </p>
+        <ul>
+          <li>
+            <strong>Dane</strong>: reprezentatywna <strong>próba</strong> z
+            populacji.
+          </li>
+          <li>
+            <strong>Cel</strong>: <strong>wnioskowanie</strong> o parametrach
+            populacji (testy hipotez, przedziały ufności).
+          </li>
+          <li>
+            <strong>Skalowanie pionowe</strong> (scale-up): mocniejsza jedna
+            maszyna.
+          </li>
+          <li>
+            <strong>ACID</strong> (Atomicity, Consistency, Isolation,
+            Durability) — gwarancje poprawności transakcji w relacyjnych
+            systemach baz danych (<strong>RDBMS</strong>).
+          </li>
+          <li>
+            <strong>ETL</strong> (Extract, Transform, Load) +
+            <strong>schema-on-write</strong>: dane czyścimy i dopasowujemy do
+            schematu przed załadowaniem do hurtowni.
+          </li>
+          <li>
+            <strong>Narzędzia</strong>: pandas, NumPy, scikit-learn, R,
+            klasyczne hurtownie (PostgreSQL, Oracle).
+          </li>
+        </ul>
+
+        <h2 id="bigdata">Paradygmat Big Data</h2>
+        <p>
+          Big Data często obejmuje prawie wszystkie <em>dostępne</em> rekordy i
+          sprzyja zadaniom predykcyjnym, ale nie usuwa statystyki ani
+          wnioskowania. Dostępne rekordy mogą systematycznie pomijać część
+          populacji, przyszłość może różnić się od historii, a pomiar może być
+          błędny — duży wolumen zmniejsza błąd losowy, lecz nie naprawia błędu
+          doboru.
+        </p>
+        <ul>
+          <li>
+            <strong>Dane</strong>: <strong>N≈all</strong> — całe dostępne dane
+            zamiast próby.
+          </li>
+          <li>
+            <strong>Cel</strong>: przesunięcie z wnioskowania na
+            <strong>predykcję</strong> (uczenie maszynowe, wykrywanie wzorców).
+          </li>
+          <li>
+            <strong>Skalowanie poziome</strong> (scale-out): klaster tanich
+            maszyn.
+          </li>
+          <li>
+            <strong>BASE</strong> (Basically Available, Soft state, Eventual
+            consistency) — wzorzec części systemów rozproszonych, które
+            dopuszczają chwilową niespójność dla dostępności.
+          </li>
+          <li>
+            <strong>ELT</strong> (Extract, Load, Transform) +
+            <strong>schema-on-read</strong>: dane najpierw trafiają do jeziora
+            danych, a strukturę nadaje się podczas późniejszego użycia.
+          </li>
+          <li>
+            <strong>Narzędzia</strong>: Hadoop, Apache Spark, Kafka, data lake /
+            lakehouse (HDFS, S3, Delta Lake).
+          </li>
+        </ul>
+        <p>
+          Rozproszenie zwiększa pojemność i przepustowość, lecz wprowadza koszt
+          komunikacji, koordynacji i obsługi awarii. Nie każdy algorytm daje się
+          dobrze podzielić, a gdy dane mieszczą się na jednej maszynie, narzut
+          klastra może być większy niż korzyść z równoległości.
+        </p>
+        <p>
+          ETL i ELT nie tworzą sztywnej granicy. <strong>ETL</strong> kontroluje
+          schemat i jakość przed załadowaniem, natomiast
+          <strong>ELT</strong> zachowuje surowe dane i przekształca je podczas
+          użycia. ELT daje elastyczność, ale bez katalogu, wersjonowania i reguł
+          jakości jezioro danych łatwo staje się zbiorem niezrozumiałych plików.
+        </p>
+
+        <h2 id="cap-mapreduce">Dwa pojęcia do wymienienia</h2>
+        <p>
+          Twierdzenie <strong>CAP</strong> (Consistency, Availability, Partition
+          tolerance) mówi, że podczas podziału sieci system nie może
+          jednocześnie gwarantować liniowej spójności i odpowiedzi z każdego
+          osiągalnego węzła. Tolerowanie podziału jest w systemie rozproszonym
+          koniecznością; kompromis C–A ujawnia się właśnie podczas awarii
+          komunikacji, nie przez cały czas.
+        </p>
+        <p>
+          <strong>MapReduce</strong> — model obliczeń rozproszonych: dane
+          dzielone na fragmenty, faza <em>map</em> przetwarza je równolegle na
+          klastrze do par klucz–wartość, faza <em>reduce</em> agreguje wartości
+          o tym samym kluczu.
+        </p>
+      </main>
+      <nav class="toc" aria-label="Spis treści">
+        <h5>Na tej stronie</h5>
+        <ol>
+          <li><a href="#5v">Model 5V</a></li>
+          <li><a href="#klasyka">Paradygmat klasyczny</a></li>
+          <li><a href="#bigdata">Paradygmat Big Data</a></li>
+          <li><a href="#cap-mapreduce">CAP i MapReduce</a></li>
+          <li><a href="#synteza">Synteza</a></li>
+        </ol>
+      </nav>
+    </div>
+    <script src="../assets/notes.js"></script>
+  </body>
+</html>

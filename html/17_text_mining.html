@@ -21,50 +21,39 @@
     <h1>Techniki i metody wydobywania informacji z plików tekstowych</h1>
     <p class="subtitle">Notatka egzaminacyjna</p>
 
-    <p><strong>Text mining</strong> oznacza wydobywanie informacji i powtarzających się wzorców ze zbioru tekstów. Korzysta z <strong>NLP</strong> (Natural Language Processing — przetwarzania języka naturalnego), ale obejmuje cały proces: od odczytania plików, przez przygotowanie tekstu, po wyszukiwanie, klasyfikację lub wydobycie konkretnych faktów.</p>
+    <p><strong>Wydobywanie informacji z plików tekstowych</strong> polega na odczytaniu tekstu z plików, znalezieniu w nim potrzebnych fragmentów za pomocą wzorców i zamianie ich w dane o ustalonej strukturze lub raport. Podstawowym, deterministycznym narzędziem są <strong>wyrażenia regularne</strong>, stosowane w Perlu i innych językach. Typowy przebieg to: odczyt pliku → dopasowanie wzorca → wyciągnięcie pól → zestawienie wyniku.</p>
 
-    <h2 id="pozyskanie">Pozyskanie tekstu</h2>
-    <p>Tekst może pochodzić z pliku TXT, dokumentu PDF, strony HTML, wiadomości lub skanu. Format nie gwarantuje jakości: PDF może zawierać tekst możliwy do skopiowania albo jedynie obraz strony. W drugim przypadku potrzebne jest <strong>OCR</strong> (Optical Character Recognition — optyczne rozpoznawanie znaków). Po odczycie usuwamy elementy techniczne, np. znaczniki HTML, nagłówki stron i powtarzające się stopki, zachowując treść oraz potrzebną strukturę dokumentu.</p>
+    <h2 id="pliki">Pliki i ich odczyt</h2>
+    <p>Tekst pochodzi z plików TXT, CSV, logów, stron HTML lub wiadomości; pliki odczytujemy zwykle wiersz po wierszu, zwracając uwagę na <strong>kodowanie znaków</strong> (np. UTF-8). Format nie gwarantuje jakości: PDF może zawierać tekst możliwy do skopiowania albo jedynie obraz strony — wtedy najpierw potrzebny jest <strong>OCR</strong> (Optical Character Recognition — optyczne rozpoznawanie znaków), aby w ogóle uzyskać tekst.</p>
 
-    <h2 id="reprezentacje">Reprezentacje tekstu</h2>
-    <p><strong>Korpus</strong> jest zbiorem analizowanych dokumentów. <strong>Tokenizacja</strong> dzieli tekst na jednostki, np. słowa i znaki interpunkcyjne. Normalizacja może obejmować ujednolicenie wielkości liter i zapisów, ale nie należy automatycznie usuwać wszystkiego: znak zapytania może być istotny, a słowa typu „nie” zmieniają znaczenie zdania.</p>
-    <p><strong>Stemming</strong> mechanicznie obcina końcówki, natomiast <strong>lematyzacja</strong> sprowadza odmienione słowo do formy słownikowej z uwzględnieniem języka. Lematyzacja jest zwykle czytelniejsza dla polszczyzny, choć jej poprawność zależy od rozpoznania kontekstu.</p>
-    <p>Aby model mógł wykonywać obliczenia, dokument zamieniamy w wektor:</p>
+    <h2 id="regex">Wyrażenia regularne</h2>
+    <p><strong>Wyrażenie regularne</strong> (regex) to wzorzec opisujący zbiór napisów. Pozwala sprawdzić, czy tekst pasuje do wzorca, wyszukać wszystkie dopasowania oraz podmienić je na inne. Najważniejsze elementy:</p>
     <ul>
-      <li><strong>BoW</strong> (Bag of Words — worek słów) przechowuje liczbę wystąpień każdego słowa. Jest prosty, ale ignoruje kolejność i znaczenie.</li>
-      <li><strong>TF-IDF</strong> (Term Frequency–Inverse Document Frequency) zwiększa wagę słowa częstego w danym dokumencie, lecz rzadkiego w całym korpusie. Dzięki temu ogranicza wpływ słów występujących prawie wszędzie.</li>
-      <li><strong>Embedding</strong> jest gęstym wektorem uczonym tak, aby podobne użycia miały podobne reprezentacje. Klasyczny word2vec przypisuje słowu jeden wektor, a model <strong>BERT</strong> (Bidirectional Encoder Representations from Transformers) może nadać temu samemu słowu różne reprezentacje zależnie od zdania.</li>
+      <li><strong>Klasy znaków</strong> — np. <code>\d</code> (cyfra), <code>\w</code> (znak słowa), <code>[a-z]</code>, <code>.</code> (dowolny znak).</li>
+      <li><strong>Kwantyfikatory</strong> — <code>*</code>, <code>+</code>, <code>?</code>, <code>{2,4}</code> — ile razy element się powtarza. Domyślnie są <strong>zachłanne</strong> (dopasowują jak najwięcej); <code>?</code> po kwantyfikatorze czyni je <strong>leniwymi</strong>.</li>
+      <li><strong>Kotwice</strong> — <code>^</code> i <code>$</code> (początek i koniec wiersza), <code>\b</code> (granica słowa).</li>
+      <li><strong>Grupy przechwytujące</strong> — nawiasy <code>(...)</code> wycinają konkretny fragment dopasowania; to właśnie nimi wyciągamy pola z tekstu.</li>
     </ul>
+    <p>Przykład: wzorzec <code>(\d{4})-(\d{2})-(\d{2})</code> dopasowuje datę i zwraca w trzech grupach rok, miesiąc i dzień. Te same wyrażenia działają w Perlu, w Pythonie (moduł <code>re</code>) oraz w narzędziach <code>grep</code> i <code>sed</code>.</p>
 
-    <h2 id="miary-podobienstwa">Miary podobieństwa</h2>
-    <p>Wektory dokumentów często porównujemy <strong>podobieństwem kosinusowym</strong>. Mierzy ono kąt między wektorami, dlatego dwa teksty o podobnych proporcjach słów mogą być uznane za podobne mimo różnej długości. Dla nieujemnych wektorów TF-IDF wynik bliski 1 oznacza duże podobieństwo kierunku, a bliski 0 — mało wspólnych ważnych słów.</p>
+    <h2 id="przetwarzanie">Przetwarzanie i czyszczenie tekstu</h2>
+    <p>Zanim zastosujemy wzorce, tekst zwykle trzeba uporządkować:</p>
+    <ul>
+      <li><strong>Usunięcie elementów technicznych</strong> — znaczników HTML, nagłówków i powtarzających się stopek — również wykonalne regexem.</li>
+      <li><strong>Podział (tokenizacja)</strong> — rozbicie wiersza na pola lub słowa, np. po separatorze w CSV albo po białych znakach.</li>
+      <li><strong>Normalizacja</strong> — ujednolicenie wielkości liter i białych znaków, aby te same dane zapisane różnie trafiły do jednej postaci.</li>
+    </ul>
+    <p>Ostrożnie: nie usuwamy wszystkiego automatycznie, bo np. znak w liczbie czy w dacie bywa istotny dla dalszej analizy.</p>
 
-    <h2 id="klasyfikacja">Klasyfikacja i modele tematyczne</h2>
-    <p>W <strong>klasyfikacji</strong> znamy etykiety dokumentów, np. „spam” i „nie spam”. Wektory TF-IDF można przekazać do naiwnego Bayesa, regresji logistycznej albo SVM (Support Vector Machine — maszyny wektorów nośnych). Model kontekstowy można również dostroić do klasyfikacji. Wynik oceniamy na dokumentach niewidzianych w treningu, używając m.in. precyzji, czułości i F1.</p>
-    <p>Bez etykiet możemy grupować podobne dokumenty albo szukać tematów. <strong>LDA</strong> (Latent Dirichlet Allocation) opisuje dokument jako mieszaninę tematów, a temat jako grupę słów występujących razem. Model nie nadaje tematowi gotowej nazwy — człowiek interpretuje go na podstawie słów o największych wagach.</p>
-
-    <h2 id="ie-ir">Information Extraction i Information Retrieval</h2>
-    <p><strong>IR</strong> (Information Retrieval — wyszukiwanie informacji) zwraca uporządkowaną listę dokumentów pasujących do zapytania. <strong>IE</strong> (Information Extraction — wydobywanie informacji) przekształca treść w ustrukturyzowane fakty, np. „firma X przejęła firmę Y”. Jednym z zadań IE jest <strong>NER</strong> (Named Entity Recognition — rozpoznawanie nazwanych obiektów), które wskazuje w tekście osoby, organizacje, miejsca lub daty.</p>
-
-    <h2 id="pipeline">Praktyczny proces</h2>
-    <ol>
-      <li>Odczytaj dokumenty i zachowaj ich identyfikatory oraz potrzebne metadane.</li>
-      <li>Oczyść elementy techniczne, a następnie wykonaj tokenizację i potrzebną normalizację.</li>
-      <li>Dopasuj reprezentację, np. TF-IDF, wyłącznie na dokumentach treningowych.</li>
-      <li>Zastosuj właściwą metodę: wyszukiwanie, klasyfikację, grupowanie albo NER.</li>
-      <li>Oceń wynik na danych testowych i obejrzyj rzeczywiste błędy, nie tylko jedną metrykę.</li>
-    </ol>
-    <p>W Pythonie spaCy obsługuje tokenizację, lematyzację i NER, scikit-learn — TF-IDF oraz klasyczne modele, a biblioteka transformers — modele kontekstowe.</p>
-    <p><strong>Pułapka</strong>: dopasowanie <code>TfidfVectorizer</code> na całym zbiorze przed podziałem na train/test to wyciek danych (leakage) — statystyki IDF muszą pochodzić tylko z treningu; rozwiązaniem jest <code>Pipeline</code> scikit-learn z <code>fit</code> wyłącznie na treningu.</p>
+    <h2 id="raport">Zestawienie wyniku</h2>
+    <p>Wydobyte grupami dopasowania scalamy w <strong>rekordy o określonej strukturze</strong> — np. wiersze tabeli z kolumnami data, kwota, nazwa. Na ich podstawie liczymy zestawienia (sumy, liczności) i zapisujemy wynik w ustalonym formacie, np. CSV lub raporcie tekstowym. Kluczowe jest, by wyjście miało stały, przewidywalny układ, który da się dalej przetwarzać.</p>
 
   </main>
   <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
-    <li><a href="#pozyskanie">Pozyskanie tekstu</a></li>
-    <li><a href="#reprezentacje">Reprezentacje tekstu</a></li>
-    <li><a href="#miary-podobienstwa">Miary podobieństwa</a></li>
-    <li><a href="#klasyfikacja">Klasyfikacja i modele tematyczne</a></li>
-    <li><a href="#ie-ir">Information Extraction i Retrieval</a></li>
-    <li><a href="#pipeline">Pipeline praktyczny i narzędzia</a></li>
+    <li><a href="#pliki">Pliki i ich odczyt</a></li>
+    <li><a href="#regex">Wyrażenia regularne</a></li>
+    <li><a href="#przetwarzanie">Przetwarzanie i czyszczenie tekstu</a></li>
+    <li><a href="#raport">Zestawienie wyniku</a></li>
   </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>

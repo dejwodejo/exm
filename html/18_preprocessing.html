@@ -58,13 +58,6 @@
       <li><strong>Target encoding</strong> — zastąpienie kategorii statystyką zmiennej docelowej; radzi sobie z wieloma kategoriami, ale wartości muszą być obliczane bez podglądania wyniku kodowanej obserwacji, bo inaczej powstaje wyciek i przeuczenie.</li>
     </ul>
 
-    <h2 id="pca">Redukcja liczby cech</h2>
-    <p><strong>PCA</strong> (Principal Component Analysis — analiza głównych składowych) tworzy nowe cechy będące kombinacjami cech pierwotnych. Pierwsza składowa zachowuje kierunek największego zróżnicowania, kolejna największy pozostały kierunek itd. Zatrzymanie kilku składowych może ograniczyć wymiar i współliniowość, ale utrudnia interpretację, ponieważ składowa nie odpowiada jednej oryginalnej kolumnie. Przy różnych jednostkach cechy zwykle wcześniej standaryzujemy.</p>
-
-    <h2 id="leakage">Data leakage i pipeline</h2>
-    <p><strong>Data leakage</strong> (wyciek danych) występuje, gdy podczas treningu wykorzystujemy informację, której nie będzie w chwili rzeczywistej predykcji. Przykładem jest obliczenie średniej do imputacji na całym zbiorze albo użycie cechy powstałej już po przewidywanym zdarzeniu.</p>
-    <p>Najpierw oddzielamy test. Podczas walidacji <strong>pipeline</strong> dopasowuje imputację, kodowanie, skalowanie i model od nowa wyłącznie na treningowej części każdego podziału. Ten sam zapis kroków chroni również przed innym preprocessingiem w treningu i produkcji.</p>
-  </main>
   <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
     <li><a href="#etapy">Etapy preprocessingu</a></li>
     <li><a href="#braki">Braki danych i imputacja</a></li>
