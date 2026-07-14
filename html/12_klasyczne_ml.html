@@ -1,96 +1,251 @@
 <!doctype html>
-<html lang="pl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Klasyczne modele uczenia maszynowego</title>
-<link rel="stylesheet" href="../assets/katex/katex.min.css">
-<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/notes.css">
-<script defer src="../assets/katex/katex.min.js"></script>
-<script defer src="../assets/katex/auto-render.min.js"></script>
-<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"\\[",right:"\\]",display:true},{left:"\\(",right:"\\)",display:false}],throwOnError:false});});</script>
-</head><body>
-<div class="topbar">
-  <a href="../index.html">← Wszystkie notatki</a>
-  <span class="sp"></span>
-  <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">Drukuj</button>
-  <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">◐ Motyw</button>
-</div>
-<div class="layout">
-  <main class="wrap">
-    <p class="eyebrow">Zagadnienie wspólne · 12</p>
-    <h1>Klasyczne modele uczenia maszynowego</h1>
-    <p class="subtitle">Notatka egzaminacyjna</p>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Klasyczne modele uczenia maszynowego</title>
+    <link rel="stylesheet" href="../assets/katex/katex.min.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/notes.css" />
+    <script defer src="../assets/katex/katex.min.js"></script>
+    <script defer src="../assets/katex/auto-render.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "\\[", right: "\\]", display: true },
+            { left: "\\(", right: "\\)", display: false },
+          ],
+          throwOnError: false,
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="topbar">
+      <a href="../index.html">← Wszystkie notatki</a>
+      <span class="sp"></span>
+      <button class="iconbtn" onclick="window.print()" title="Drukuj / PDF">
+        Drukuj
+      </button>
+      <button class="iconbtn" onclick="toggleTheme()" title="Zmień motyw">
+        ◐ Motyw
+      </button>
+    </div>
+    <div class="layout">
+      <main class="wrap">
+        <p class="eyebrow">Zagadnienie wspólne · 12</p>
+        <h1>Klasyczne modele uczenia maszynowego</h1>
+        <p class="subtitle">Notatka egzaminacyjna</p>
 
-    <p><strong>Uczenie maszynowe (ML — Machine Learning)</strong> polega na wyznaczeniu reguły na podstawie przykładów. Model dopasowuje się do danych treningowych, ale powinien działać również na nowych obserwacjach. Tę zdolność nazywamy <strong>generalizacją</strong>. Sam mały błąd treningowy nie wystarcza — wynik trzeba sprawdzić na danych, których model nie widział podczas uczenia.</p>
+        <p>
+          <strong>Uczenie maszynowe (ML — Machine Learning)</strong> polega na
+          wyznaczeniu reguły na podstawie przykładów. Model dopasowuje się do
+          danych treningowych, ale powinien działać również na nowych
+          obserwacjach. Tę zdolność nazywamy <strong>generalizacją</strong>. Sam
+          mały błąd treningowy nie wystarcza — wynik trzeba sprawdzić na danych,
+          których model nie widział podczas uczenia.
+        </p>
 
-    <h2 id="typy-uczenia">Typy uczenia</h2>
-    <ul>
-      <li><strong>Nadzorowane</strong> — pary \((x, y)\); klasyfikacja, gdy etykiety dyskretne, regresja, gdy liczbowe.</li>
-      <li><strong>Nienadzorowane</strong> — same \(\{x_i\}\), cel to struktura danych: klasteryzacja, redukcja wymiarów.</li>
-      <li><strong>Uczenie ze wzmocnieniem (RL — Reinforcement Learning)</strong> — agent wybiera działania i maksymalizuje sumę nagród, równoważąc poznawanie nowych możliwości z używaniem już poznanych.</li>
-    </ul>
+        <h2 id="typy-uczenia">Typy uczenia</h2>
+        <ul>
+          <li>
+            <strong>Nadzorowane</strong> — pary \((x, y)\); klasyfikacja, gdy
+            etykiety dyskretne, regresja, gdy liczbowe.
+          </li>
+          <li>
+            <strong>Nienadzorowane</strong> — same \(\{x_i\}\), cel to struktura
+            danych: klasteryzacja, redukcja wymiarów.
+          </li>
+          <li>
+            <strong
+              >Uczenie ze wzmocnieniem (RL — Reinforcement Learning)</strong
+            >
+            — agent wybiera działania i maksymalizuje sumę nagród, równoważąc
+            poznawanie nowych możliwości z używaniem już poznanych.
+          </li>
+        </ul>
 
-    <h2 id="proces">Proces uczenia modelu</h2>
-    <ol>
-      <li>Dzielimy dane na cechy \(X\) i oczekiwany wynik \(y\).</li>
-      <li>Wydzielamy dane treningowe, walidacyjne lub testowe.</li>
-      <li>Przetwarzanie, np. uzupełnianie braków i skalowanie, dopasowujemy wyłącznie na części treningowej.</li>
-      <li>Model uczy się parametrów przez minimalizację wybranej funkcji straty.</li>
-      <li>Na walidacji dobieramy ustawienia modelu, a końcowy wynik podajemy na nietkniętym zbiorze testowym.</li>
-    </ol>
+        <h2 id="modele-nadzorowane">Najważniejsze modele nadzorowane</h2>
+        <ul>
+          <li>
+            <strong>Regresja logistyczna</strong> oblicza liniową kombinację
+            cech \(z=\beta_0+\beta_1 x_1+\ldots+\beta_p x_p\), a następnie
+            zamienia ją na prawdopodobieństwo klasy funkcją sigmoidalną
+            \(p=\frac{1}{1+e^{-z}}\); duże dodatnie \(z\) daje \(p\) blisko 1,
+            duże ujemne — blisko 0. Jest szybka i łatwa do interpretacji, ale
+            bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.
+          </li>
+          <li>
+            <strong>k-NN</strong> (k-Nearest Neighbours — metoda \(k\)
+            najbliższych sąsiadów) przewiduje na podstawie najbardziej podobnych
+            obserwacji treningowych. Może odwzorować nieliniową granicę, lecz
+            wymaga skalowania i zwalnia przy dużym zbiorze.
+          </li>
+          <li>
+            <strong>Drzewo decyzyjne</strong> kolejno dzieli dane pytaniami typu
+            „czy cecha jest mniejsza od progu?”. Jest czytelne i nie wymaga
+            skalowania, ale głębokie drzewo łatwo się przeucza.
+          </li>
+        </ul>
 
-    <h2 id="bias-variance-tradeoff">Niedouczenie i przeuczenie</h2>
-    <p><strong>Niedouczenie</strong> występuje, gdy model jest zbyt prosty i popełnia duży błąd nawet na danych treningowych. <strong>Przeuczenie</strong> oznacza, że model zapamiętał przypadkowe szczegóły treningu: radzi sobie tam dobrze, ale słabo na nowych danych. Ograniczamy je przez prostszy model, regularyzację, więcej danych lub właściwe strojenie w walidacji.</p>
-    <p>Ten kompromis opisuje się też przez obciążenie i wariancję. Model bardzo prosty ma zwykle większe obciążenie, a bardzo elastyczny — większą wrażliwość na konkretną próbę treningową.</p>
+        <h2 id="modele-nienadzorowane">Najważniejsze modele nienadzorowane</h2>
+        <ul>
+          <li>
+            <strong>k-means</strong> przypisuje punkty do najbliższych centrów,
+            przelicza centra i powtarza te dwa kroki. Wymaga podania liczby
+            klastrów i najlepiej działa dla skupień o podobnym rozmiarze oraz
+            kształcie.
+          </li>
+          <li>
+            <strong>DBSCAN</strong> (Density-Based Spatial Clustering of
+            Applications with Noise — klasteryzacja gęstościowa z wykrywaniem
+            szumu) łączy punkty mające dostatecznie wielu sąsiadów w zadanym
+            promieniu. Nie wymaga liczby klastrów i wykrywa nieregularne
+            kształty, ale trudno dobrać jeden promień przy mocno różniących się
+            gęstościach.
+          </li>
+        </ul>
 
-    <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
-    <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
-    <p>Dla klasyfikacji punktem wyjścia jest <strong>macierz pomyłek</strong> (confusion matrix), która zlicza cztery wyniki predykcji: <strong>TP</strong> (true positive) — poprawnie wskazany pozytyw, <strong>TN</strong> (true negative) — poprawnie wskazany negatyw, <strong>FP</strong> (false positive) — fałszywy alarm, <strong>FN</strong> (false negative) — przeoczony pozytyw. Z tych czterech liczb powstają metryki:</p>
-    <ul>
-      <li><strong>Trafność (accuracy)</strong> \(=\frac{TP+TN}{TP+TN+FP+FN}\) — odsetek poprawnych predykcji. Myli przy niezbalansowanych klasach: gdy 99% przypadków to negatywy, model odpowiadający zawsze „nie” osiąga trafność 99%.</li>
-      <li><strong>Precyzja (precision)</strong> \(=\frac{TP}{TP+FP}\) — jak często model ma rację, <em>gdy</em> wskazuje pozytyw. Spada, gdy produkujemy fałszywe alarmy.</li>
-      <li><strong>Czułość (recall, sensitivity)</strong> \(=\frac{TP}{TP+FN}\) — jaką część rzeczywistych pozytywów udało się wykryć. Spada, gdy przypadki przeoczamy — a to bywa najkosztowniejsze, np. w badaniach przesiewowych.</li>
-      <li><strong>F1</strong> \(=\frac{2PR}{P+R}\) — średnia harmoniczna precyzji \(P\) i czułości \(R\). Jest wysoka tylko wtedy, gdy obie są wysokie, więc nie da się jej podbić maksymalizując jedną kosztem drugiej.</li>
-      <li><strong>ROC-AUC</strong> — krzywa ROC (Receiver Operating Characteristic) pokazuje, jak przy przesuwaniu progu rośnie czułość kosztem odsetka fałszywych alarmów wśród negatywów. Pole pod nią, AUC (Area Under the Curve), to prawdopodobieństwo, że losowy pozytyw dostanie wyższy wynik niż losowy negatyw: 0,5 oznacza model losowy, 1 — idealny ranking.</li>
-      <li><strong>Krzywa precyzja–czułość i jej pole</strong> — bardziej informacyjna przy rzadkiej klasie pozytywnej, bo nie korzysta z TN: przy ogromnej przewadze negatywów ROC-AUC może wyglądać zbyt optymistycznie.</li>
-    </ul>
-    <p>Precyzja i czułość zwykle stoją w konflikcie, a sterujemy nimi <strong>progiem decyzyjnym</strong>: niższy próg wykrywa więcej pozytywów (wyższa czułość), ale produkuje więcej fałszywych alarmów (niższa precyzja). O wyborze metryki i progu powinno decydować to, który błąd jest droższy — FP czy FN.</p>
-    <p>Dla regresji używamy:</p>
-    <ul>
-      <li><strong>RMSE</strong> — pierwiastek błędu średniokwadratowego.</li>
-      <li><strong>MAE</strong> — średni błąd bezwzględny.</li>
-      <li><strong>\(R^2\)</strong> — współczynnik determinacji.</li>
-    </ul>
+        <h2 id="proces">Proces uczenia modelu</h2>
+        <ol>
+          <li>Dzielimy dane na cechy \(X\) i oczekiwany wynik \(y\).</li>
+          <li>Wydzielamy dane treningowe, walidacyjne lub testowe.</li>
+          <li>
+            Przetwarzanie, np. uzupełnianie braków i skalowanie, dopasowujemy
+            wyłącznie na części treningowej.
+          </li>
+          <li>
+            Model uczy się parametrów przez minimalizację wybranej funkcji
+            straty.
+          </li>
+          <li>
+            Na walidacji dobieramy ustawienia modelu, a końcowy wynik podajemy
+            na nietkniętym zbiorze testowym.
+          </li>
+        </ol>
 
-    <h2 id="modele-nadzorowane">Najważniejsze modele nadzorowane</h2>
-    <ul>
-      <li><strong>Regresja logistyczna</strong> oblicza liniową kombinację cech \(z=\beta_0+\beta_1 x_1+\ldots+\beta_p x_p\), a następnie zamienia ją na prawdopodobieństwo klasy funkcją sigmoidalną \(p=\frac{1}{1+e^{-z}}\); duże dodatnie \(z\) daje \(p\) blisko 1, duże ujemne — blisko 0. Jest szybka i łatwa do interpretacji, ale bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.</li>
-      <li><strong>k-NN</strong> (k-Nearest Neighbours — metoda \(k\) najbliższych sąsiadów) przewiduje na podstawie najbardziej podobnych obserwacji treningowych. Może odwzorować nieliniową granicę, lecz wymaga skalowania i zwalnia przy dużym zbiorze.</li>
-      <li><strong>Drzewo decyzyjne</strong> kolejno dzieli dane pytaniami typu „czy cecha jest mniejsza od progu?”. Jest czytelne i nie wymaga skalowania, ale głębokie drzewo łatwo się przeucza.</li>
-    </ul>
+        <h2 id="bias-variance-tradeoff">Niedouczenie i przeuczenie</h2>
+        <p>
+          <strong>Niedouczenie</strong> występuje, gdy model jest zbyt prosty i
+          popełnia duży błąd nawet na danych treningowych.
+          <strong>Przeuczenie</strong> oznacza, że model zapamiętał przypadkowe
+          szczegóły treningu: radzi sobie tam dobrze, ale słabo na nowych
+          danych. Ograniczamy je przez prostszy model, regularyzację, więcej
+          danych lub właściwe strojenie w walidacji.
+        </p>
+        <p>
+          Ten kompromis opisuje się też przez obciążenie i wariancję. Model
+          bardzo prosty ma zwykle większe obciążenie, a bardzo elastyczny —
+          większą wrażliwość na konkretną próbę treningową.
+        </p>
 
-    <h2 id="modele-nienadzorowane">Najważniejsze modele nienadzorowane</h2>
-    <ul>
-      <li><strong>k-means</strong> przypisuje punkty do najbliższych centrów, przelicza centra i powtarza te dwa kroki. Wymaga podania liczby klastrów i najlepiej działa dla skupień o podobnym rozmiarze oraz kształcie.</li>
-      <li><strong>DBSCAN</strong> (Density-Based Spatial Clustering of Applications with Noise — klasteryzacja gęstościowa z wykrywaniem szumu) łączy punkty mające dostatecznie wielu sąsiadów w zadanym promieniu. Nie wymaga liczby klastrów i wykrywa nieregularne kształty, ale trudno dobrać jeden promień przy mocno różniących się gęstościach.</li>
-    </ul>
+        <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
+        <p>
+          <strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\)
+          części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia;
+          wariant stratyfikowany zachowuje proporcje klas. Walidacja ma
+          symulować kontakt z nieznanymi danymi, więc krok przetwarzania
+          wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda
+          przyszłość i zawyża wynik — to <strong>data leakage</strong>.
+        </p>
+        <p>
+          Dla klasyfikacji punktem wyjścia jest
+          <strong>macierz pomyłek</strong> (confusion matrix), która zlicza
+          cztery wyniki predykcji: <strong>TP</strong> (true positive) —
+          poprawnie wskazany pozytyw, <strong>TN</strong> (true negative) —
+          poprawnie wskazany negatyw, <strong>FP</strong> (false positive) —
+          fałszywy alarm, <strong>FN</strong> (false negative) — przeoczony
+          pozytyw. Z tych czterech liczb powstają metryki:
+        </p>
+        <ul>
+          <li>
+            <strong>Trafność (accuracy)</strong> \(=\frac{TP+TN}{TP+TN+FP+FN}\)
+            — odsetek poprawnych predykcji. Myli przy niezbalansowanych klasach:
+            gdy 99% przypadków to negatywy, model odpowiadający zawsze „nie”
+            osiąga trafność 99%.
+          </li>
+          <li>
+            <strong>Precyzja (precision)</strong> \(=\frac{TP}{TP+FP}\) — jak
+            często model ma rację, <em>gdy</em> wskazuje pozytyw. Spada, gdy
+            produkujemy fałszywe alarmy.
+          </li>
+          <li>
+            <strong>Czułość (recall, sensitivity)</strong> \(=\frac{TP}{TP+FN}\)
+            — jaką część rzeczywistych pozytywów udało się wykryć. Spada, gdy
+            przypadki przeoczamy — a to bywa najkosztowniejsze, np. w badaniach
+            przesiewowych.
+          </li>
+          <li>
+            <strong>F1</strong> \(=\frac{2PR}{P+R}\) — średnia harmoniczna
+            precyzji \(P\) i czułości \(R\). Jest wysoka tylko wtedy, gdy obie
+            są wysokie, więc nie da się jej podbić maksymalizując jedną kosztem
+            drugiej.
+          </li>
+          <li>
+            <strong>ROC-AUC</strong> — krzywa ROC (Receiver Operating
+            Characteristic) pokazuje, jak przy przesuwaniu progu rośnie czułość
+            kosztem odsetka fałszywych alarmów wśród negatywów. Pole pod nią,
+            AUC (Area Under the Curve), to prawdopodobieństwo, że losowy pozytyw
+            dostanie wyższy wynik niż losowy negatyw: 0,5 oznacza model losowy,
+            1 — idealny ranking.
+          </li>
+          <li>
+            <strong>Krzywa precyzja–czułość i jej pole</strong> — bardziej
+            informacyjna przy rzadkiej klasie pozytywnej, bo nie korzysta z TN:
+            przy ogromnej przewadze negatywów ROC-AUC może wyglądać zbyt
+            optymistycznie.
+          </li>
+        </ul>
+        <p>
+          Precyzja i czułość zwykle stoją w konflikcie, a sterujemy nimi
+          <strong>progiem decyzyjnym</strong>: niższy próg wykrywa więcej
+          pozytywów (wyższa czułość), ale produkuje więcej fałszywych alarmów
+          (niższa precyzja). O wyborze metryki i progu powinno decydować to,
+          który błąd jest droższy — FP czy FN.
+        </p>
+        <p>Dla regresji używamy:</p>
+        <ul>
+          <li>
+            <strong>RMSE</strong> — pierwiastek błędu średniokwadratowego.
+          </li>
+          <li><strong>MAE</strong> — średni błąd bezwzględny.</li>
+          <li><strong>\(R^2\)</strong> — współczynnik determinacji.</li>
+        </ul>
 
-    <h2 id="regularyzacja">Regularyzacja</h2>
-    <p>Regularyzacja dodaje do minimalizowanej straty karę za duże wagi \(\beta_j\):</p>
-    <div class="mathblock">\[\text{strata} + \lambda \sum_j |\beta_j| \;\;\text{(L1)} \qquad\quad \text{strata} + \lambda \sum_j \beta_j^2 \;\;\text{(L2)}\]</div>
-    <p><strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
-
-
-  </main>
-  <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
-    <li><a href="#typy-uczenia">Typy uczenia</a></li>
-    <li><a href="#proces">Proces uczenia</a></li>
-    <li><a href="#bias-variance-tradeoff">Niedouczenie i przeuczenie</a></li>
-    <li><a href="#walidacja-i-metryki">Walidacja i metryki</a></li>
-    <li><a href="#modele-nadzorowane">Modele nadzorowane</a></li>
-    <li><a href="#modele-nienadzorowane">Modele nienadzorowane</a></li>
-    <li><a href="#regularyzacja">Regularyzacja</a></li>
-  </ol></nav>
-</div>
-<script src="../assets/notes.js"></script>
-</body></html>
+        <h2 id="regularyzacja">Regularyzacja</h2>
+        <p>
+          Regularyzacja dodaje do minimalizowanej straty karę za duże wagi
+          \(\beta_j\):
+        </p>
+        <div class="mathblock">
+          \[\text{strata} + \lambda \sum_j |\beta_j| \;\;\text{(L1)} \qquad\quad
+          \text{strata} + \lambda \sum_j \beta_j^2 \;\;\text{(L2)}\]
+        </div>
+        <p>
+          <strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa
+          dopasowania nie rekompensuje kary; wybór zależy od danych i przy
+          skorelowanych cechach bywa niestabilny.
+          <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego
+          zerowania. Większa siła kary \(\lambda\) oznacza prostszy model;
+          \(\lambda\) dobieramy walidacją.
+        </p>
+      </main>
+      <nav class="toc" aria-label="Spis treści">
+        <h5>Na tej stronie</h5>
+        <ol>
+          <li><a href="#typy-uczenia">Typy uczenia</a></li>
+          <li><a href="#proces">Proces uczenia</a></li>
+          <li>
+            <a href="#bias-variance-tradeoff">Niedouczenie i przeuczenie</a>
+          </li>
+          <li><a href="#walidacja-i-metryki">Walidacja i metryki</a></li>
+          <li><a href="#modele-nadzorowane">Modele nadzorowane</a></li>
+          <li><a href="#modele-nienadzorowane">Modele nienadzorowane</a></li>
+          <li><a href="#regularyzacja">Regularyzacja</a></li>
+        </ol>
+      </nav>
+    </div>
+    <script src="../assets/notes.js"></script>
+  </body>
+</html>
