@@ -45,15 +45,16 @@
 
     <h2 id="walidacja-i-metryki">Walidacja i metryki</h2>
     <p><strong>Walidacja krzyżowa \(k\)-krotna</strong> dzieli dane na \(k\) części, trenuje na \(k-1\) i testuje na pozostałej, a wynik uśrednia; wariant stratyfikowany zachowuje proporcje klas. Walidacja ma symulować kontakt z nieznanymi danymi, więc krok przetwarzania wstępnego policzony na całym zbiorze <em>przed</em> podziałem podgląda przyszłość i zawyża wynik — to <strong>data leakage</strong>.</p>
-    <p>Dla klasyfikacji liczymy:</p>
+    <p>Dla klasyfikacji punktem wyjścia jest <strong>macierz pomyłek</strong> (confusion matrix), która zlicza cztery wyniki predykcji: <strong>TP</strong> (true positive) — poprawnie wskazany pozytyw, <strong>TN</strong> (true negative) — poprawnie wskazany negatyw, <strong>FP</strong> (false positive) — fałszywy alarm, <strong>FN</strong> (false negative) — przeoczony pozytyw. Z tych czterech liczb powstają metryki:</p>
     <ul>
-      <li><strong>Trafność (accuracy)</strong> — odsetek poprawnych predykcji wśród wszystkich przypadków.</li>
-      <li><strong>Precyzja</strong> — odsetek prawdziwych trafień wśród wskazań pozytywnych.</li>
-      <li><strong>Czułość</strong> — odsetek wykrytych przypadków wśród wszystkich rzeczywiście pozytywnych.</li>
-      <li><strong>F1</strong> — średnia harmoniczna precyzji i czułości.</li>
-      <li><strong>ROC-AUC</strong> — łączy krzywą ROC (Receiver Operating Characteristic) z polem pod krzywą AUC (Area Under the Curve) i mierzy jakość rankingu w wielu progach.</li>
-      <li><strong>Krzywa precyzja–czułość i jej pole</strong> — bardziej informacyjna przy rzadkiej klasie pozytywnej.</li>
+      <li><strong>Trafność (accuracy)</strong> \(=\frac{TP+TN}{TP+TN+FP+FN}\) — odsetek poprawnych predykcji. Myli przy niezbalansowanych klasach: gdy 99% przypadków to negatywy, model odpowiadający zawsze „nie” osiąga trafność 99%.</li>
+      <li><strong>Precyzja (precision)</strong> \(=\frac{TP}{TP+FP}\) — jak często model ma rację, <em>gdy</em> wskazuje pozytyw. Spada, gdy produkujemy fałszywe alarmy.</li>
+      <li><strong>Czułość (recall, sensitivity)</strong> \(=\frac{TP}{TP+FN}\) — jaką część rzeczywistych pozytywów udało się wykryć. Spada, gdy przypadki przeoczamy — a to bywa najkosztowniejsze, np. w badaniach przesiewowych.</li>
+      <li><strong>F1</strong> \(=\frac{2PR}{P+R}\) — średnia harmoniczna precyzji \(P\) i czułości \(R\). Jest wysoka tylko wtedy, gdy obie są wysokie, więc nie da się jej podbić maksymalizując jedną kosztem drugiej.</li>
+      <li><strong>ROC-AUC</strong> — krzywa ROC (Receiver Operating Characteristic) pokazuje, jak przy przesuwaniu progu rośnie czułość kosztem odsetka fałszywych alarmów wśród negatywów. Pole pod nią, AUC (Area Under the Curve), to prawdopodobieństwo, że losowy pozytyw dostanie wyższy wynik niż losowy negatyw: 0,5 oznacza model losowy, 1 — idealny ranking.</li>
+      <li><strong>Krzywa precyzja–czułość i jej pole</strong> — bardziej informacyjna przy rzadkiej klasie pozytywnej, bo nie korzysta z TN: przy ogromnej przewadze negatywów ROC-AUC może wyglądać zbyt optymistycznie.</li>
     </ul>
+    <p>Precyzja i czułość zwykle stoją w konflikcie, a sterujemy nimi <strong>progiem decyzyjnym</strong>: niższy próg wykrywa więcej pozytywów (wyższa czułość), ale produkuje więcej fałszywych alarmów (niższa precyzja). O wyborze metryki i progu powinno decydować to, który błąd jest droższy — FP czy FN.</p>
     <p>Dla regresji używamy:</p>
     <ul>
       <li><strong>RMSE</strong> — pierwiastek błędu średniokwadratowego.</li>

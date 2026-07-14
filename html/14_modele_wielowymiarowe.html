@@ -76,15 +76,22 @@
         <h2 id="pca">PCA — redukcja wymiaru</h2>
         <p>
           <strong>PCA</strong> (Principal Component Analysis — analiza głównych
-          składowych) obraca układ współrzędnych tak, aby pierwsza nowa oś
+          składowych) odpowiada na problem skorelowanych cech: skoro częściowo
+          niosą tę samą informację, można ją „przepakować” do mniejszej liczby
+          nowych osi. PCA obraca układ współrzędnych tak, aby pierwsza nowa oś
           wskazywała kierunek największej wariancji danych. Druga oś jest do
           niej prostopadła i zachowuje największą część pozostałej wariancji;
           kolejne powstają analogicznie. Każda składowa jest kombinacją liniową
-          cech, a składowe są ze sobą nieskorelowane.
+          cech, a składowe są ze sobą nieskorelowane (technicznie: składowe to
+          wektory własne macierzy kowariancji, a ich wariancje — wartości
+          własne).
         </p>
         <p>
           Jeżeli kilka pierwszych składowych zachowuje większość zmienności,
-          pozostałe można odrzucić. Zmniejsza to liczbę wymiarów, usuwa
+          pozostałe można odrzucić. W praktyce patrzy się na
+          <strong>procent wyjaśnionej wariancji</strong>: zostawiamy tyle
+          składowych, aby łącznie tłumaczyły np. 80–90% zmienności danych.
+          Zmniejsza to liczbę wymiarów, usuwa
           współliniowość i może przyspieszyć dalszy model, lecz utrudnia
           interpretację, bo jedna składowa miesza kilka cech. Przed PCA zwykle
           standaryzuje się cechy o różnych jednostkach; inaczej cecha o dużej
@@ -193,7 +200,6 @@
         <ol>
           <li><a href="#aparat">Kowariancja i korelacja</a></li>
           <li><a href="#pca">PCA — redukcja wymiaru</a></li>
-          <li><a href="#lda-qda">LDA i QDA — klasyfikacja</a></li>
           <li><a href="#klasteryzacja">Klasteryzacja — segmentacja</a></li>
           <li>
             <a href="#zastosowania">Zastosowania: prognozowanie i decyzje</a>

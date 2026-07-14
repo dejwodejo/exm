@@ -44,8 +44,10 @@
 
     <h2 id="estymator">Estymator i nieobciążoność</h2>
     <p><strong>Estymator</strong> to reguła obliczania przybliżenia parametru z danych próby, np. średnia z próby \(\bar{y}\) może estymować średnią populacji \(\mu\). Przed losowaniem estymator jest zmienną losową, bo nie wiemy, które jednostki trafią do próby. Po zebraniu danych otrzymujemy jego konkretną wartość, nazywaną <strong>oszacowaniem</strong>.</p>
-    <p>Estymator jest <strong>nieobciążony</strong>, jeżeli jego wartość oczekiwana po wszystkich próbach możliwych w danym schemacie jest równa prawdziwemu parametrowi. Nie oznacza to, że wynik jednej próby będzie dokładnie trafny, lecz że procedura nie zawyża ani nie zaniża parametru systematycznie. <strong>Wariancja estymatora</strong> opisuje rozrzut wyników między możliwymi próbami, a jej pierwiastek to <strong>błąd standardowy</strong>.</p>
-    <p>Większa próba zwykle zmniejsza błąd standardowy, lecz dokładność zależy również od schematu losowania, zróżnicowania populacji i zastosowanych wag. Ponadto zwiększanie próby ogranicza błąd losowania, ale nie usuwa błędów pokrycia, pomiaru ani braku odpowiedzi. Z tego powodu duża próba dobrana wadliwie może dać bardziej precyzyjny, lecz nadal systematycznie błędny wynik.</p>
+    <p>Estymator jest <strong>nieobciążony</strong>, jeżeli jego wartość oczekiwana po wszystkich próbach możliwych w danym schemacie jest równa prawdziwemu parametrowi. Nie oznacza to, że wynik jednej próby będzie dokładnie trafny, lecz że procedura nie zawyża ani nie zaniża parametru systematycznie. <strong>Wariancja estymatora</strong> opisuje rozrzut wyników między możliwymi próbami, a jej pierwiastek to <strong>błąd standardowy</strong>. Dla średniej z próby prostej wynosi on:</p>
+    <div class="mathblock">\[SE(\bar y)=\frac{s}{\sqrt{n}}\]</div>
+    <p>gdzie \(s\) to odchylenie standardowe obliczone z próby, a \(n\) — liczebność próby. Pierwiastek w mianowniku daje praktyczną regułę: aby błąd zmalał dwukrotnie, próba musi wzrosnąć czterokrotnie.</p>
+    <p>Dokładność nie zależy jednak wyłącznie od \(n\): wpływają na nią także schemat losowania, zróżnicowanie populacji i zastosowane wagi. Ponadto zwiększanie próby ogranicza błąd losowania, ale nie usuwa błędów pokrycia, pomiaru ani braku odpowiedzi. Z tego powodu duża próba dobrana wadliwie może dać bardziej precyzyjny, lecz nadal systematycznie błędny wynik.</p>
   </main>
   <nav class="toc" aria-label="Spis treści">
     <h5>Na tej stronie</h5>

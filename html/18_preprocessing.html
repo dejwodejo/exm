@@ -43,11 +43,11 @@
     <p>Braki można uzupełnić medianą lub najczęstszą kategorią, a bardziej złożone metody przewidują brakującą wartość z pozostałych cech. Prosta imputacja zmniejsza zmienność i może osłabić zależności, dlatego czasem dodaje się również kolumnę informującą, że wartość była brakująca. Parametry imputacji obliczamy tylko na danych treningowych.</p>
 
     <h2 id="outliery">Wartości odstające</h2>
-    <p><strong>Wartość odstająca</strong> wyraźnie różni się od większości obserwacji. Może być błędem, np. wzrostem 1800 cm, albo prawdziwym rzadkim przypadkiem, np. bardzo dużą transakcją. Reguła oparta na odstępie międzykwartylowym oznacza jako podejrzane wartości oddalone od kwartylu o więcej niż \(1{,}5\) tego odstępu, ale jest to sygnał do kontroli, a nie automatyczny nakaz usunięcia.</p>
+    <p><strong>Wartość odstająca</strong> wyraźnie różni się od większości obserwacji. Może być błędem, np. wzrostem 1800 cm, albo prawdziwym rzadkim przypadkiem, np. bardzo dużą transakcją. Najczęstsza jest reguła odstępu międzykwartylowego: <strong>IQR</strong> (Interquartile Range) \(=Q_3-Q_1\) to szerokość przedziału, w którym mieści się środkowe 50% obserwacji. Za podejrzane uznaje się wartości poniżej \(Q_1-1{,}5\cdot IQR\) albo powyżej \(Q_3+1{,}5\cdot IQR\), czyli leżące daleko poza typowym środkiem rozkładu. Jest to jednak sygnał do kontroli, a nie automatyczny nakaz usunięcia.</p>
     <p>Najpierw sprawdzamy źródło i kontekst obserwacji. Błąd poprawiamy lub oznaczamy jako brak; prawidłową skrajną wartość można zachować, przekształcić cechę albo zastosować model i skalowanie odporne na skrajności. Usunięcie prawdziwych rzadkich przypadków zmieni populację, o której wnioskujemy.</p>
 
     <h2 id="skalowanie">Skalowanie cech</h2>
-    <p><strong>Standaryzacja</strong> odejmuje średnią i dzieli przez odchylenie standardowe, więc cecha ma średnią 0 i odchylenie 1. Skalowanie min–max przenosi wartości do ustalonego zakresu, zwykle 0–1. Wariant odporny wykorzystuje medianę i odstęp międzykwartylowy, dlatego słabiej reaguje na skrajności.</p>
+    <p><strong>Standaryzacja</strong> odejmuje średnią i dzieli przez odchylenie standardowe: \(z=\frac{x-\mu}{\sigma}\). Cecha ma po niej średnią 0 i odchylenie 1, a wartość \(z\) mówi wprost, o ile odchyleń standardowych obserwacja leży od średniej. <strong>Skalowanie min–max</strong> przenosi wartości do ustalonego zakresu, zwykle 0–1: \(x'=\frac{x-x_{min}}{x_{max}-x_{min}}\). Wariant odporny wykorzystuje medianę i odstęp międzykwartylowy, dlatego słabiej reaguje na skrajności. Parametry skalowania (\(\mu\), \(\sigma\), minimum, maksimum) wyznaczamy wyłącznie na zbiorze treningowym.</p>
     <p>Skalowania wymagają przede wszystkim metody wykorzystujące odległość lub wielkość współczynników, np. k-NN (metoda \(k\) najbliższych sąsiadów), SVM (Support Vector Machine — maszyna wektorów nośnych), k-means i regresja z regularyzacją. Drzewa dzielą wartości progami, więc zmiana skali cechy nie zmienia ich decyzji.</p>
 
     <h2 id="kodowanie">Kodowanie zmiennych kategorycznych</h2>
@@ -57,15 +57,13 @@
       <li><strong>One-hot encoding</strong> — osobna kolumna binarna dla każdej kategorii; nie tworzy fałszywego porządku, lecz przy bardzo wielu różnych kategoriach gwałtownie zwiększa liczbę kolumn.</li>
       <li><strong>Target encoding</strong> — zastąpienie kategorii statystyką zmiennej docelowej; radzi sobie z wieloma kategoriami, ale wartości muszą być obliczane bez podglądania wyniku kodowanej obserwacji, bo inaczej powstaje wyciek i przeuczenie.</li>
     </ul>
-
+  </main>
   <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
     <li><a href="#etapy">Etapy preprocessingu</a></li>
     <li><a href="#braki">Braki danych i imputacja</a></li>
     <li><a href="#outliery">Wartości odstające</a></li>
     <li><a href="#skalowanie">Skalowanie cech</a></li>
     <li><a href="#kodowanie">Kodowanie zmiennych kategorycznych</a></li>
-    <li><a href="#pca">Redukcja liczby cech</a></li>
-    <li><a href="#leakage">Data leakage i pipeline</a></li>
   </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
