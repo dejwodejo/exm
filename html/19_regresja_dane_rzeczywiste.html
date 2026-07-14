@@ -23,6 +23,11 @@
 
     <p><strong>Regresja liniowa</strong> opisuje oczekiwaną wartość liczbowego wyniku \(y\) jako sumę wpływów cech. W danych rzeczywistych najwięcej pracy nie wymaga samo dopasowanie prostej, lecz prawidłowe określenie obserwacji, przygotowanie cech, sprawdzenie założeń i odróżnienie związku statystycznego od przyczyny.</p>
 
+    <h2 id="definicja">Definicja modelu</h2>
+    <p>Dla jednej cechy mówimy o regresji prostej, dla \(p\) cech — o wielorakiej:</p>
+    <div class="mathblock">\[y = \beta_0 + \beta_1 x_1 + \ldots + \beta_p x_p + \varepsilon\]</div>
+    <p>Tu \(\beta_0\) to wyraz wolny, \(\beta_1,\ldots,\beta_p\) — współczynniki cech, a \(\varepsilon\) zbiera to, czego cechy nie wyjaśniają. Współczynniki dopasowuje <strong>metoda najmniejszych kwadratów</strong>, wybierając takie \(\beta\), by suma kwadratów reszt \(\sum_i (y_i-\hat y_i)^2\) była najmniejsza. Model jest liniowy <strong>w parametrach</strong>, nie w cechach — dlatego logarytmy, potęgi i interakcje z dalszych sekcji nadal mieszczą się w regresji liniowej.</p>
+
     <h2 id="proces">Proces budowy modelu</h2>
     <ol>
       <li><strong>Określ cel:</strong> czy model ma przewidywać, czy wyjaśniać współczynniki. Od tego zależą sposób podziału danych i wymagania wobec założeń.</li>
@@ -34,12 +39,13 @@
 
     <h2 id="cechy">Jak odwzorować rzeczywiste zależności?</h2>
     <p>Zależność może być liniowa w przygotowanych cechach, choć nie jest prostą względem surowej zmiennej. Przykładowo cena mieszkania może rosnąć wraz z powierzchnią, ale nie w tym samym tempie dla każdego metra. Można wtedy użyć logarytmu, potęgi lub odcinkowej funkcji powierzchni.</p>
+    <p>Najczęstszą transformacją jest <strong>logarytm</strong>. Stosuje się go do dodatnich, prawoskośnych zmiennych, takich jak ceny czy dochody, oraz gdy zależność jest z natury procentowa: kolejny metr zmienia cenę o podobny procent, a nie o stałą kwotę. Po zlogarytmowaniu \(y\) współczynnik przy cesze odpowiada w przybliżeniu procentowej zmianie wyniku na jednostkę cechy, a przy \(\log y\) i \(\log x\) jednocześnie — elastyczności, czyli procentowej zmianie \(y\) na procent zmiany \(x\). Logarytm wyniku często przy okazji stabilizuje rosnący z poziomem rozrzut błędów.</p>
     <p>Zmienne kategorialne, np. dzielnicę, kodujemy kolumnami zero-jedynkowymi. <strong>Interakcja</strong> pozwala, aby wpływ jednej cechy zależał od drugiej — np. dodatkowy metr powierzchni może mieć inną wartość w centrum niż na obrzeżach. Każda taka zmiana powinna wynikać z wiedzy o problemie lub poprawy potwierdzonej walidacją.</p>
 
     <h2 id="gdy-padaja">Problemy widoczne w resztach</h2>
     <ul>
       <li><strong>Łuk</strong> na wykresie reszt oznacza, że model pominął nieliniowość. Pomóc może transformacja lub dodatkowa cecha.</li>
-      <li><strong>Lejek</strong> oznacza heteroskedastyczność, czyli zmianę rozrzutu błędów wraz z poziomem przewidywania. Współczynniki mogą pozostać użyteczne, ale klasyczne błędy standardowe są wtedy niewiarygodne; stosuje się błędy odporne albo zmienia postać wyniku.</li>
+      <li><strong>Lejek</strong> oznacza heteroskedastyczność, czyli zmianę rozrzutu błędów wraz z poziomem przewidywania. Współczynniki mogą pozostać użyteczne, ale klasyczne błędy standardowe są wtedy niewiarygodne; stosuje się błędy odporne albo zmienia postać wyniku, np. modeluje \(\log y\).</li>
       <li><strong>Serie dodatnich i ujemnych reszt w czasie</strong> wskazują autokorelację. Modelowi może brakować trendu, sezonowości lub opóźnień.</li>
       <li><strong>Obserwacja wpływowa</strong> ma nietypowe cechy i dużą resztę, przez co mocno zmienia dopasowanie. Należy sprawdzić jej poprawność oraz porównać model z nią i bez niej, a nie usuwać jej automatycznie.</li>
     </ul>
@@ -53,6 +59,7 @@
     <p>Model nie powinien być bez uzasadnienia używany daleko poza zakresem treningowym, ponieważ liniowy trend może tam przestać obowiązywać. Dla wyniku binarnego stosujemy regresję logistyczną, a gdy złożone nieliniowości są ważniejsze od interpretacji, warto porównać regresję z drzewami. Prostota nadal jest zaletą: regresja stanowi czytelny punkt odniesienia, który bardziej złożony model powinien rzeczywiście poprawić.</p>
   </main>
   <nav class="toc" aria-label="Spis treści"><h5>Na tej stronie</h5><ol>
+    <li><a href="#definicja">Definicja modelu</a></li>
     <li><a href="#proces">Proces budowy modelu</a></li>
     <li><a href="#cechy">Jak odwzorować rzeczywiste zależności?</a></li>
     <li><a href="#gdy-padaja">Problemy widoczne w resztach</a></li>

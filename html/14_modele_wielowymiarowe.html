@@ -54,6 +54,21 @@
           kosztami i regułą działania, aby podjąć decyzję.
         </p>
 
+        <h2 id="role">Trzy role w prognozowaniu i decyzjach</h2>
+        <p>
+          <strong>Rola predykcyjna:</strong> regresja wieloraka przewiduje
+          wartość liczbową na podstawie wielu cech naraz, regresja logistyczna
+          — prawdopodobieństwo klasy, a <strong>LDA</strong> (Linear
+          Discriminant Analysis — liniowa analiza dyskryminacyjna) klasyfikuje
+          obserwację, szukając kombinacji cech najlepiej rozdzielającej znane
+          grupy. <strong>Rola wspierająca:</strong> PCA usuwa współliniowość i
+          zmniejsza liczbę wymiarów przed modelem predykcyjnym, a klasteryzacja
+          pozwala zbudować osobne modele dla odmiennych segmentów.
+          <strong>Rola decyzyjna:</strong> prognoza staje się decyzją dopiero
+          po połączeniu z kosztami błędów i progiem działania. Reszta notatki
+          rozwija te role.
+        </p>
+
         <h2 id="aparat">Kowariancja i korelacja</h2>
         <p>
           <strong>Kowariancja</strong> dwóch cech jest dodatnia, gdy wartości
@@ -100,7 +115,9 @@
         </p>
         <p>
           PCA nie zna zmiennej celu, więc kierunek o małej wariancji może zostać
-          odrzucony mimo dużej wartości predykcyjnej.
+          odrzucony mimo dużej wartości predykcyjnej. Gdy etykiety klas są
+          znane, LDA szuka natomiast kierunków najlepiej rozdzielających grupy,
+          a nie kierunków o największej wariancji.
           <strong>Analiza czynnikowa</strong> odpowiada na inne pytanie:
           zakłada, że korelacje obserwowanych cech są skutkiem kilku
           nieobserwowalnych czynników, np. pytania ankietowe mogą mierzyć
@@ -121,8 +138,13 @@
             punkt do najbliższego, przelicza centra jako średnie grup i powtarza
             te kroki aż do ustabilizowania. Minimalizuje sumę kwadratów
             odległości od centrów, dlatego najlepiej opisuje zwarte, zbliżone
-            rozmiarem klastry. Trzeba z góry wybrać \(K\), wynik zależy od
-            inicjalizacji, a wartości odstające mogą silnie przesuwać średnie.
+            rozmiarem klastry. Trzeba z góry wybrać \(K\): w praktyce porównuje
+            się kilka wartości <strong>metodą łokcia</strong> (na wykresie sumy
+            kwadratów odległości względem \(K\) szuka się zgięcia, za którym
+            zysk maleje) lub współczynnikiem <strong>silhouette</strong>,
+            mierzącym, czy punkt leży bliżej własnego klastra niż najbliższego
+            cudzego. Wynik zależy też od inicjalizacji, a wartości odstające
+            mogą silnie przesuwać średnie.
           </li>
           <li>
             <strong>DBSCAN</strong> (Density-Based Spatial Clustering of
@@ -134,7 +156,11 @@
             potrafi znaleźć grupy o nieregularnych kształtach. Trzeba jednak
             dobrać promień \(\varepsilon\) i minimalną liczbę sąsiadów; jeden
             zestaw parametrów działa słabo, gdy klastry mają bardzo różne
-            gęstości, a w wysokim wymiarze odległości tracą użyteczność.
+            gęstości. W wysokim wymiarze obie metody słabną przez
+            <strong>przekleństwo wymiarowości</strong>: wraz z liczbą cech
+            punkty stają się niemal równoodległe, więc odległość i „gęste
+            sąsiedztwo” przestają różnicować obserwacje — to kolejny powód, by
+            najpierw zredukować wymiar, np. przez PCA.
           </li>
         </ul>
 
@@ -198,6 +224,7 @@
       <nav class="toc" aria-label="Spis treści">
         <h5>Na tej stronie</h5>
         <ol>
+          <li><a href="#role">Trzy role w prognozowaniu</a></li>
           <li><a href="#aparat">Kowariancja i korelacja</a></li>
           <li><a href="#pca">PCA — redukcja wymiaru</a></li>
           <li><a href="#klasteryzacja">Klasteryzacja — segmentacja</a></li>
