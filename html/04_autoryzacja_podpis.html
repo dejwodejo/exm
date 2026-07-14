@@ -85,28 +85,45 @@
         </p>
         <ul>
           <li>
-            <strong>DAC</strong> (Discretionary Access Control) pozwala
-            właścicielowi nadawać prawa, np. przez <code>rwx</code> lub listę
-            <strong>ACL</strong>. Jest elastyczny, ale właściciel może omyłkowo
+            <strong>DAC</strong> (Discretionary Access Control) — o dostępie
+            decyduje <strong>właściciel zasobu</strong>, nadając prawa np.
+            przez <code>rwx</code> lub listę <strong>ACL</strong>; tak działa
+            też udostępnianie pliku w chmurze. Jest elastyczny, ale
+            bezpieczeństwo zależy od rozsądku właściciela, który może omyłkowo
             udostępnić zasób zbyt szeroko.
           </li>
           <li>
-            <strong>MAC</strong> (Mandatory Access Control) opiera się na
-            centralnej polityce i etykietach; użytkownik nie może sam zmienić
-            reguły. Daje ścisłą kontrolę kosztem elastyczności.
+            <strong>MAC</strong> (Mandatory Access Control) — o dostępie
+            decyduje <strong>centralna polityka systemu</strong> na podstawie
+            etykiet nadanych użytkownikom i zasobom (np. „poufne”, „tajne”);
+            właściciel sam nie zmieni reguły. Typowy dla wojska i systemów
+            typu SELinux — ścisła kontrola kosztem elastyczności.
           </li>
           <li>
-            <strong>RBAC</strong> (Role-Based Access Control) wiąże prawa z
-            rolami służbowymi, a użytkowników z rolami. Upraszcza zmianę
-            stanowiska i audyt, lecz zbyt wiele wyjątków prowadzi do mnożenia
-            ról.
+            <strong>RBAC</strong> (Role-Based Access Control) — prawa są
+            przypięte do <strong>ról służbowych</strong> (np. „księgowa”,
+            „administrator”), a użytkownicy do ról, więc zmiana stanowiska to
+            podmiana roli, nie przepisywanie dziesiątek uprawnień. Upraszcza
+            administrację i audyt, lecz nadmiar wyjątków prowadzi do
+            „eksplozji ról”.
           </li>
           <li>
-            <strong>ABAC</strong> (Attribute-Based Access Control) wylicza
-            decyzję z cech podmiotu, zasobu, operacji i kontekstu. Jest
-            dynamiczny, ale liczne reguły trudniej testować i wyjaśniać.
+            <strong>ABAC</strong> (Attribute-Based Access Control) — decyzja
+            jest <strong>wyliczana z atrybutów</strong> podmiotu, zasobu,
+            operacji i kontekstu, np. „lekarz widzi kartę pacjenta tylko ze
+            swojego oddziału i tylko w czasie dyżuru”. Najbardziej precyzyjny
+            i dynamiczny, ale liczne reguły trudno testować i wyjaśniać, czemu
+            ktoś dostał lub nie dostał dostępu.
           </li>
         </ul>
+        <div class="callout key">
+          <span class="clabel">Ściąga</span>
+          <p>
+            Kto decyduje: <strong>DAC</strong> — właściciel,
+            <strong>MAC</strong> — system i etykiety, <strong>RBAC</strong> —
+            rola, <strong>ABAC</strong> — atrybuty i kontekst.
+          </p>
+        </div>
 
         <h2 id="podpis">Podpis cyfrowy</h2>
         <p>
