@@ -63,10 +63,10 @@
 
     <h2 id="modele-nadzorowane">Najważniejsze modele nadzorowane</h2>
     <ul>
-      <li><strong>Regresja logistyczna</strong> oblicza liniową kombinację cech, a następnie zamienia ją na prawdopodobieństwo klasy. Jest szybka i łatwa do interpretacji, ale bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.</li>
+      <li><strong>Regresja logistyczna</strong> oblicza liniową kombinację cech \(z=\beta_0+\beta_1 x_1+\ldots+\beta_p x_p\), a następnie zamienia ją na prawdopodobieństwo klasy funkcją sigmoidalną \(p=\frac{1}{1+e^{-z}}\); duże dodatnie \(z\) daje \(p\) blisko 1, duże ujemne — blisko 0. Jest szybka i łatwa do interpretacji, ale bez przygotowania dodatkowych cech tworzy liniową granicę decyzji.</li>
       <li><strong>k-NN</strong> (k-Nearest Neighbours — metoda \(k\) najbliższych sąsiadów) przewiduje na podstawie najbardziej podobnych obserwacji treningowych. Może odwzorować nieliniową granicę, lecz wymaga skalowania i zwalnia przy dużym zbiorze.</li>
       <li><strong>Drzewo decyzyjne</strong> kolejno dzieli dane pytaniami typu „czy cecha jest mniejsza od progu?”. Jest czytelne i nie wymaga skalowania, ale głębokie drzewo łatwo się przeucza.</li>
-
+    </ul>
 
     <h2 id="modele-nienadzorowane">Najważniejsze modele nienadzorowane</h2>
     <ul>
@@ -75,7 +75,9 @@
     </ul>
 
     <h2 id="regularyzacja">Regularyzacja</h2>
-    <p>Regularyzacja dodaje do błędu karę za duże wagi. <strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
+    <p>Regularyzacja dodaje do minimalizowanej straty karę za duże wagi \(\beta_j\):</p>
+    <div class="mathblock">\[\text{strata} + \lambda \sum_j |\beta_j| \;\;\text{(L1)} \qquad\quad \text{strata} + \lambda \sum_j \beta_j^2 \;\;\text{(L2)}\]</div>
+    <p><strong>L1 (Lasso)</strong> zeruje współczynnik cechy, gdy jej poprawa dopasowania nie rekompensuje kary; wybór zależy od danych i przy skorelowanych cechach bywa niestabilny. <strong>L2 (Ridge)</strong> zmniejsza wszystkie wagi bez dokładnego zerowania. Większa siła kary \(\lambda\) oznacza prostszy model; \(\lambda\) dobieramy walidacją.</p>
 
 
   </main>
@@ -87,7 +89,6 @@
     <li><a href="#modele-nadzorowane">Modele nadzorowane</a></li>
     <li><a href="#modele-nienadzorowane">Modele nienadzorowane</a></li>
     <li><a href="#regularyzacja">Regularyzacja</a></li>
-    <li><a href="#kluczowe-rozroznienia">Wybór modelu</a></li>
   </ol></nav>
 </div>
 <script src="../assets/notes.js"></script>
